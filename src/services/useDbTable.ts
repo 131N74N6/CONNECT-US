@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import type { DatabaseProps, DeleteDataProps, InsertDataProps, UpdateDataProps, UpsertDataProps } from "./custom-types";
 import supabase from "./supabase-config";
 
-export default function useSupabaseTable<D extends { id: string }>() {
+export default function useDbTable<D extends { id: string }>() {
     const queryClient = useQueryClient();
     const realtimeChannelRef = useRef<RealtimeChannel | null>(null);
     const isInitializeRef = useRef<boolean>(false);
@@ -97,6 +97,12 @@ export default function useSupabaseTable<D extends { id: string }>() {
                 }
             }
         );
+        
+        realtimeChannelRef.current.subscribe();
+        isInitializeRef.current = true;
+
+        const data = await fetchData(props);
+        queryClient.setQueryData(queryKey, data);
     }, [queryClient, fetchData, teardownTable, transformsData]);
 
     function initTableData(props: DatabaseProps) {
@@ -184,6 +190,6 @@ export default function useSupabaseTable<D extends { id: string }>() {
         upsertData: upsertMutation.mutateAsync,
         updateData: updateMutation.mutateAsync,
         deleteData: deleteMutation.mutateAsync,
-        realTimeInit, initTableData
+        realTimeInit, initTableData, teardownTable
     }
 }

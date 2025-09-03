@@ -1,55 +1,64 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Notification from "../components/Notification";
-import useAuth from "../services/useAuth";
-import useSupabaseTable from "../services/useSupabaseTable";
-import type { Users } from "../services/custom-types";
 import supabase from "../services/supabase-config";
+import useAuth from "../services/useAuth";
+import useDbTable from "../services/useDbTable";
+import type { Users } from "../services/custom-types";
 
 export default function SignIn() {
-    const { signIn, user } = useAuth();
-    const { upsertData } = useSupabaseTable<Users>();
-    const navigate = useNavigate();
-    const galleryUserTable = 'image_gallery_user';
-
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
+
+    const noteUserTable = 'image_gallery_user';
+    const { user, signIn } = useAuth();
+    const navigate = useNavigate();
+    const { upsertData } = useDbTable<Users>();
 
     useEffect(() => {
         if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
+    useEffect(() => {
+        if (showMessage) {
+            const timer = setTimeout(() => setShowMessage(false), 3000);
+            return clearTimeout(timer);
+        }
+    }, [showMessage]);
+
     async function handleSignIn(event: React.FormEvent): Promise<void> {
         event.preventDefault();
+        setLoading(true);
+
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
-        
-        try {
-            if (trimmedEmail === '' || trimmedPassword === '') throw new Error('Missing required data');
 
+        try {
             const { error } = await signIn(trimmedEmail, trimmedPassword);
 
             if (error) throw new Error('Failed to signin. Try again later');
 
             if (user) {
-                const { data, error } = await supabase
-                .from(galleryUserTable)
+                const { data: profile, error: errorGetProfile } = await supabase
+                .from(noteUserTable)
                 .select('*')
                 .eq('id', user.id)
                 .single();
 
-                if (error && error.code === 'PGRST116') throw error.message;
+                if (errorGetProfile && errorGetProfile.code === 'PGRST116') throw errorGetProfile;
 
-                if (!data) {
-                    const username = user.user_metadata?.username || 'new user';
+                if (!profile) {
+                    const username = user.user_metadata?.username || 'New User';
+
                     await upsertData({
-                        tableName: galleryUserTable,
+                        tableName: noteUserTable,
                         data: {
-                            username: username,
-                            email: trimmedEmail,
-                            password: trimmedPassword
+                            id: user.id,
+                            email: user.email,
+                            password: trimmedPassword,
+                            username: username
                         }
                     });
                 }
@@ -58,52 +67,53 @@ export default function SignIn() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
+        } finally {
+            setEmail('');
+            setPassword('');
+            setLoading(false);
         }
     }
-
+    
     return (
-        <>
-            {showMessage ? 
-                <Notification 
-                    className='bg-white p-[0.5rem] border border-black font-[550]'
-                    message={message} 
-                    onClose={() => setShowMessage(false)}
-                /> 
-            : null}
-            <div className="flex justify-center items-center h-screen">
-                <form onSubmit={handleSignIn} className="border border-gray-400 p-[1rem] flex flex-col gap-[1rem] w-[320px]">
-                    <div className="font-[650] text-[1.5rem] text-center">Hello</div>
-                    <div className="flex flex-col gap-[0.5rem]">
-                        <label htmlFor="email">Email</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            value={email}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600]" 
-                            placeholder="your@gmail.com"
-                        />
+        <div className="flex justify-center items-center h-screen">
+            <form onSubmit={handleSignIn} className="border border-gray-400 p-[1rem] flex flex-col gap-[1rem] w-[320px]">
+                <div className="font-[650] text-[1.5rem] text-center">Hello</div>
+                <div className="flex flex-col gap-[0.5rem]">
+                    <label htmlFor="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        value={email}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+                        className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600]" 
+                        placeholder="your@gmail.com"
+                    />
+                </div>
+                <div className="flex flex-col gap-[0.5rem]">
+                    <label htmlFor="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        value={password}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                        className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600]" 
+                        placeholder="your_password"
+                    />
+                </div>
+                <div className="text-center">Don't have account? <Link className="text-blue-700" to={'/signup'}>SignUp</Link></div>
+                {showMessage ? 
+                    <div className="text-red-600 text-sm font-medium text-center">
+                        {message}
                     </div>
-                    <div className="flex flex-col gap-[0.5rem]">
-                        <label htmlFor="password">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            value={password}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600]" 
-                            placeholder="your_password"
-                        />
-                    </div>
-                    <div className="text-center">Don't have account? <Link className="text-blue-700" to={'/signup'}>SignUp</Link></div>
-                    <button 
-                        type="submit" 
-                        className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer"
-                    >
-                        Sign In
-                    </button>
-                </form>
-            </div>
-        </>
+                : null}
+                <button 
+                    type="submit" 
+                    disabled={loading || (email === '' || password === '')}
+                    className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Sign In
+                </button>
+            </form>
+        </div>
     );
 }

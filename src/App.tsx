@@ -6,6 +6,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import PostDetail from "./pages/PostDetail";
+import AddPost from "./pages/AddPost";
+import SearchPost from "./pages/SearchPost";
 
 export default function App() {
     const initClient = new QueryClient();
@@ -17,7 +19,9 @@ export default function App() {
                         <Route path="/signin" element={<SignIn/>}/>
                         <Route path="/signup" element={<SignUp/>}/>
                         <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
+                        <Route path="/add-post" element={<ProtectedRoute><AddPost/></ProtectedRoute>}/>
                         <Route path="/about" element={<ProtectedRoute><About/></ProtectedRoute>}/>
+                        <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
                         <Route path="/post/:id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
                         <Route path="/" element={<Navigate to="/home" replace/>}/>
                         <Route path="*" element={<Navigate to="/signin" replace/>}/>

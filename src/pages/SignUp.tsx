@@ -11,20 +11,32 @@ export default function SignUp() {
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [message, setMessage] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
     useEffect(() => {
         if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
+    useEffect(() => {
+        if (showMessage) {
+            const timer = setTimeout(() => setShowMessage(false), 3000);
+            return clearTimeout(timer);
+        }
+    }, [showMessage]);
+
     async function hansleSignUp(event: React.FormEvent): Promise<void> {
         event.preventDefault();
+        setLoading(true);
+
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
         const trimmedUserName = username.trim();
 
         try {
             if (trimmedEmail === '' || trimmedPassword === '' || trimmedUserName === '') throw new Error('Missing required data');
+            
+            if (trimmedPassword.length < 6) throw new Error('Password is weak');
 
             const { error } = await signUp(trimmedEmail, trimmedUserName, trimmedPassword);
 
@@ -32,6 +44,11 @@ export default function SignUp() {
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
+        } finally {
+            setUsername('');
+            setEmail('');
+            setPassword('');
+            setLoading(false);
         }
     }
 
@@ -83,7 +100,8 @@ export default function SignUp() {
                     <div className="text-center">Already have account? <Link className="text-blue-700" to={'/signin'}>SignIn</Link></div>
                     <button 
                         type="submit" 
-                        className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer"
+                        disabled={loading || email === '' || username === '' || password === ''}
+                        className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Sign Up
                     </button>

@@ -35,6 +35,14 @@ export type Users = {
     username: string;
 }
 
+export type UsersProfiles = {
+    id: string;
+    email: string;
+    gender: 'male' | 'female';
+    birth_date: string;
+    username: string;
+}
+
 export type NotificationProps = {
     className: string;
     onClose: () => void;
@@ -43,9 +51,17 @@ export type NotificationProps = {
 
 export type PostItemProps = {
     id: string;
-    image_url: string;
+    image_url: string[];
 }
 
 export type PostListProps = {
     data: PostItemProps[];
+}
+
+export type PostDetailProps = {
+    id: string;
+    created_at: Date;
+    description: string;
+    image_url: string[];
+    user_id: string;
 }

@@ -4,8 +4,12 @@ import type { PostItemProps } from "../services/custom-types";
 export default function PostItem(props: PostItemProps) {
     return (    
         <Link to={`/post/${props.id}`}>
-            <div className="image-wrap w-full aspect-square overflow-hidden rounded-t-lg">
-                <img className="w-full h-full object-cover block" src={props.image_url}/>
+            <div className="rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                <div className="image-wrap w-full aspect-square overflow-hidden rounded-t-lg">
+                    {props.image_url.map((image, index) => (
+                        <img key={`image_${props.id}_${index}`} className="w-full h-full object-cover block" src={image}/>
+                    ))}
+                </div>
             </div>
         </Link>
     );
