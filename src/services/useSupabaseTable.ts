@@ -1,6 +1,6 @@
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { DatabaseProps, DeleteDataProps, InsertDataProps, UpdateDataProps, UpsertDataProps } from "./custom-types";
 import supabase from "./supabase-config";
 
@@ -9,7 +9,7 @@ export default function useSupabaseTable<D extends { id: string }>() {
     const realtimeChannelRef = useRef<RealtimeChannel | null>(null);
     const isInitializeRef = useRef<boolean>(false);
 
-    const teardownDatabase = useCallback(() => {
+    const teardownTable = useCallback(() => {
         if (realtimeChannelRef.current) {
             realtimeChannelRef.current.unsubscribe();
             realtimeChannelRef.current = null;
@@ -17,12 +17,12 @@ export default function useSupabaseTable<D extends { id: string }>() {
         isInitializeRef.current = false;
     }, []);
 
-    function transformsData(data: any): D {
+    const transformsData = useCallback((data: any): D => {
         if (data && data.created_at && typeof data.created_at === 'string') {
             return { ...data, created_at: new Date(data.created_at) } as D;
         }
         return data as D;
-    }
+    }, []);
 
     const fetchData = useCallback(async(props: DatabaseProps) => {
         let query = supabase.from(props.tableName).select(props.relationalQuery || '*');
@@ -37,7 +37,7 @@ export default function useSupabaseTable<D extends { id: string }>() {
     }, [transformsData]);
 
     const realTimeInit = useCallback(async(props: DatabaseProps) => {
-        teardownDatabase();
+        teardownTable();
         const queryKey = [props.tableName, props.uniqueQueryKey];
 
         realtimeChannelRef.current = supabase.channel(`db_${props.tableName}`);
@@ -82,20 +82,22 @@ export default function useSupabaseTable<D extends { id: string }>() {
                         if (error) throw new Error('Failed to fetch inserted data');
 
                         const transformedData = transformsData(data);
-                        queryClient.setQueryData<D[]>(queryKey, (oldData = []) => 
-                            oldData.map(item => item.id === transformedData.id ? transformedData : item)
-                        );
+                        queryClient.setQueryData<D[]>(queryKey, (oldData = []) => {
+                            return oldData.map(item => item.id === transformedData.id ? transformedData : item)
+                        });
                         break;
                     }
                     case "DELETE": {
                         const deleteData = payload.old.id;
-                        queryClient.setQueryData<D[]>(queryKey, (oldData = []) => oldData.filter(item => item.id !== deleteData));
+                        queryClient.setQueryData<D[]>(queryKey, (oldData = []) => {
+                            return oldData.filter(item => item.id !== deleteData)
+                        });
                         break;
                     }
                 }
             }
         );
-    }, [queryClient, fetchData, teardownDatabase, transformsData]);
+    }, [queryClient, fetchData, teardownTable, transformsData]);
 
     function initTableData(props: DatabaseProps) {
         return useQuery({
@@ -172,6 +174,10 @@ export default function useSupabaseTable<D extends { id: string }>() {
             }
         }
     });
+
+    useEffect(() => {
+        return () => teardownTable();
+    }, [teardownTable]);
 
     return {
         insertData: insertMutation.mutateAsync,

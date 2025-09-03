@@ -2,7 +2,6 @@ export type DatabaseProps = {
     tableName: string;
     additionalQuery?: (query: any) => any;
     relationalQuery?: string;
-    filterKey?: string;
     uniqueQueryKey?: any[];
 }
 
@@ -30,7 +29,23 @@ export type DeleteDataProps = {
 }
 
 export type Users = {
+    id: string;
     email: string;
     password: string;
     username: string;
+}
+
+export type NotificationProps = {
+    className: string;
+    onClose: () => void;
+    message: string;
+}
+
+export type PostItemProps = {
+    id: string;
+    image_url: string;
+}
+
+export type PostListProps = {
+    data: PostItemProps[];
 }
