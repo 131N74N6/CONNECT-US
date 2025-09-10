@@ -5,30 +5,30 @@ import { useEffect, useState } from "react";
 export default function useAuth() {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        async function getSession(): Promise<void> {
-            const { data } = await supabase.auth.getSession();
-            setSession(data.session);
-            setUser(data.session?.user ?? null);
+        setLoading(true);
+        
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setUser(session?.user ?? null);
             setLoading(false);
-        }
+        });
 
-        getSession();
-
-        const { data } = supabase.auth.onAuthStateChange(
-            async(_, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            async (_, session) => {
                 setSession(session);
                 setUser(session?.user ?? null);
                 setLoading(false);
             }
         );
 
-        return () => data.subscription.unsubscribe();
+        return () => subscription.unsubscribe();
     }, []);
 
     async function signUp(email: string, username: string, password: string) {
+        setLoading(true);
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
@@ -37,16 +37,21 @@ export default function useAuth() {
                 emailRedirectTo: `${window.location.origin}/signup`
             }
         });
+        setLoading(false);
         return { data, error }
     }
 
     async function signIn(email: string, password: string) {
+        setLoading(true);
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        setLoading(false);
         return { data, error }
     }
 
     async function signOut() {
+        setLoading(true);
         const { error } = await supabase.auth.signOut();
+        setLoading(false);
         return { error }
     }
 
