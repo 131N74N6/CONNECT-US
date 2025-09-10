@@ -1,59 +1,76 @@
-import type { Session, User } from "@supabase/supabase-js";
-import supabase from "./supabase-config";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from 'react';
+import type { User } from 'firebase/auth'
+import {  
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut as firebaseSignOut,
+    onAuthStateChanged,
+    updateProfile
+} from 'firebase/auth';
+import { auth } from './firebase-config';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from './firebase-config';
 
 export default function useAuth() {
     const [user, setUser] = useState<User | null>(null);
-    const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         setLoading(true);
-        
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setUser(user);
             setLoading(false);
         });
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_, session) => {
-                setSession(session);
-                setUser(session?.user ?? null);
-                setLoading(false);
-            }
-        );
-
-        return () => subscription.unsubscribe();
+        return () => unsubscribe();
     }, []);
 
-    async function signUp(email: string, username: string, password: string) {
+    const signUp = useCallback(async(email: string, username: string, password: string) => {
         setLoading(true);
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: { username },
-                emailRedirectTo: `${window.location.origin}/signup`
-            }
-        });
-        setLoading(false);
-        return { data, error }
-    }
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            
+            await updateProfile(user, { displayName: username });
+            
+            await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                email: user.email,
+                username: username,
+                createdAt: new Date()
+            });
+            
+            return { data: user, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-    async function signIn(email: string, password: string) {
+    const signIn = useCallback(async(email: string, password: string) => {
         setLoading(true);
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        setLoading(false);
-        return { data, error }
-    }
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            return { data: userCredential.user, error: null };
+        } catch (error: any) {
+            return { data: null, error };
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-    async function signOut() {
+    const signOut = useCallback(async() => {
         setLoading(true);
-        const { error } = await supabase.auth.signOut();
-        setLoading(false);
-        return { error }
-    }
+        try {
+            await firebaseSignOut(auth);
+            return { error: null };
+        } catch (error: any) {
+            return { error };
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-    return { session, user, loading, signUp, signIn, signOut }
+    return { user, loading, signUp, signIn, signOut };
 }

@@ -1,9 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../services/useAuth";
-import useDbTable from "../services/useDbTable";
-import type { Users } from "../services/custom-types";
-import supabase from "../services/supabase-config";
+import Loading from "../components/Loading";
 
 export default function SignIn() {
     const [email, setEmail] = useState<string>('');
@@ -11,25 +9,8 @@ export default function SignIn() {
     const [message, setMessage] = useState<string>('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
-    const noteUserTable = 'image_gallery_user';
     const { user, signIn, loading: authLoading } = useAuth();
     const navigate = useNavigate();
-    const { upsertData } = useDbTable<Users>();
-
-    const checkUserExists = useCallback(async (userId: string): Promise<boolean> => {
-        try {
-            const { data, error } = await supabase
-                .from(noteUserTable)
-                .select('id')
-                .eq('id', userId)
-                .single();
-                
-            return !error && data !== null;
-        } catch (error) {
-            console.error('Error checking user existence:', error);
-            return false;
-        }
-    }, [noteUserTable]);
 
     const handleSignIn = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -44,34 +25,16 @@ export default function SignIn() {
                 throw new Error('Email and password are required');
             }
 
-            const { data: authData, error: signInError } = await signIn(trimmedEmail, trimmedPassword);
+            const { error: signInError } = await signIn(trimmedEmail, trimmedPassword);
 
             if (signInError) {
                 throw new Error(signInError.message || 'Failed to sign in. Please try again.');
             }
-
-            if (!authData?.user) {
-                throw new Error('No user data returned from sign in');
-            }
-
-            checkUserExists(authData.user.id).then(userExists => {
-                if (!userExists) {
-                    upsertData({
-                        tableName: noteUserTable,
-                        data: {
-                            id: authData.user.id,
-                            email: authData.user.email,
-                            username: authData.user.user_metadata?.username || 'New User',
-                            password: password.trim()
-                        }
-                    }).catch(console.error);
-                }
-            });
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
         }
-    }, [email, password, signIn, checkUserExists, upsertData]);
+    }, [email, password, signIn]);
 
     useEffect(() => {
         if (user && !authLoading) {
@@ -86,27 +49,21 @@ export default function SignIn() {
         }
     }, [showMessage]);
 
-    if (authLoading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-            </div>
-        );
-    }
+    if (authLoading) return <Loading/>
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            <form onSubmit={handleSignIn} className="border border-gray-400 p-[1rem] flex flex-col gap-[1rem] w-[320px]">
-                <div className="font-[650] text-[1.5rem] text-center">Hello</div>
+        <div className="flex justify-center items-center h-screen bg-[#1a1a1a]">
+            <form onSubmit={handleSignIn} className="border bg-black border-purple-400 p-[1rem] flex flex-col gap-[1rem] w-[320px]">
+                <div className="font-[650] text-[1.5rem] text-center text-purple-400">Hello</div>
                 
                 <div className="flex flex-col gap-[0.5rem]">
-                    <label htmlFor="email" className="font-[600]">Email</label>
+                    <label htmlFor="email" className="text-purple-400 font-[600]">Email</label>
                     <input 
                         type="email" 
                         id="email" 
                         value={email}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-                        className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600] rounded" 
+                        className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your@gmail.com"
                         required
                         disabled={authLoading}
@@ -114,13 +71,13 @@ export default function SignIn() {
                 </div>
                 
                 <div className="flex flex-col gap-[0.5rem]">
-                    <label htmlFor="password" className="font-[600]">Password</label>
+                    <label htmlFor="password" className="font-[600] text-purple-400">Password</label>
                     <input 
                         type="password" 
                         id="password" 
                         value={password}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-                        className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600] rounded" 
+                        className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your_password"
                         required
                         disabled={authLoading}
@@ -128,11 +85,11 @@ export default function SignIn() {
                 </div>
                 
                 <div className="text-center text-sm">
-                    Don't have an account? <Link className="text-blue-700 hover:underline" to={'/signup'}>Sign Up</Link>
+                    <span className="text-white">Don't have an account?</span> <Link className="text-blue-700 hover:underline" to={'/signup'}>Sign Up</Link>
                 </div>
                 
                 {showMessage && (
-                    <div className="text-red-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
+                    <div className="text-amber-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
                         {message}
                     </div>
                 )}

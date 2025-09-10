@@ -9,7 +9,7 @@ export default function PostList(props: PostListProps) {
     }
 
     return (
-        <div className="flex-1 p-[1rem] gap-[1rem] grid grid-cols-3 md:w-3/4 w-full overflow-y-auto">
+        <div className="bg-[#1a1a1a] flex-1 p-[1rem] gap-[1rem] grid grid-cols-3 md:w-3/4 w-full overflow-y-auto">
             {props.data.map((post) => (
                 <PostItem key={`post_${post.id}`} id={post.id} image_url={post.image_url}/>
             ))}

@@ -1,4 +1,4 @@
-import supabase from "./supabase-config";
+import supabase from "./firebase-config";
 
 export async function InsertFile(chosenFiles: File, bucketName: string): Promise<string> {
     const changeFileName = chosenFiles.name

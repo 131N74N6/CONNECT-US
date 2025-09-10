@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Notification from "../components/Notification";
 import useAuth from "../services/useAuth";
+import Loading from "../components/Loading";
 
 export default function SignUp() {
-    const { signUp, user } = useAuth();
+    const { signUp, user, loading } = useAuth();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [message, setMessage] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
     useEffect(() => {
@@ -27,7 +26,6 @@ export default function SignUp() {
 
     async function hansleSignUp(event: React.FormEvent): Promise<void> {
         event.preventDefault();
-        setLoading(true);
 
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
@@ -48,18 +46,17 @@ export default function SignUp() {
             setUsername('');
             setEmail('');
             setPassword('');
-            setLoading(false);
         }
     }
+    
+    if (loading) return <Loading/>
 
     return (
         <>
             {showMessage ? 
-                <Notification 
-                    className='bg-white p-[0.5rem] border border-black font-[550]'
-                    message={message} 
-                    onClose={() => setShowMessage(false)}
-                /> 
+                <div className="text-red-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
+                    {message}
+                </div>
             : null}
             <div className="flex justify-center items-center h-screen">
                 <form onSubmit={hansleSignUp} className="border border-gray-400 p-[1rem] flex flex-col gap-[1rem] w-[320px]">

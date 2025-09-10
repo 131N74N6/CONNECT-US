@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import type { PostItemProps } from "../services/custom-types";
 import useAuth from "../services/useAuth";
-import useDbTable from "../services/useDbTable";
+import useDbTable from "../services/useFirestore";
 import PostList from "../components/PostList";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 
