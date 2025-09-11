@@ -1,38 +1,25 @@
-import { useEffect } from "react";
 import type { PostItemProps } from "../services/custom-types";
 import useAuth from "../services/useAuth";
-import useDbTable from "../services/useFirestore";
+import { useShowDocument } from "../services/useFirestore";
 import PostList from "../components/PostList";
 import { Navbar1, Navbar2 } from "../components/Navbar";
+import Loading from "../components/Loading";
 
 export default function About() {
-    const imageGalleryTable = 'image_gallery';
+    const postCollection = 'posts';
     const { user } = useAuth();
-    const { realTimeInit, initTableData, teardownTable } = useDbTable<PostItemProps>();
-    const { data = [], error } = initTableData({
-        tableName: imageGalleryTable,
-        additionalQuery: (addQuery) => user?.id ? addQuery.eq('user_id', user.id) : addQuery,
-        uniqueQueryKey: user?.id ? [user.id] : ['no-user']
+    const { data, error, loading } = useShowDocument<PostItemProps>({
+        collectionName: postCollection,
+        filters: [['user_id', '==', user?.uid]],
+        orderBy: [['created_at', 'desc']]
     });
 
-    useEffect(() => {
-        if (user?.id) {
-            realTimeInit({
-                tableName: imageGalleryTable,
-                additionalQuery: (addQuery) => addQuery.eq('user_id', user.id),
-                uniqueQueryKey: [user.id]
-            });
-        }
-        return () => teardownTable();
-    }, [teardownTable, user?.id, realTimeInit]);
+    if (loading) return <Loading/>
 
     if (error) {
-        const errorMessage = error.name === "TypeError" && error.message === "Failed to fetch" 
-            ? "Check your internet connection" 
-            : error.message;
         return (
             <div className="flex justify-center items-center h-screen">
-                <span className="text-[2rem] font-[600] text-purple-700">{errorMessage}</span>
+                <span className="text-[2rem] font-[600] text-purple-700">{error}</span>
             </div>
         );
     }

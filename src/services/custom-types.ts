@@ -1,31 +1,36 @@
-export type DatabaseProps = {
-    tableName: string;
-    additionalQuery?: (query: any) => any;
-    relationalQuery?: string;
-    uniqueQueryKey?: any[];
+import type { QueryOptions } from "@tanstack/react-query";
+import type { WhereFilterOp, OrderByDirection } from "firebase/firestore";
+
+export type DatabaseProps<T> = {
+    collectionName: string;
+    callback?: (data: T[]) => void;
+    queryOptions?: QueryOptions;
+    filters?: [string, WhereFilterOp, any][];
+    orderBy?: [string, OrderByDirection][];
+    limit?: number;
 }
 
 export type InsertDataProps<T> = {
-    tableName: string;
-    newData: Omit<T, 'id' | 'created_at'>;
+    collectionName: string; 
+    data: Omit<T, 'id' | 'created_at'>;
 }
 
 export type UpdateDataProps<T> = {
-    tableName: string;
-    chosenData: Partial<Omit<T, 'id' | 'created_at'>>;
-    column: string;
-    values: string;
-}
-
-export type UpsertDataProps<T> = {
-    tableName: string;
-    data: Partial<T>;
+    docId: string;
+    collectionName: string; 
+    newData: Partial<Omit<T, 'id' | 'created_at'>>;
 }
 
 export type DeleteDataProps = {
-    tableName: string;
-    column?: string;
-    values?: string;
+    collectionName: string;
+    docId?: string;
+    filters?: [string, WhereFilterOp, any][];
+}
+
+export type QueryOption = {
+    enabled?: boolean;
+    staleTime?: number;
+    refetchOnWindowFocus?: boolean;
 }
 
 export type Users = {
@@ -51,7 +56,7 @@ export type NotificationProps = {
 
 export type PostItemProps = {
     id: string;
-    image_url: string[];
+    file_url: string[];
 }
 
 export type PostListProps = {
@@ -62,6 +67,6 @@ export type PostDetailProps = {
     id: string;
     created_at: Date;
     description: string;
-    image_url: string[];
+    file_url: string[];
     user_id: string;
 }

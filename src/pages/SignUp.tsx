@@ -54,47 +54,47 @@ export default function SignUp() {
     return (
         <>
             {showMessage ? 
-                <div className="text-red-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
+                <div className="text-red-400 text-sm font-medium text-center p-2 bg-red-100 rounded">
                     {message}
                 </div>
             : null}
-            <div className="flex justify-center items-center h-screen">
-                <form onSubmit={hansleSignUp} className="border border-gray-400 p-[1rem] flex flex-col gap-[1rem] w-[320px]">
-                    <div className="font-[650] text-[1.5rem] text-center">Welcome</div>
+            <div className="flex justify-center items-center h-screen bg-[#1a1a1a]">
+                <form onSubmit={hansleSignUp} className="border border-purple-400 p-[1rem] flex flex-col gap-[1rem] bg-black w-[320px]">
+                    <div className="font-[650] text-[1.5rem] text-purple-400 text-center">Welcome</div>
                     <div className="flex flex-col gap-[0.5rem]">
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="username" className="text-purple-400">Username</label>
                         <input 
                             type="text" 
                             id="username" 
                             value={username}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event.target.value)}
-                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600]" 
+                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-purple-400 text-purple-400 font-[600]" 
                             placeholder="ex: john"
                         />
                     </div>
                     <div className="flex flex-col gap-[0.5rem]">
-                        <label htmlFor="email">Email</label>
+                        <label htmlFor="email" className="text-purple-400">Email</label>
                         <input 
                             type="email" 
                             id="email" 
                             value={email}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600]" 
+                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-purple-400 text-purple-400 font-[600]" 
                             placeholder="your@gmail.com"
                         />
                     </div>
                     <div className="flex flex-col gap-[0.5rem]">
-                        <label htmlFor="password">Password</label>
+                        <label htmlFor="password" className="text-purple-400">Password</label>
                         <input 
                             type="password" 
                             id="password" 
                             value={password}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-gray-800 font-[600]" 
+                            className="p-[0.45rem] text-[0.9rem] outline-0 border border-purple-400 text-purple-400 font-[600]" 
                             placeholder="your_password"
                         />
                     </div>
-                    <div className="text-center">Already have account? <Link className="text-blue-700" to={'/signin'}>SignIn</Link></div>
+                    <div className="text-center text-white">Already have account? <Link className="text-blue-700" to={'/signin'}>SignIn</Link></div>
                     <button 
                         type="submit" 
                         disabled={loading || email === '' || username === '' || password === ''}
