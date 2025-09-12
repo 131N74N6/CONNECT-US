@@ -1,5 +1,10 @@
 import { memo, useEffect } from "react";
-import type { NotificationProps } from "../services/custom-types";
+
+type NotificationProps = {
+    className: string;
+    message: string;
+    onClose: () => void;
+}
 
 function Notification(props: NotificationProps) {
     useEffect(() => {

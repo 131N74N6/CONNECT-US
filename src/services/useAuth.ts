@@ -14,11 +14,16 @@ import { db } from './firebase-config';
 export default function useAuth() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading(true);
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
+            setLoading(false);
+            setError(null);
+        }, (error) => {
+            setError(error.message);
             setLoading(false);
         });
 
@@ -42,6 +47,7 @@ export default function useAuth() {
             
             return { data: user, error: null };
         } catch (error: any) {
+            setError(error.message);
             return { data: null, error };
         } finally {
             setLoading(false);
@@ -54,7 +60,7 @@ export default function useAuth() {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             return { data: userCredential.user, error: null };
         } catch (error: any) {
-            return { data: null, error };
+            setError(error.message);
         } finally {
             setLoading(false);
         }
@@ -64,13 +70,12 @@ export default function useAuth() {
         setLoading(true);
         try {
             await firebaseSignOut(auth);
-            return { error: null };
         } catch (error: any) {
-            return { error };
+            setError(error.message);
         } finally {
             setLoading(false);
         }
     }, []);
 
-    return { user, loading, signUp, signIn, signOut };
+    return { user, loading, error, signUp, signIn, signOut };
 }

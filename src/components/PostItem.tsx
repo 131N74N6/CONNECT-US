@@ -64,11 +64,11 @@ export default function PostItem(props: PostItemProps) {
                         </div>
                     )}
                     
-                    {fileUrls.length > 1 && (
+                    {fileUrls.length > 1 ? (
                         <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full w-6 h-6 flex items-center justify-center">
                             <span className="text-white text-xs">+{fileUrls.length - 1}</span>
                         </div>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </Link>

@@ -1,27 +1,21 @@
 import type { PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
-import { useShowDocument } from "../services/useFirestore";
-import type { OrderByDirection } from "firebase/firestore";
+import Error from "./Error";
+import { useFirestoreRealtime } from "../services/useFirestore";
 import PostList from "../components/PostList";
 
 export default function Home() {
     const postCollection = 'posts';
 
-    const { data, error, loading } = useShowDocument<PostItemProps>({
+    const { data, error, loading } = useFirestoreRealtime<PostItemProps>({
         collectionName: postCollection,
-        orderBy: [['created_at', 'desc']] as [string, OrderByDirection][]
+        orderBy: [['created_at', 'desc']],
     });
 
     if (loading) return <Loading/>
 
-    if (error) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <span className="text-[2rem] font-[600] text-purple-700">{error}</span>
-            </div>
-        );
-    }
+    if (error) return <Error message={error}/>
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">

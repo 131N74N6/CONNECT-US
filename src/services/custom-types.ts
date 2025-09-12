@@ -15,14 +15,14 @@ export type InsertDataProps<T> = {
 }
 
 export type UpdateDataProps<T> = {
-    docId: string;
+    values: string;
     collectionName: string; 
     newData: Partial<Omit<T, 'id' | 'created_at'>>;
 }
 
 export type DeleteDataProps = {
     collectionName: string;
-    docId?: string;
+    values?: string;
     filters?: [string, WhereFilterOp, any][];
 }
 
@@ -32,27 +32,6 @@ export type QueryOption = {
     refetchOnWindowFocus?: boolean;
 }
 
-export type Users = {
-    id: string;
-    email: string;
-    password: string;
-    username: string;
-}
-
-export type UsersProfiles = {
-    id: string;
-    email: string;
-    gender: 'male' | 'female';
-    birth_date: string;
-    username: string;
-}
-
-export type NotificationProps = {
-    className: string;
-    onClose: () => void;
-    message: string;
-}
-
 export type PostItemProps = {
     id: string;
     created_at: Date;
@@ -60,6 +39,16 @@ export type PostItemProps = {
     description: string;
     media_type?: 'image' | 'video' | 'text';
     user_id: string;
+}
+
+export type NewPost = {
+    id: string;
+    created_at: Date;
+    file_url?: string[];
+    description: string;
+    media_type?: 'image' | 'video' | 'text';
+    user_id: string;
+    uploader_name: string;
 }
 
 export type PostListProps = {
