@@ -1,9 +1,8 @@
 import type { QueryOptions } from "@tanstack/react-query";
 import type { WhereFilterOp, OrderByDirection } from "firebase/firestore";
 
-export type DatabaseProps<T> = {
+export type DatabaseProps = {
     collectionName: string;
-    callback?: (data: T[]) => void;
     queryOptions?: QueryOptions;
     filters?: [string, WhereFilterOp, any][];
     orderBy?: [string, OrderByDirection][];
@@ -56,17 +55,13 @@ export type NotificationProps = {
 
 export type PostItemProps = {
     id: string;
-    file_url: string[];
+    created_at: Date;
+    file_url?: string[];
+    description: string;
+    media_type?: 'image' | 'video' | 'text';
+    user_id: string;
 }
 
 export type PostListProps = {
     data: PostItemProps[];
-}
-
-export type PostDetailProps = {
-    id: string;
-    created_at: Date;
-    description: string;
-    file_url: string[];
-    user_id: string;
 }

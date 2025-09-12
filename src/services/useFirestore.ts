@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { QueryKey, QueryOptions } from '@tanstack/react-query';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Unsubscribe, DocumentData, FirestoreError } from "firebase/firestore";
@@ -21,16 +21,15 @@ import {
 import { db } from './firebase-config';
 import type { DatabaseProps, InsertDataProps, UpdateDataProps, DeleteDataProps } from './custom-types';
 
-export const useShowDocument = <T extends { id: string }>(props: DatabaseProps<T>) => {
+export const useShowDocument = <T extends { id: string }>(props: DatabaseProps) => {
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const unsubscribeRef = useRef<Unsubscribe | null>(null);
-    const isMountedRef = useRef(true);
+const isMountedRef = useRef(true);
 
     const {
         collectionName,
-        callback,
         filters = [],
         orderBy: orderByOptions = [],
         limit: limitOption
@@ -39,64 +38,67 @@ export const useShowDocument = <T extends { id: string }>(props: DatabaseProps<T
     const queryConfig = useMemo(() => {
         let q: Query<DocumentData> = collection(db, collectionName);
         
-        // Apply filters
         filters.forEach(([field, op, value]) => {
             q = query(q, where(field, op, value));
         });
         
-        // Apply ordering
         orderByOptions.forEach(([field, direction]) => {
             q = query(q, orderBy(field, direction));
         });
         
-        // Apply limit
         if (limitOption) q = query(q, limit(limitOption));
 
         return q;
     }, [collectionName, filters, orderByOptions, limitOption]);
 
-    const fetchData = useCallback(async () => {
-        if (!isMountedRef.current) return;
-
-        try {
-            setLoading(true);
-            setError(null);
-
-            unsubscribeRef.current = onSnapshot(
-                queryConfig,
-                (snapshot: QuerySnapshot<DocumentData>) => {
-                    const newData = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    })) as T[];
-                    
-                    setData(newData);
-                    setLoading(false);
-                    callback?.(newData);
-                },
-                (err: FirestoreError) => {
-                    setError(err.message);
-                    setLoading(false);
-                }
-            );
-        } catch (err: any) {
-            if (!isMountedRef.current) return;
-            setError(err.message);
-            setLoading(false);
-        }
-    }, [queryConfig, callback]);
-
     useEffect(() => {
         isMountedRef.current = true;
-        fetchData();
+        
+        const setupListener = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                if (unsubscribeRef.current) {
+                    unsubscribeRef.current();
+                    unsubscribeRef.current = null;
+                }
+
+                unsubscribeRef.current = onSnapshot(
+                    queryConfig,
+                    (snapshot: QuerySnapshot<DocumentData>) => {
+                        if (!isMountedRef.current) return;
+                        
+                        const newData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as T[];
+                        
+                        setData(newData);
+                        setLoading(false);
+                    },
+                    (err: FirestoreError) => {
+                        if (!isMountedRef.current) return;
+                        setError(err.message);
+                        setLoading(false);
+                    }
+                );
+            } catch (err: any) {
+                if (!isMountedRef.current) return;
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+
+        setupListener();
 
         return () => {
             isMountedRef.current = false;
-            if (unsubscribeRef.current) unsubscribeRef.current();
+            if (unsubscribeRef.current) {
+                unsubscribeRef.current();
+                unsubscribeRef.current = null;
+            }
         };
-    }, [fetchData]);
+    }, [queryConfig]);
 
-    return { data, loading, error, refetch: fetchData };
+    return { data, loading, error };
 }
 
 export const useAddDocument = <T,>() => {
@@ -106,10 +108,7 @@ export const useAddDocument = <T,>() => {
         mutationFn: async (props: InsertDataProps<T>) => {
             const docRef = await addDoc(
                 collection(db, props.collectionName), 
-                {
-                    ...props.data,
-                    created_at: new Date().toISOString()
-                }
+                { ...props.data, created_at: new Date().toISOString() }
             );
             return { id: docRef.id, ...props.data };
         },
