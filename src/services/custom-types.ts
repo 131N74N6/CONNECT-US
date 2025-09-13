@@ -1,17 +1,22 @@
-import type { QueryOptions } from "@tanstack/react-query";
-import type { WhereFilterOp, OrderByDirection } from "firebase/firestore";
+import type { OrderByDirection, WhereFilterOp } from "firebase/firestore";
 
-export type DatabaseProps = {
-    collectionName: string;
-    queryOptions?: QueryOptions;
-    filters?: [string, WhereFilterOp, any][];
-    orderBy?: [string, OrderByDirection][];
-    limit?: number;
+export type IInfiniteScroll = {
+    collection_name: string; 
+    filters?: [string, WhereFilterOp, any][]; 
+    order_by_options?: [string, OrderByDirection][]; 
+    page_size: number;
 }
 
 export type InsertDataProps<T> = {
     collectionName: string; 
-    data: Omit<T, 'created_at'>;
+    data: Omit<T, 'id' | 'created_at'>;
+}
+
+export type MediaFile = {
+    file: File;
+    previewUrl: string;
+    type: 'image' | 'video';
+    publicId?: string;
 }
 
 export type UpdateDataProps<T> = {
@@ -41,6 +46,29 @@ export type PostItemProps = {
     user_id: string;
 }
 
+export type ILikes = {
+    id: string;
+    created_at: Date;
+    post_id: string;
+    user_id: string;
+    username: string;
+}
+
+export type IComments = {
+    id: string;
+    created_at: Date;
+    opinion: string;
+    post_id: string;
+    user_id: string;
+    username: string;
+}
+
+export type IGetSelectedData = {
+    collection_name: string;
+    field_name: string;
+    values: string;
+}
+
 export type NewPost = {
     id: string;
     created_at: Date;
@@ -53,4 +81,15 @@ export type NewPost = {
 
 export type PostListProps = {
     data: PostItemProps[];
+}
+
+export type PaginationParams = {
+    page_size: number;
+    last_visible?: any;
+}
+
+export type PaginatedResponse<T> = {
+    data: T[];
+    last_visible: any;
+    has_more: boolean;
 }

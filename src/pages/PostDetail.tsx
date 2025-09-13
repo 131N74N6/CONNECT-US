@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { useFirestoreRealtime } from "../services/useFirestore";
+import { infinteScroll } from "../services/useFirestore";
 import { deleteData } from "../services/useFirestore";
 import useAuth from "../services/useAuth";
 import type { NewPost } from "../services/custom-types";
@@ -15,10 +15,11 @@ export default function PostDetail() {
     const navigate = useNavigate();
     const { user } = useAuth();
     
-    const { data, error, loading } = useFirestoreRealtime<NewPost>({
-        collectionName: postCollection,
-        filters: id ? [['id', '==', id]] : []
-    });
+    const { data, loading } = infinteScroll<NewPost>(
+        postCollection,
+        id ? [['id', '==', id]] : [],
+        []
+    );
 
     const post = data && data.length > 0 ? data[0] : null;
 
@@ -38,7 +39,7 @@ export default function PostDetail() {
                 await Promise.all(deletePromises);
             }
 
-            await deleteData().mutateAsync({
+            await deleteData({
                 collectionName: postCollection,
                 values: post.id
             });
@@ -52,7 +53,7 @@ export default function PostDetail() {
 
     if (loading) return <Loading />;
 
-    if (error || !post) return <Error message={'404 | NOT FOUND'} />;
+    if (!post) return <Error message={'404 | NOT FOUND'} />;
 
     // Check if the current user is the post owner
     const isPostOwner = user && user.uid === post.user_id;
@@ -90,7 +91,7 @@ export default function PostDetail() {
                         ) : null}
                     </div>
                     
-                    {post.description ? <text className="text-gray-200">{post.description}</text> : null}
+                    {post.description ? <div className="text-gray-200">{post.description}</div> : null}
                     
                     <div className="space-y-4">
                         {images.length > 0 ? <PostSlider images={images} /> : null}

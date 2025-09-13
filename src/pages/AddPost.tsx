@@ -3,14 +3,7 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import useAuth from "../services/useAuth";
 import { insertData } from "../services/useFirestore";
 import { uploadToCloudinary } from "../services/useFileStorage";
-import type { NewPost } from "../services/custom-types";
-
-interface MediaFile {
-    file: File;
-    previewUrl: string;
-    type: 'image' | 'video';
-    publicId?: string;
-}
+import type { MediaFile, NewPost } from "../services/custom-types";
 
 export default function AddPost() {
     const { user } = useAuth();
@@ -19,7 +12,6 @@ export default function AddPost() {
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const postsCollection = 'posts';
-    const insertMutation = insertData<NewPost>();
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -101,10 +93,9 @@ export default function AddPost() {
                 user_name: user.displayName || 'Anonymous',
             };
             
-            await insertMutation.mutateAsync({
+            await insertData<NewPost>({
                 collectionName: postsCollection,
                 data: {
-                    id: '',
                     user_id: postData.user_id,
                     uploader_name: postData.user_name,
                     file_url: postData.media_urls,
