@@ -7,7 +7,7 @@ export function Navbar1() {
     
     return (
         <nav className="bg-[#1a1a1a] md:w-1/4 md:flex shrink-0 hidden flex-col gap-[1.25rem] p-[1rem]">
-            <Link to={'/home'} className="outline-0 text-purple-400 flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
+            <Link to={'/home'} className="outline-0 text-white flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
                 <i className="fa-solid fa-house"></i>
                 <span>Home</span>
             </Link>

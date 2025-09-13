@@ -54,7 +54,7 @@ export default function AddPost() {
         setMediaFiles(prev => [...prev, ...newMediaFiles]);
         
         if (fileInputRef.current) fileInputRef.current.value = '';
-    };
+    }
 
     const removeMediaFile = (index: number) => {
         const fileToRemove = mediaFiles[index];
@@ -62,7 +62,7 @@ export default function AddPost() {
         URL.revokeObjectURL(fileToRemove.previewUrl);
         
         setMediaFiles(prev => prev.filter((_, i) => i !== index));
-    };
+    }
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -104,6 +104,7 @@ export default function AddPost() {
             await insertMutation.mutateAsync({
                 collectionName: postsCollection,
                 data: {
+                    id: '',
                     user_id: postData.user_id,
                     uploader_name: postData.user_name,
                     file_url: postData.media_urls,
@@ -121,7 +122,7 @@ export default function AddPost() {
         } finally {
             setIsUploading(false);
         }
-    };
+    }
 
     return (
         <div className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">

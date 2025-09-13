@@ -12,8 +12,8 @@ import type { DatabaseProps, InsertDataProps, UpdateDataProps, DeleteDataProps, 
 
 const createQueryConfig = (
     collectionName: string,
-    filters: [string, WhereFilterOp, any][] = [],
-    orderByOptions: [string, OrderByDirection][] = [],
+    filters: [string, WhereFilterOp, any][],
+    orderByOptions: [string, OrderByDirection][],
     limitOption?: number
 ): Query<DocumentData, DocumentData> => {
     let q: Query<DocumentData> = collection(db, collectionName);
@@ -29,7 +29,7 @@ const createQueryConfig = (
     if (limitOption) q = query(q, limit(limitOption));
 
     return q;
-};
+}
 
 export const useFirestoreRealtime = <T extends { id: string }>(props: DatabaseProps) => {
     const [data, setData] = useState<T[]>([]);
@@ -119,7 +119,7 @@ export const updateData = <T>() => {
             });
         }
     });
-};
+}
 
 export const deleteData = () => {
     const queryClient = useQueryClient();

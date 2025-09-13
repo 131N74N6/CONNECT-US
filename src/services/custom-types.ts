@@ -11,7 +11,7 @@ export type DatabaseProps = {
 
 export type InsertDataProps<T> = {
     collectionName: string; 
-    data: Omit<T, 'id' | 'created_at'>;
+    data: Omit<T, 'created_at'>;
 }
 
 export type UpdateDataProps<T> = {

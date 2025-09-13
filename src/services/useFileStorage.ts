@@ -45,9 +45,9 @@ export async function deleteFromCloudinary(publicId: string, resourceType: 'imag
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 public_id: publicId,
-                api_key: process.env.REACT_APP_CLOUDINARY_API_KEY,
+                api_key: import.meta.env.VITE_CLOUDINARY_API_KEY,
                 timestamp: Date.now(),
-                signature: process.env.REACT_APP_CLOUDINARY_API_SECRET, 
+                signature: import.meta.env.VITE_CLOUDINARY_API_SECRET, 
             })}
         );
 
