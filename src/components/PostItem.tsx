@@ -3,8 +3,8 @@ import type { PostItemProps } from "../services/custom-types";
 import { useState, useMemo } from "react";
 
 export default function PostItem(props: PostItemProps) {
-    const [imageError, setImageError] = useState(false);
-    const [videoError, setVideoError] = useState(false);
+    const [imageError, setImageError] = useState<boolean>(false);
+    const [videoError, setVideoError] = useState<boolean>(false);
     
     const fileUrls = props.file_url || [];
     

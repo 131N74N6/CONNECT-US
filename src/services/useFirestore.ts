@@ -38,11 +38,11 @@ const createQueryConfig = (
     return q;
 };
 
-function infinteScroll <T extends { id: string }>(
+function infiniteScroll <T extends { id: string }>(
     collectionName: string,
     filters?: [string, WhereFilterOp, any][],
     orderByOptions: [string, OrderByDirection][] = [['created_at', 'desc']],
-    pageSize: number = 10
+    pageSize: number = 12
 ) {
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
@@ -133,4 +133,4 @@ async function deleteData(props: DeleteDataProps) {
     }
 }
 
-export { deleteData, getSelectedData, infinteScroll, insertData, updateData }
+export { deleteData, getSelectedData, infiniteScroll, insertData, updateData }

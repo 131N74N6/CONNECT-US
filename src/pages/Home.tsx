@@ -3,17 +3,18 @@ import type { PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import Error from "./Error";
-import { infinteScroll } from "../services/useFirestore";
+import { infiniteScroll } from "../services/useFirestore";
 import PostList from "../components/PostList";
+import LoadScroll from '../components/LoadScroll';
 
 export default function Home() {
     const postCollection = 'posts';
 
-    const { data, loading, hasMore, fetchData } = infinteScroll<PostItemProps>(
+    const { data, loading, hasMore, fetchData } = infiniteScroll<PostItemProps>(
         postCollection,
         [],
         [['created_at', 'desc']], 
-        10
+        12
     );
 
     const handleScroll = useCallback(() => {
@@ -35,8 +36,8 @@ export default function Home() {
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
             <Navbar1 />
             <Navbar2 />
-            <PostList data={data} />
-            {loading ? <Loading /> : null}
+            <PostList data={data} has_more={hasMore}/>
+            {loading ? <LoadScroll/> : null}
         </div>
     );
 }

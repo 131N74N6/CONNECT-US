@@ -22,6 +22,14 @@ export default function PostList(props: PostListProps) {
                     user_id={post.user_id}
                 />
             ))}
+            
+            <div>
+                {!props.has_more && props.data.length > 0 ? (
+                    <div className="text-center text-gray-400 pt-[0.5rem] w-full">
+                        <span className="text-center">No more posts to load</span>
+                    </div>
+                ) : null}
+            </div>
         </div>
     );
 }

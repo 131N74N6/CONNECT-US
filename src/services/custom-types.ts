@@ -46,11 +46,24 @@ export type PostItemProps = {
     user_id: string;
 }
 
+export type IUser = {
+    uid: string;
+    createdAt: string;
+    username: string
+}
+
 export type ILikes = {
     id: string;
     created_at: Date;
     post_id: string;
     user_id: string;
+    username: string;
+}
+
+export type NewComment = {
+    opinion: string;
+    user_id: string;
+    post_id: string;
     username: string;
 }
 
@@ -80,16 +93,11 @@ export type NewPost = {
 }
 
 export type PostListProps = {
+    has_more: boolean;
     data: PostItemProps[];
 }
 
-export type PaginationParams = {
-    page_size: number;
-    last_visible?: any;
-}
-
-export type PaginatedResponse<T> = {
-    data: T[];
-    last_visible: any;
-    has_more: boolean;
+export type CommentProps = {
+    comments_data: IComments[];
+    onClose: () => void;
 }

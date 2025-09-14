@@ -28,12 +28,14 @@ export default function PostSlider({ images }: PostSliderProps) {
             {images.length > 1 ? (
                 <>
                     <button
+                        type="button"
                         onClick={goToPrevious}
                         className="absolute cursor-pointer left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
                     >
                         <i className="fa-solid fa-square-caret-left"></i>
                     </button>
                     <button
+                        type="button"
                         onClick={goToNext}
                         className="absolute cursor-pointer right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
                     >
