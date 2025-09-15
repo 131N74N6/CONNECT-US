@@ -31,7 +31,7 @@ function createQueryConfig(
     if (limitOption) q = query(q, limit(limitOption));
 
     return q;
-};
+}
 
 function infiniteScroll <Q extends { id: string }>(props: IInfiniteScroll) {
     const [data, setData] = useState<Q[]>([]);

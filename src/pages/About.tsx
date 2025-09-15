@@ -13,7 +13,6 @@ export default function About() {
     
     const filter = useMemo(() => {
         if (user) { 
-            console.log("Current user UID:", user.uid);
             return [['user_id', '==', user.uid] as [string, WhereFilterOp, any]];
         }
         return undefined;

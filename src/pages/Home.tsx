@@ -33,8 +33,8 @@ export default function Home() {
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
-            <Navbar1 />
-            <Navbar2 />
+            <Navbar1/>
+            <Navbar2/>
             <PostList data={data} has_more={hasMore}/>
         </div>
     );

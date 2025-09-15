@@ -111,6 +111,16 @@ export default function PostDetail() {
                 values: selectedPost.id
             });
 
+            await deleteData({
+                collectionName: commentCollection,
+                values: selectedPost.id
+            });
+
+            await deleteData({
+                collectionName: likeCollection,
+                values: selectedPost.id
+            });
+
             navigate('/home');
         } catch (error) {
             console.error('Error deleting post:', error);
