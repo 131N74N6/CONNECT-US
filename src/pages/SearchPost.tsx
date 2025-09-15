@@ -13,7 +13,7 @@ export default function SearchPost() {
                         className="p-[0.45rem] font-[550] text-purple-400 outline-0 border w-full border-purple-400"
                     />
                 </form>
-                <div className="bg-[#1a1a1a] text-purple-400 p-[1rem] h-full overflow-y-auto">
+                <div className="bg-[#1a1a1a] text-purple-400 p-[1rem] h-screen overflow-y-auto">
                     <div className="text-purple-400">No Searched Post Available</div>
                 </div>
             </div>

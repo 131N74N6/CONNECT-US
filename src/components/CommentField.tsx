@@ -11,10 +11,9 @@ export default function CommentField(props: CommentProps) {
                     </button>
                 </div>
                 <div className="flex flex-col gap-[1rem]">
-                    {
-                        props.comments_data.length > 0 ?
+                    {props.comments_data.length > 0 ?
                         props.comments_data.map((comment) => (
-                            <div className="bg-black p-[0.6rem]">
+                            <div className="bg-black p-[0.6rem] rounded-[0.6rem]">
                                 <div className="flex justify-between">
                                     <p>{comment.username}</p>
                                     <p className="text-[0.9rem]">{new Date(comment.created_at).toLocaleString()}</p>

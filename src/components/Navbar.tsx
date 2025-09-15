@@ -80,7 +80,7 @@ export function Navbar2() {
                     </button>
                     <div className="text-purple-400 flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
                         <i className="fa-solid fa-user"></i>
-                        <span>{user?.displayName}</span>
+                        <span>Hello, {user?.displayName}</span>
                     </div>
                 </nav>
             : null}

@@ -29,7 +29,7 @@ export default function PostDetail() {
     });
 
     const { data: commentsData } = realTimeInit<IComments>({
-        collection_name: postCollection,
+        collection_name: commentCollection,
         order_by_options: [['created_at', 'desc']],
         filters: id ? [['post_id', '==', id]] : []
     });
