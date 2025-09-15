@@ -12,7 +12,7 @@ export default function CommentField(props: CommentProps) {
                 </div>
                 <div className="flex flex-col gap-[1rem]">
                     {
-                        props.comments_data.length > 1 ?
+                        props.comments_data.length > 0 ?
                         props.comments_data.map((comment) => (
                             <div className="bg-black p-[0.6rem]">
                                 <div className="flex justify-between">

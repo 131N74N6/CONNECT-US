@@ -5,17 +5,16 @@ import Loading from "../components/Loading";
 import Error from "./Error";
 import { infiniteScroll } from "../services/useFirestore";
 import PostList from "../components/PostList";
-import LoadScroll from '../components/LoadScroll';
 
 export default function Home() {
     const postCollection = 'posts';
 
-    const { data, loading, hasMore, fetchData } = infiniteScroll<PostItemProps>(
-        postCollection,
-        [],
-        [['created_at', 'desc']], 
-        12
-    );
+    const { data, loading, hasMore, fetchData } = infiniteScroll<PostItemProps>({
+        collection_name: postCollection,
+        filters: [],
+        order_by_options: [['created_at', 'desc']], 
+        page_size: 12
+    });
 
     const handleScroll = useCallback(() => {
         if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 500 && hasMore && !loading) {
@@ -37,7 +36,6 @@ export default function Home() {
             <Navbar1 />
             <Navbar2 />
             <PostList data={data} has_more={hasMore}/>
-            {loading ? <LoadScroll/> : null}
         </div>
     );
 }

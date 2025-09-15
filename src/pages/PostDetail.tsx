@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { infiniteScroll, insertData } from "../services/useFirestore";
+import { getSelectedData, insertData, realTimeInit } from "../services/useFirestore";
 import { deleteData } from "../services/useFirestore";
 import useAuth from "../services/useAuth";
 import type { IComments, ILikes, NewComment, NewPost } from "../services/custom-types";
@@ -23,33 +23,30 @@ export default function PostDetail() {
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
     
-    const { data, loading } = infiniteScroll<NewPost>(
-        postCollection,
-        id ? [['id', '==', id]] : [],
-        []
-    );
+    const { data: selectedPost, loading } = getSelectedData<NewPost>({
+        collection_name: postCollection,
+        values: id ? id : ''
+    });
 
-    const { data: postComment } = infiniteScroll<IComments>(
-        commentCollection,
-        id ? [['post_id', '==', id]] : [],
-        [['created_at', 'desc']],
-        12
-    );
+    const { data: commentsData } = realTimeInit<IComments>({
+        collection_name: postCollection,
+        order_by_options: [['created_at', 'desc']],
+        filters: id ? [['post_id', '==', id]] : []
+    });
 
-    const { data: likesData } = infiniteScroll<ILikes>(
-        likeCollection,
-        id ? [['post_id', '==', id]] : [],
-    );
+    const { data: likesData } = realTimeInit<ILikes>({
+        collection_name: likeCollection,
+        order_by_options: [['created_at', 'desc']],
+        filters: id ? [['post_id', '==', id]] : []
+    });
 
-    const post = data && data.length > 0 ? data[0] : null;
+    const userLiked = user && likesData.some(like => like.user_id === user.uid);
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
         try {    
             if (!user || !user.displayName) throw 'Invalid user data';
-
             if (!id) throw 'Failed to get post';
-
             if (!comment.trim()) throw 'Missing required data';
 
             await insertData<NewComment>({
@@ -71,28 +68,36 @@ export default function PostDetail() {
     async function givingLikes() {
         try {
             if (!user || !user.displayName) throw 'Invalid user data';
-
             if (!id) throw 'Failed to get post';
 
-            await insertData<ILikes>({
-                collectionName: likeCollection,
-                data: {
-                    post_id: id,
-                    user_id: user.uid,
-                    username: user.displayName
-                }
-            });
+            const existingLike = likesData.find(like => like.user_id === user.uid && like.post_id === id);
+
+            if (!existingLike) {
+                await insertData<ILikes>({
+                    collectionName: likeCollection,
+                    data: {
+                        post_id: id,
+                        user_id: user.uid,
+                        username: user.displayName
+                    }
+                });
+            } else {
+                await deleteData({
+                    collectionName: likeCollection,
+                    values: existingLike.id
+                });
+            }
         } catch (error: any) {
             console.log(error.message);
         }
     }
 
     const handleDeletePost = async () => {
-        if (!post || !window.confirm('Are you sure you want to delete this post?')) return;
+        if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
 
         try {
-            if (post.file_url && post.file_url.length > 0) {
-                const deletePromises = post.file_url.map(url => {
+            if (selectedPost.file_url && selectedPost.file_url.length > 0) {
+                const deletePromises = selectedPost.file_url.map(url => {
                     const parts = url.split('/');
                     const publicId = parts[parts.length - 1].split('.')[0];
                     return deleteFromCloudinary(publicId, url.includes('.mp4') ? 'video' : 'image');
@@ -103,7 +108,7 @@ export default function PostDetail() {
 
             await deleteData({
                 collectionName: postCollection,
-                values: post.id
+                values: selectedPost.id
             });
 
             navigate('/home');
@@ -115,15 +120,15 @@ export default function PostDetail() {
 
     if (loading) return <Loading />;
 
-    if (!post) return <Error message={'404 | NOT FOUND'} />;
+    if (!selectedPost) return <Error message={'404 | NOT FOUND'} />;
 
     // Check if the current user is the post owner
-    const isPostOwner = user && user.uid === post.user_id;
+    const isPostOwner = user && user.uid === selectedPost.user_id;
 
     // Separate images and videos
-    const images = post.file_url?.filter(url => url.match(/\.(jpeg|jpg|gif|png)$/) !== null) || [];
+    const images = selectedPost.file_url?.filter(url => url.match(/\.(jpeg|jpg|gif|png)$/) !== null) || [];
 
-    const videos = post.file_url?.filter(url => url.match(/\.(mp4|webm|ogg)$/) !== null) || [];
+    const videos = selectedPost.file_url?.filter(url => url.match(/\.(mp4|webm|ogg)$/) !== null) || [];
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
@@ -134,11 +139,11 @@ export default function PostDetail() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {post.uploader_name?.charAt(0).toUpperCase() || 'U'}
+                            {selectedPost.uploader_name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                         <div>
-                            <h3 className="font-semibold">{post.uploader_name || 'Unknown User'}</h3>
-                            <p className="text-gray-400 text-sm">{new Date(post.created_at).toLocaleString()}</p>
+                            <h3 className="font-semibold">{selectedPost.uploader_name || 'Unknown User'}</h3>
+                            <p className="text-gray-400 text-sm">{new Date(selectedPost.created_at).toLocaleString()}</p>
                         </div>
                     </div>
                     
@@ -152,7 +157,7 @@ export default function PostDetail() {
                     ) : null}
                 </div>
                 
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-[1rem]">
+                <div className="flex flex-col gap-[1rem]">
                     {images.length > 0 ? <PostSlider images={images} /> : null}
                     
                     {videos.map((videoUrl, index) => (
@@ -166,15 +171,18 @@ export default function PostDetail() {
                     ))}
             
                     <div>
-                        <div className="text-gray-200 h-[90%] overflow-y-auto">{post.description}</div>
+                        <div className="text-gray-200 h-[90%] overflow-y-auto">{selectedPost.description}</div>
                         <div className="flex gap-[1rem]">                            
                             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
-                                <i className="fa-regular fa-heart cursor-pointer" onClick={givingLikes}></i>
+                                <i 
+                                    className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
+                                    onClick={givingLikes}
+                                ></i>
                                 <span>{likesData.length}</span>
                             </div>
                             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                                 <i className="fa-regular fa-comment cursor-pointer" onClick={() => setOpenComments(true)}></i>
-                                <span>{postComment.length}</span>
+                                <span>{commentsData.length}</span>
                             </div>
                         </div>
                     </div>
@@ -198,7 +206,7 @@ export default function PostDetail() {
                 {openComments ? 
                     <CommentField 
                         onClose={() => setOpenComments(false)} 
-                        comments_data={postComment}
+                        comments_data={commentsData}
                     /> 
                 : null}
             </div>

@@ -7,6 +7,12 @@ export type IInfiniteScroll = {
     page_size: number;
 }
 
+export type IRealTime = {
+    collection_name: string; 
+    filters: [string, WhereFilterOp, any][]; 
+    order_by_options: [string, OrderByDirection][]; 
+}
+
 export type InsertDataProps<T> = {
     collectionName: string; 
     data: Omit<T, 'id' | 'created_at'>;
@@ -78,7 +84,6 @@ export type IComments = {
 
 export type IGetSelectedData = {
     collection_name: string;
-    field_name: string;
     values: string;
 }
 
@@ -99,5 +104,11 @@ export type PostListProps = {
 
 export type CommentProps = {
     comments_data: IComments[];
+    onClose: () => void;
+}
+
+export type NotificationProps = {
+    className: string;
+    message: string;
     onClose: () => void;
 }
