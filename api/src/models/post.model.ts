@@ -3,7 +3,7 @@ import mongoose, { Schema, Types } from "mongoose";
 interface IPost {
     created_at: string;
     description: string;
-    image_url: string[];
+    file_url: string[];
     uploader_name: string;
     user_id: Types.ObjectId;
 }
@@ -11,7 +11,7 @@ interface IPost {
 const postSchema = new Schema<IPost>({
     created_at: { type: String, required: true },
     description: { type: String, required: true },
-    image_url: [{ type: String, required: true }],
+    file_url: [{ type: String, required: true }],
     uploader_name: { type: String, required: true },
     user_id: { type: Schema.Types.ObjectId, required: true },
 });

@@ -22,23 +22,15 @@ export type User = {
 
 export type ILikes = {
     id: string;
-    created_at: Date;
+    created_at: string;
     post_id: string;
     user_id: string;
-    username: string;
-}
-
-export type NewComment = {
-    opinion: string;
-    user_id: string;
-    post_id: string;
-    username: string;
 }
 
 export type IComments = {
     id: string;
-    created_at: Date;
-    opinion: string;
+    created_at: string;
+    opinions: string;
     post_id: string;
     user_id: string;
     username: string;

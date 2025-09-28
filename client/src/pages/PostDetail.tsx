@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifer from "../services/data-modifier";
+import { getData, deleteData, insertData } from "../services/data-modifier";
 import useAuth from "../services/useAuth";
-import type { IComments, ILikes, NewComment, NewPost } from "../services/custom-types";
+import type { IComments, ILikes, NewPost } from "../services/custom-types";
 import Loading from "../components/Loading";
 import Error from "./Error";
 import PostSlider from "../components/PostSlider";
@@ -18,31 +18,59 @@ export default function PostDetail() {
 
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
-    
-    const { getData } = DataModifer<NewPost>();
-    const { getData } = DataModifer<ILikes>();
-    const { getData } = DataModifer<IComments>();
 
-    const { data: selectedPost } = useSWR<NewPost>();
-    const { data: likesData } = useSWR<ILikes[]>();
-    const { data: commentsData } = useSWR<IComments[]>()
+    const { data: selectedPost, isLoading: postLoading, mutate: selectedPostMutate } = useSWR<NewPost>(
+        `http://localhost:1234/posts/selected/${id}`,
+        getData,
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000,
+            errorRetryCount: 3
+        }
+    );
 
-    const userLiked = user && likesData.some(like => like.user_id === user.uid);
+    const { data: likesData, mutate: likeMutate } = useSWR<ILikes[]>(
+        `http://localhost:1234/likes/get-all/${id}`,
+        getData,
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000,
+            errorRetryCount: 3
+        }
+    );
+
+    const { data: commentsData, mutate: commentMutate } = useSWR<IComments[]>(
+        `http://localhost:1234/comments/get-all/${id}`,
+        getData,
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000,
+            errorRetryCount: 3
+        }
+    );
+
+    const userLiked = user && likesData ? likesData.some(like => like.user_id === user.info.id) : [];
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
+        const getCurrentDate = new Date();
+
         try {    
-            if (!user || !user.displayName) throw 'Invalid user data';
+            if (!user) throw 'Invalid user data';
             if (!id) throw 'Failed to get post';
             if (!comment.trim()) throw 'Missing required data';
 
-            await insertData<NewComment>({
-                collectionName: commentCollection,
+            await insertData<IComments>({
+                api_url: `http://localhost:1234/comments/add`,
                 data: {
-                    opinion: comment.trim(),
+                    created_at: getCurrentDate.toISOString(),
+                    opinions: comment.trim(),
                     post_id: id,
-                    user_id: user.uid,
-                    username: user.displayName
+                    user_id: user.info.id,
+                    username: user.info.username
                 }
             });
         } catch (error: any) {
@@ -53,26 +81,26 @@ export default function PostDetail() {
     }
     
     async function givingLikes() {
+        const getCurrentDate = new Date();
         try {
-            if (!user || !user.displayName) throw 'Invalid user data';
+            if (!user || !likesData) return;
             if (!id) throw 'Failed to get post';
 
-            const existingLike = likesData.find(like => like.user_id === user.uid && like.post_id === id);
+            const existingLike = likesData.find(like => like.user_id === user.info.id && like.post_id === id);
 
             if (!existingLike) {
                 await insertData<ILikes>({
-                    collectionName: likeCollection,
+                    api_url: `http://localhost:1234/likes/add`,
                     data: {
+                        created_at: getCurrentDate.toISOString(),
                         post_id: id,
-                        user_id: user.uid,
-                        username: user.displayName
+                        user_id: user.info.id,
                     }
                 });
+                likeMutate();
             } else {
-                await deleteData({
-                    collectionName: likeCollection,
-                    values: existingLike.id
-                });
+                await deleteData(`http://localhost:1234/likes/delete/${user.info.id}`);
+                likeMutate();
             }
         } catch (error: any) {
             console.log(error.message);
@@ -80,6 +108,7 @@ export default function PostDetail() {
     }
 
     const handleDeletePost = async () => {
+        if (!id) return;
         if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
 
         try {
@@ -93,20 +122,14 @@ export default function PostDetail() {
                 await Promise.all(deletePromises);
             }
 
-            await deleteData({
-                collectionName: postCollection,
-                values: selectedPost.id
-            });
+            await deleteData(`http://localhost:1234/posts/delete/${id}`);
+            selectedPostMutate();
 
-            await deleteData({
-                collectionName: commentCollection,
-                values: selectedPost.id
-            });
+            await deleteData(`http://localhost:1234/likes/delete/${id}`);
+            likeMutate();
 
-            await deleteData({
-                collectionName: likeCollection,
-                values: selectedPost.id
-            });
+            await deleteData(`http://localhost:1234/comments/delete/${id}`);
+            commentMutate();
 
             navigate('/home');
         } catch (error) {
@@ -115,12 +138,12 @@ export default function PostDetail() {
         }
     };
 
-    if (loading) return <Loading />;
+    if (postLoading) return <Loading />;
 
     if (!selectedPost) return <Error message={'404 | NOT FOUND'} />;
 
     // Check if the current user is the post owner
-    const isPostOwner = user && user.uid === selectedPost.user_id;
+    const isPostOwner = user && user.info.id === selectedPost.user_id;
 
     // Separate images and videos
     const images = selectedPost.file_url?.filter(url => url.match(/\.(jpeg|jpg|gif|png)$/) !== null) || [];
@@ -175,11 +198,11 @@ export default function PostDetail() {
                                     className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
                                     onClick={givingLikes}
                                 ></i>
-                                <span>{likesData.length}</span>
+                                <span>{likesData ? likesData.length : 0}</span>
                             </div>
                             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                                 <i className="fa-regular fa-comment cursor-pointer" onClick={() => setOpenComments(true)}></i>
-                                <span>{commentsData.length}</span>
+                                <span>{commentsData ? commentsData.length : 0}</span>
                             </div>
                         </div>
                     </div>
@@ -203,7 +226,7 @@ export default function PostDetail() {
                 {openComments ? 
                     <CommentField 
                         onClose={() => setOpenComments(false)} 
-                        comments_data={commentsData}
+                        comments_data={commentsData ? commentsData : []}
                     /> 
                 : null}
             </div>

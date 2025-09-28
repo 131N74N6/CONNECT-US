@@ -14,6 +14,28 @@ export default function useAuth() {
         setLoading(false);
     }, []);
 
+    const signIn = async (email: string, password: string) => {
+        setLoading(true);
+        try {
+            const request = await fetch(`http://localhost:1234/users/sign-in`, {
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+                method: 'POST',
+            });
+
+            if (!request.ok) {
+                const errorMsg = await request.json()
+                throw new Error(errorMsg.message);
+            }
+
+            navigate('/signin');
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const signUp = async (created_at: string, email: string, username: string, password: string) => {
         setLoading(true);
         try {
@@ -41,28 +63,6 @@ export default function useAuth() {
 
             setUser(signedInUser);
             localStorage.setItem('user', JSON.stringify(signedInUser));
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const signIn = async (email: string, password: string) => {
-        setLoading(true);
-        try {
-            const request = await fetch(`http://localhost:1234/users/sign-in`, {
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-                method: 'POST',
-            });
-
-            if (!request.ok) {
-                const errorMsg = await request.json()
-                throw new Error(errorMsg.message);
-            }
-
-            navigate('/signin');
         } catch (error: any) {
             setError(error.message);
         } finally {

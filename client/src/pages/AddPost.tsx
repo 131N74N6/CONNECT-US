@@ -1,13 +1,12 @@
 import { useState, useRef } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import useAuth from "../services/useAuth";
-import DataModifer from "../services/data-modifier";
+import { insertData } from "../services/data-modifier";
 import { uploadToCloudinary } from "../services/useFileStorage";
 import type { MediaFile, NewPost } from "../services/custom-types";
 
 export default function AddPost() {
     const { user } = useAuth();
-    const { insertData } = DataModifer<NewPost>();
     const [description, setDescription] = useState<string>('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -87,7 +86,7 @@ export default function AddPost() {
                 }
             }
             
-            await insertData({
+            await insertData<NewPost>({
                 api_url: `http://localhost:1234/posts/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),

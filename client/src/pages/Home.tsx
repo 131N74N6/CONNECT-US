@@ -3,11 +3,10 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import Error from "./Error";
 import PostList from "../components/PostList";
-import DataModifer from '../services/data-modifier';
+import { getData } from '../services/data-modifier';
 import useSWR from 'swr';
 
 export default function Home() {
-    const { getData } = DataModifer<PostItemProps>();
     const { data: allPosts, isLoading } = useSWR<PostItemProps[]>(
         `http://localhost:1234/posts/get-all`, 
         getData,
