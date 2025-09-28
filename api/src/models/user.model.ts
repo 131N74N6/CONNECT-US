@@ -14,6 +14,6 @@ const userSchema = new Schema<IUser>({
     username: { type: String, required: true }
 });
 
-const User = mongoose.model<IUser>('user', userSchema, 'user');
+const User = mongoose.model<IUser>('users', userSchema, 'users');
 
 export { IUser, User }

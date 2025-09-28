@@ -29,7 +29,7 @@ async function signIn(req: Request, res: Response) {
             { expiresIn: '1h' }
         );
 
-        res.status(200).json({
+        res.status(201).json({
             status: 'sign-in successfully',
             token,
             info: {
@@ -52,15 +52,18 @@ async function signUp(req: Request, res: Response) {
         if (!username) return res.status(400).send({ message: 'username is required' });
 
         const findUser = await User.findOne({ email });
-        if (!findUser) return res.status(409).send({ message: 'User already exist' });
+        if (findUser) return res.status(409).send({ message: 'User already exist' });
 
-        await User.insertOne({
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = new User({
             created_at,
             email,
-            password,
+            password: hashedPassword,
             username
         });
 
+        await newUser.save();
         res.status(201).json({ message: 'new user added' });
     } catch (error) {
         res.status(500).json({ message: 'internail server error' });

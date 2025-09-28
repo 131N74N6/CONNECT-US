@@ -8,8 +8,8 @@ import userRoutes from './routes/user.router';
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 app.use('/posts', postRoutes);
 app.use('/likes', likeRoutes);
 app.use('/comments', commentRoutes);

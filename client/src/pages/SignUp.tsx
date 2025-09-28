@@ -18,11 +18,11 @@ export default function SignUp() {
     }, [user, navigate]);
 
     useEffect(() => {
-        if (showMessage) {
+        if (error && showMessage) {
             const timer = setTimeout(() => setShowMessage(false), 3000);
             return clearTimeout(timer);
         }
-    }, [showMessage]);
+    }, [error, showMessage]);
 
     const hansleSignUp = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
@@ -91,7 +91,7 @@ export default function SignUp() {
                 : null}
                 <button 
                     type="submit" 
-                    disabled={loading || email === '' || username === '' || password === ''}
+                    disabled={loading}
                     className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Sign Up

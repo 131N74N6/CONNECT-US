@@ -28,7 +28,19 @@ export default function useAuth() {
                 throw new Error(errorMsg.message);
             }
 
-            if (request.ok) navigate('/signin');
+            const response: User = await request.json();
+            const signedInUser = {
+                status: response.status,
+                token: response.token,
+                info: {
+                    id: response.info.id,
+                    email: response.info.email,
+                    username: response.info.username
+                }
+            }
+
+            setUser(signedInUser);
+            localStorage.setItem('user', JSON.stringify(signedInUser));
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -50,19 +62,7 @@ export default function useAuth() {
                 throw new Error(errorMsg.message);
             }
 
-            const response: User = await request.json();
-            const signedInUser = {
-                status: response.status,
-                token: response.token,
-                info: {
-                    id: response.info.id,
-                    email: response.info.email,
-                    username: response.info.username
-                }
-            }
-
-            setUser(signedInUser);
-            localStorage.setItem('user', JSON.stringify(signedInUser));
+            if (request.ok) navigate('/signin');
         } catch (error: any) {
             setError(error.message);
         } finally {
