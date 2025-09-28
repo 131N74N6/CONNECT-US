@@ -9,7 +9,7 @@ export default function SignIn() {
     const [message, setMessage] = useState<string>('');
     const [showMessage, setShowMessage] = useState<boolean>(false);
 
-    const { user, signIn, loading: authLoading } = useAuth();
+    const { error, loading, user, signIn } = useAuth();
     const navigate = useNavigate();
 
     const handleSignIn = useCallback(async (event: React.FormEvent): Promise<void> => {
@@ -21,26 +21,19 @@ export default function SignIn() {
         const trimmedPassword = password.trim();
 
         try {
-            if (!trimmedEmail || !trimmedPassword) {
-                throw new Error('Email and password are required');
-            }
-
-            const { error: signInError } = await signIn(trimmedEmail, trimmedPassword);
-
-            if (signInError) {
-                throw new Error(signInError.message || 'Failed to sign in. Please try again.');
-            }
+            if (error) throw new Error(error);
+            await signIn(trimmedEmail, trimmedPassword);
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
         }
-    }, [email, password, signIn]);
+    }, [email, password]);
 
     useEffect(() => {
-        if (user && !authLoading) {
+        if (user && !loading) {
             navigate('/home', { replace: true });
         }
-    }, [user, authLoading, navigate]);
+    }, [user, loading, navigate]);
 
     useEffect(() => {
         if (showMessage) {
@@ -49,7 +42,7 @@ export default function SignIn() {
         }
     }, [showMessage]);
 
-    if (authLoading) return <Loading/>
+    if (loading) return <Loading/>
 
     return (
         <div className="flex justify-center items-center h-screen bg-[#1a1a1a]">
@@ -66,7 +59,7 @@ export default function SignIn() {
                         className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your@gmail.com"
                         required
-                        disabled={authLoading}
+                        disabled={loading}
                     />
                 </div>
                 
@@ -80,7 +73,7 @@ export default function SignIn() {
                         className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your_password"
                         required
-                        disabled={authLoading}
+                        disabled={loading}
                     />
                 </div>
                 
@@ -96,10 +89,10 @@ export default function SignIn() {
                 
                 <button 
                     type="submit" 
-                    disabled={authLoading || !email || !password}
+                    disabled={loading || !email || !password}
                     className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-purple-800 transition-colors"
                 >
-                    {authLoading ? 'Signing In...' : 'Sign In'}
+                    {loading ? 'Signing In...' : 'Sign In'}
                 </button>
             </form>
         </div>

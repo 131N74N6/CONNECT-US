@@ -1,81 +1,86 @@
-import { useEffect, useState, useCallback } from 'react';
-import type { User } from 'firebase/auth'
-import {  
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut as firebaseSignOut,
-    onAuthStateChanged,
-    updateProfile
-} from 'firebase/auth';
-import { auth } from './firebase-config';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from './firebase-config';
+import { useEffect, useState } from 'react';
+import type { User } from './custom-types';
+import { useNavigate } from 'react-router-dom';
 
 export default function useAuth() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        setLoading(true);
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-            setError(null);
-        }, (error) => {
-            setError(error.message);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
+        const userExist = localStorage.getItem('user');
+        if (userExist) setUser(JSON.parse(userExist));
+        setLoading(false);
     }, []);
 
-    const signUp = useCallback(async(email: string, username: string, password: string) => {
+    const signUp = async (created_at: string, email: string, username: string, password: string) => {
         setLoading(true);
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            
-            await updateProfile(user, { displayName: username });
-            
-            await setDoc(doc(db, 'users', user.uid), {
-                uid: user.uid,
-                email: user.email,
-                username: username,
-                createdAt: new Date()
+            const request = await fetch(`http://localhost:1234/users/sign-up`, {
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ created_at, email, password, username }),
+                method: 'POST',
             });
-            
-            return { data: user, error: null };
+
+            if (!request.ok) {
+                const errorMsg = await request.json()
+                throw new Error(errorMsg.message);
+            }
+
+            const response: User = await request.json();
+            const signedInUser = {
+                status: response.status,
+                token: response.token,
+                info: {
+                    id: response.info.id,
+                    email: response.info.email,
+                    username: response.info.username
+                }
+            }
+
+            setUser(signedInUser);
+            localStorage.setItem('user', JSON.stringify(signedInUser));
         } catch (error: any) {
             setError(error.message);
-            return { data: null, error };
         } finally {
             setLoading(false);
         }
-    }, []);
+    }
 
-    const signIn = useCallback(async(email: string, password: string) => {
+    const signIn = async (email: string, password: string) => {
         setLoading(true);
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            return { data: userCredential.user, error: null };
+            const request = await fetch(`http://localhost:1234/users/sign-in`, {
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+                method: 'POST',
+            });
+
+            if (!request.ok) {
+                const errorMsg = await request.json()
+                throw new Error(errorMsg.message);
+            }
+
+            navigate('/signin');
         } catch (error: any) {
             setError(error.message);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }
 
-    const signOut = useCallback(async() => {
+    const signOut = async () => {
         setLoading(true);
         try {
-            await firebaseSignOut(auth);
+            localStorage.removeItem('user');
+            navigate('/signin');
         } catch (error: any) {
             setError(error.message);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }
 
     return { user, loading, error, signUp, signIn, signOut };
 }

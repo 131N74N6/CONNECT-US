@@ -1,11 +1,20 @@
 import { Request, Response } from "express";
 import { Post } from "../models/post.model";
 
-async function getAllPosts(req: Request, res: Response): Promise<void> {
+async function getAllPosts(_: Request, res: Response): Promise<void> {
+    try {
+        const allPost = await Post.find();
+        res.json(allPost);
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
+async function getSignedUserPosts(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
-        const getPosts = await Post.find({ user_id: getUserId });
-        res.json(getPosts);
+        const userPosts = await Post.find({ user_id: getUserId });
+        res.json(userPosts);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -51,4 +60,4 @@ async function deleteSelectedPost(req: Request, res: Response): Promise<void> {
     }
 }
 
-export { deleteAllPosts, deleteSelectedPost, getAllPosts, getSelectedPost, insertNewPost }
+export { deleteAllPosts, deleteSelectedPost, getAllPosts, getSelectedPost, getSignedUserPosts, insertNewPost }

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../services/useAuth";
 import Loading from "../components/Loading";
 
 export default function SignUp() {
-    const { signUp, user, loading } = useAuth();
+    const { error, loading, signUp, user } = useAuth();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
@@ -24,21 +24,16 @@ export default function SignUp() {
         }
     }, [showMessage]);
 
-    async function hansleSignUp(event: React.FormEvent): Promise<void> {
+    const hansleSignUp = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
-
+        const getCurrentDate = new Date();
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
         const trimmedUserName = username.trim();
 
         try {
-            if (trimmedEmail === '' || trimmedPassword === '' || trimmedUserName === '') throw new Error('Missing required data');
-            
-            if (trimmedPassword.length < 6) throw new Error('Password is weak');
-
-            const { error } = await signUp(trimmedEmail, trimmedUserName, trimmedPassword);
-
-            if (error) throw new Error('Failed to sign up. Try again later.');
+            if (error) throw new Error(error);
+            await signUp(getCurrentDate.toISOString(), trimmedEmail, trimmedUserName, trimmedPassword);
         } catch (error: any) {
             setMessage(error.message);
             setShowMessage(true);
@@ -47,7 +42,7 @@ export default function SignUp() {
             setEmail('');
             setPassword('');
         }
-    }
+    }, [email, password, username]);
     
     if (loading) return <Loading/>
 

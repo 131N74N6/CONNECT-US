@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { getSelectedData, insertData, realTimeInit } from "../services/useFirestore";
-import { deleteData } from "../services/useFirestore";
+import DataModifer from "../services/data-modifier";
 import useAuth from "../services/useAuth";
 import type { IComments, ILikes, NewComment, NewPost } from "../services/custom-types";
 import Loading from "../components/Loading";
@@ -10,12 +9,9 @@ import PostSlider from "../components/PostSlider";
 import { deleteFromCloudinary } from "../services/useFileStorage";
 import { useState } from "react";
 import CommentField from "../components/CommentField";
+import useSWR from "swr";
 
 export default function PostDetail() {
-    const postCollection = 'posts';
-    const commentCollection = 'comments';
-    const likeCollection = 'likes';
-
     const { id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -23,22 +19,13 @@ export default function PostDetail() {
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
     
-    const { data: selectedPost, loading } = getSelectedData<NewPost>({
-        collection_name: postCollection,
-        values: id ? id : ''
-    });
+    const { getData } = DataModifer<NewPost>();
+    const { getData } = DataModifer<ILikes>();
+    const { getData } = DataModifer<IComments>();
 
-    const { data: commentsData } = realTimeInit<IComments>({
-        collection_name: commentCollection,
-        order_by_options: [['created_at', 'desc']],
-        filters: id ? [['post_id', '==', id]] : []
-    });
-
-    const { data: likesData } = realTimeInit<ILikes>({
-        collection_name: likeCollection,
-        order_by_options: [['created_at', 'desc']],
-        filters: id ? [['post_id', '==', id]] : []
-    });
+    const { data: selectedPost } = useSWR<NewPost>();
+    const { data: likesData } = useSWR<ILikes[]>();
+    const { data: commentsData } = useSWR<IComments[]>()
 
     const userLiked = user && likesData.some(like => like.user_id === user.uid);
 

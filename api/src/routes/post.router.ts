@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { deleteAllPosts, getAllPosts, getSelectedPost, insertNewPost } from "../controllers/post.controller";
+import { 
+    deleteAllPosts, getAllPosts, getSelectedPost, getSignedUserPosts, insertNewPost 
+} from "../controllers/post.controller";
 
 const postRoutes = Router();
 
-postRoutes.get('/get-all/:id', getAllPosts);
+postRoutes.get('/get-all/', getAllPosts);
+
+postRoutes.get('/signed-user/:id', getSignedUserPosts);
 
 postRoutes.get('/selected/:id', getSelectedPost);
 

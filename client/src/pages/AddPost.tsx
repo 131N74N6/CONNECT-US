@@ -1,17 +1,17 @@
 import { useState, useRef } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import useAuth from "../services/useAuth";
-import { insertData } from "../services/useFirestore";
+import DataModifer from "../services/data-modifier";
 import { uploadToCloudinary } from "../services/useFileStorage";
 import type { MediaFile, NewPost } from "../services/custom-types";
 
 export default function AddPost() {
     const { user } = useAuth();
+    const { insertData } = DataModifer<NewPost>();
     const [description, setDescription] = useState<string>('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const postsCollection = 'posts';
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -58,6 +58,7 @@ export default function AddPost() {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        const getCurrentDate = new Date();
         
         if (!user) {
             alert('You must be logged in to create a post');
@@ -86,27 +87,19 @@ export default function AddPost() {
                 }
             }
             
-            const postData = {
-                description: description.trim(),
-                media_urls: mediaUrls,
-                user_id: user.uid,
-                user_name: user.displayName || 'Anonymous',
-            };
-            
-            await insertData<NewPost>({
-                collectionName: postsCollection,
+            await insertData({
+                api_url: `http://localhost:1234/posts/add`,
                 data: {
-                    user_id: postData.user_id,
-                    uploader_name: postData.user_name,
-                    file_url: postData.media_urls,
-                    description: postData.description,
+                    created_at: getCurrentDate.toISOString(),
+                    description: description.trim(),
+                    file_url: mediaUrls,
+                    uploader_name: user.info.username,
+                    user_id: user.info.id,
                 }
             });
             
             setDescription('');
             setMediaFiles([]);
-            alert('Post created successfully!');
-        
         } catch (error) {
             console.error('Failed to create post:', error);
             alert('Failed to create post');
