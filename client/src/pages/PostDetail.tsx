@@ -6,7 +6,7 @@ import type { IComments, ILikes, NewPost } from "../services/custom-types";
 import Loading from "../components/Loading";
 import Error from "./Error";
 import PostSlider from "../components/PostSlider";
-import { deleteFromCloudinary } from "../services/useFileStorage";
+import { deleteFromCloudinary } from "../services/media-storage";
 import { useState } from "react";
 import CommentField from "../components/CommentField";
 import useSWR from "swr";
