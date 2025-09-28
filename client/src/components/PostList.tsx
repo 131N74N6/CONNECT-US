@@ -4,9 +4,9 @@ import PostItem from "./PostItem";
 export default function PostList(props: PostListProps) {
     if (!props.data || props.data.length === 0) {
         return (
-            <div className="flex justify-center items-center h-full">
-                <span className="text-[1.5rem] font-[600] text-purple-400">No Posts Found</span>
-            </div>
+             <section className="flex h-full items-center justify-center">
+                <span className="text-purple-400 font-[600] text-[1rem]">No post added currently...</span>
+            </section>
         );
     }
 

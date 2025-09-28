@@ -55,7 +55,7 @@ export function Navbar2() {
             </header>
             {openBar ?
                 <nav className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem]">
-                    <button type="button" className="text-purple-400 font-[500] text-[1rem]" onClick={() => setOpenBar(false)}>
+                    <button type="button" className="text-purple-400 font-[500] text-[1rem] text-right" onClick={() => setOpenBar(false)}>
                         <i className="fa-solid fa-xmark"></i>
                     </button>
                     <Link to={'/home'} className="outline-0 text-white flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
