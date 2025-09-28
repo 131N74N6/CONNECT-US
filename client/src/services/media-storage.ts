@@ -41,7 +41,7 @@ export async function deleteFromCloudinary(publicId: string, resourceType: 'imag
 
     try {
         const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/destroy`, {
-            method: 'POST',
+            method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 public_id: publicId,

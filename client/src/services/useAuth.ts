@@ -28,7 +28,7 @@ export default function useAuth() {
                 throw new Error(errorMsg.message);
             }
 
-            navigate('/signin');
+            if (request.ok) navigate('/signin');
         } catch (error: any) {
             setError(error.message);
         } finally {

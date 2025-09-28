@@ -1,10 +1,10 @@
 import type { IPostData } from "./custom-types";
 import useAuth from "./useAuth";
 
-const { user } = useAuth();
-const token = user ? user.token : null;
-
 async function deleteData(api_url: string) {
+    const { user } = useAuth();
+    const token = user ? user.token : null;
+
     const request = await fetch(api_url, {
         headers: {
             'Content-Type': 'application/json',
@@ -18,6 +18,9 @@ async function deleteData(api_url: string) {
 }
 
 async function getData(api_url: string) {
+    const { user } = useAuth();
+    const token = user ? user.token : null;
+
     const request = await fetch(api_url, {
         headers: {
             'Content-Type': 'application/json',
@@ -31,6 +34,9 @@ async function getData(api_url: string) {
 }
 
 async function insertData<TSX>(props: IPostData<TSX>) {
+    const { user } = useAuth();
+    const token = user ? user.token : null;
+    
     const request = await fetch(props.api_url, {
         body: JSON.stringify(props.data),
         headers: {

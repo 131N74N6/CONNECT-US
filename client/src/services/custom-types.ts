@@ -3,6 +3,11 @@ export type IPostData<T> = {
     data: Omit<T, 'id'>;
 }
 
+export type IPutData<T> = {
+    api_url: string;
+    data: Partial<Omit<T, 'id'>>;
+}
+
 export type MediaFile = {
     file: File;
     previewUrl: string;

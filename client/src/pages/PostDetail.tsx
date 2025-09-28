@@ -20,7 +20,7 @@ export default function PostDetail() {
     const [openComments, setOpenComments] = useState<boolean>(false);
 
     const { data: selectedPost, isLoading: postLoading, mutate: selectedPostMutate } = useSWR<NewPost>(
-        `http://localhost:1234/posts/selected/${id}`,
+        id ? `http://localhost:1234/posts/selected/${id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -31,7 +31,7 @@ export default function PostDetail() {
     );
 
     const { data: likesData, mutate: likeMutate } = useSWR<ILikes[]>(
-        `http://localhost:1234/likes/get-all/${id}`,
+        id ? `http://localhost:1234/likes/get-all/${id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -42,7 +42,7 @@ export default function PostDetail() {
     );
 
     const { data: commentsData, mutate: commentMutate } = useSWR<IComments[]>(
-        `http://localhost:1234/comments/get-all/${id}`,
+        id ? `http://localhost:1234/comments/get-all/${id}` : '',
         getData,
         {
             revalidateOnFocus: true,

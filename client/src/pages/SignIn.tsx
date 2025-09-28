@@ -58,7 +58,6 @@ export default function SignIn() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your@gmail.com"
-                        required
                         disabled={loading}
                     />
                 </div>
@@ -72,7 +71,6 @@ export default function SignIn() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your_password"
-                        required
                         disabled={loading}
                     />
                 </div>
@@ -89,7 +87,7 @@ export default function SignIn() {
                 
                 <button 
                     type="submit" 
-                    disabled={loading || !email || !password}
+                    disabled={loading}
                     className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-purple-800 transition-colors"
                 >
                     {loading ? 'Signing In...' : 'Sign In'}
