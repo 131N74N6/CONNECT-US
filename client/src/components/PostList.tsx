@@ -11,7 +11,7 @@ export default function PostList(props: PostListProps) {
     }
 
     return (
-        <section className="bg-[#1a1a1a] p-[1rem] gap-[1rem] flex flex-col md:w-3/4 w-full h-full overflow-y-auto">
+        <section className="bg-[#1a1a1a] gap-[1rem] flex flex-col overflow-y-auto">
             <div className="gap-[0.5rem] grid grid-cols-3">
                 {props.data.map((post) => (
                     <PostItem 
@@ -19,6 +19,7 @@ export default function PostList(props: PostListProps) {
                         _id={post._id} 
                         file_url={post.file_url}
                         description={post.description}
+                        user_id={post.user_id}
                     />
                 ))}
             </div>

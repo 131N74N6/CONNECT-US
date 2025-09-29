@@ -12,7 +12,7 @@ export function Navbar1() {
                 <i className="fa-solid fa-house"></i>
                 <span>Home</span>
             </Link>
-            <Link to={'/about'} className="outline-0 text-orange-400 flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
+            <Link to={user ? `/about/${user.info.id}` : '/home'} className="outline-0 text-orange-400 flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
                 <i className="fa-solid fa-address-card"></i>
                 <span>About</span>
             </Link>

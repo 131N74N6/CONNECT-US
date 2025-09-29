@@ -59,6 +59,7 @@ export type PostItemProps = {
     _id: string;
     description: string;
     file_url?: string[];
+    user_id: string;
 }
 
 export type PostDetail = {
@@ -77,6 +78,14 @@ export type PostListProps = {
 export type CommentProps = {
     comments_data: IComments[];
     onClose: () => void;
+}
+
+export type IFollowers = {
+    _id: string;
+    created_at: string;
+    other_user_id: string;
+    user_id: string;
+    username: string;
 }
 
 export type NotificationProps = {

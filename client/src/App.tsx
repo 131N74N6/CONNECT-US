@@ -16,7 +16,7 @@ export default function App() {
                     <Route path="/signin" element={<SignIn/>}/>
                     <Route path="/signup" element={<SignUp/>}/>
                     <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
-                    <Route path="/about" element={<ProtectedRoute><About/></ProtectedRoute>}/>
+                    <Route path="/about/:user_id" element={<ProtectedRoute><About/></ProtectedRoute>}/>
                     <Route path="/add-post" element={<ProtectedRoute><AddPost/></ProtectedRoute>}/>
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
                     <Route path="/post/:_id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>

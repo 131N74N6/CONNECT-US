@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Follower } from '../models/follower.model';
 
-async function deleteAllFollowers(req: Request, res: Response) {
+async function deleteAllFollowers(req: Request, res: Response): Promise<void> {
     try {
         const getSignedUserId = req.params.id;
         await Follower.deleteMany({ other_user_id: getSignedUserId });
@@ -11,7 +11,7 @@ async function deleteAllFollowers(req: Request, res: Response) {
     }
 }
 
-async function getAllFollowers(req: Request, res: Response) {
+async function getSignedUserAllFollowers(req: Request, res: Response): Promise<void> {
     try {
         const getSignedUserId = req.params.id;
         const showFollowers = await Follower.find({ other_user_id: getSignedUserId });
@@ -21,7 +21,17 @@ async function getAllFollowers(req: Request, res: Response) {
     }
 }
 
-async function followOtherUser(req: Request, res: Response) {
+async function getSignedUserWhoFollowed(req: Request, res: Response): Promise<void> {
+    try {
+        const getSignedUserId = req.params.id;
+        const showFollowed = await Follower.find({ user_id: getSignedUserId });
+        res.json(showFollowed);
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
+async function followOtherUser(req: Request, res: Response): Promise<void> {
     try {
         const newFollower = new Follower(req.body);
         await newFollower.save();
@@ -31,7 +41,7 @@ async function followOtherUser(req: Request, res: Response) {
     }
 }
 
-async function unfollowOtherUser(req: Request, res: Response) {
+async function unfollowOtherUser(req: Request, res: Response): Promise<void> {
     try {
         const getSignedUserId = req.params.id;
         await Follower.deleteOne({ user_id: getSignedUserId });
@@ -41,4 +51,7 @@ async function unfollowOtherUser(req: Request, res: Response) {
     }
 }
 
-export { deleteAllFollowers, getAllFollowers, followOtherUser, unfollowOtherUser }
+export { 
+    deleteAllFollowers, getSignedUserAllFollowers, getSignedUserWhoFollowed, 
+    followOtherUser, unfollowOtherUser 
+}

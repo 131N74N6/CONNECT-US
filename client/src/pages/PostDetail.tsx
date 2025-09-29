@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
@@ -76,6 +76,8 @@ export default function PostDetail() {
                     username: user.info.username
                 }
             });
+
+            commentMutate();
         } catch (error: any) {
             console.log(error.message);
         } finally {
@@ -165,7 +167,9 @@ export default function PostDetail() {
                             {selectedPost[0].uploader_name.charAt(0)}
                         </div>
                         <div>
-                            <h3 className="font-semibold">{selectedPost[0].uploader_name || 'Unknown User'}</h3>
+                            <Link to={`/about/${selectedPost[0].user_id}`} className="font-semibold">
+                                {selectedPost[0].uploader_name || 'Unknown User'}
+                            </Link>
                             <p className="text-gray-400 text-sm">{new Date(selectedPost[0].created_at).toLocaleString()}</p>
                         </div>
                     </div>
