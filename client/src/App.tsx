@@ -19,7 +19,7 @@ export default function App() {
                     <Route path="/about" element={<ProtectedRoute><About/></ProtectedRoute>}/>
                     <Route path="/add-post" element={<ProtectedRoute><AddPost/></ProtectedRoute>}/>
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
-                    <Route path="/post/:id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
+                    <Route path="/post/:_id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
                     <Route path="/" element={<Navigate to="/home" replace/>}/>
                     <Route path="*" element={<Navigate to="/signin" replace/>}/>
                 </Routes>

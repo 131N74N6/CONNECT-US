@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { getData, deleteData, insertData } from "../services/data-modifier";
 import useAuth from "../services/useAuth";
-import type { IComments, ILikes, NewPost } from "../services/custom-types";
+import type { IComments, ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import Error from "./Error";
 import PostSlider from "../components/PostSlider";
@@ -12,15 +12,15 @@ import CommentField from "../components/CommentField";
 import useSWR from "swr";
 
 export default function PostDetail() {
-    const { id } = useParams();
+    const { _id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
 
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
 
-    const { data: selectedPost, isLoading: postLoading, mutate: selectedPostMutate } = useSWR<NewPost>(
-        id ? `http://localhost:1234/posts/selected/${id}` : '',
+    const { data: selectedPost, isLoading: postLoading, mutate: selectedPostMutate } = useSWR<PostDetail>(
+        _id ? `http://localhost:1234/posts/selected/${_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -31,7 +31,7 @@ export default function PostDetail() {
     );
 
     const { data: likesData, mutate: likeMutate } = useSWR<ILikes[]>(
-        id ? `http://localhost:1234/likes/get-all/${id}` : '',
+        _id ? `http://localhost:1234/likes/get-all/${_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -42,7 +42,7 @@ export default function PostDetail() {
     );
 
     const { data: commentsData, mutate: commentMutate } = useSWR<IComments[]>(
-        id ? `http://localhost:1234/comments/get-all/${id}` : '',
+        _id ? `http://localhost:1234/comments/get-all/${_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -60,7 +60,7 @@ export default function PostDetail() {
 
         try {    
             if (!user) throw 'Invalid user data';
-            if (!id) throw 'Failed to get post';
+            if (!_id) throw 'Failed to get post';
             if (!comment.trim()) throw 'Missing required data';
 
             await insertData<IComments>({
@@ -68,7 +68,7 @@ export default function PostDetail() {
                 data: {
                     created_at: getCurrentDate.toISOString(),
                     opinions: comment.trim(),
-                    post_id: id,
+                    post_id: _id,
                     user_id: user.info.id,
                     username: user.info.username
                 }
@@ -84,16 +84,16 @@ export default function PostDetail() {
         const getCurrentDate = new Date();
         try {
             if (!user || !likesData) return;
-            if (!id) throw 'Failed to get post';
+            if (!_id) throw 'Failed to get post';
 
-            const existingLike = likesData.find(like => like.user_id === user.info.id && like.post_id === id);
+            const existingLike = likesData.find(like => like.user_id === user.info.id && like.post_id === _id);
 
             if (!existingLike) {
                 await insertData<ILikes>({
                     api_url: `http://localhost:1234/likes/add`,
                     data: {
                         created_at: getCurrentDate.toISOString(),
-                        post_id: id,
+                        post_id: _id,
                         user_id: user.info.id,
                     }
                 });
@@ -108,7 +108,7 @@ export default function PostDetail() {
     }
 
     const handleDeletePost = async () => {
-        if (!id) return;
+        if (!_id) return;
         if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
 
         try {
@@ -122,13 +122,13 @@ export default function PostDetail() {
                 await Promise.all(deletePromises);
             }
 
-            await deleteData(`http://localhost:1234/posts/delete/${id}`);
+            await deleteData(`http://localhost:1234/posts/delete/${_id}`);
             selectedPostMutate();
 
-            await deleteData(`http://localhost:1234/likes/delete/${id}`);
+            await deleteData(`http://localhost:1234/likes/delete/${_id}`);
             likeMutate();
 
-            await deleteData(`http://localhost:1234/comments/delete/${id}`);
+            await deleteData(`http://localhost:1234/comments/delete/${_id}`);
             commentMutate();
 
             navigate('/home');
@@ -159,7 +159,7 @@ export default function PostDetail() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {selectedPost.uploader_name?.charAt(0).toUpperCase() || 'U'}
+                            {selectedPost.uploader_name.charAt(0).toUpperCase() || 'U'}
                         </div>
                         <div>
                             <h3 className="font-semibold">{selectedPost.uploader_name || 'Unknown User'}</h3>

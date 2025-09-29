@@ -1,11 +1,11 @@
 export type IPostData<T> = {
     api_url: string;
-    data: Omit<T, 'id'>;
+    data: Omit<T, '_id'>;
 }
 
 export type IPutData<T> = {
     api_url: string;
-    data: Partial<Omit<T, 'id'>>;
+    data: Partial<Omit<T, '_id'>>;
 }
 
 export type MediaFile = {
@@ -26,14 +26,14 @@ export type User = {
 }
 
 export type ILikes = {
-    id: string;
+    _id: string;
     created_at: string;
     post_id: string;
     user_id: string;
 }
 
 export type IComments = {
-    id: string;
+    _id: string;
     created_at: string;
     opinions: string;
     post_id: string;
@@ -47,7 +47,7 @@ export type IGetSelectedData = {
 }
 
 export type NewPost = {
-    id: string;
+    _id: string;
     created_at: string;
     file_url?: string[];
     description: string;
@@ -56,11 +56,17 @@ export type NewPost = {
 }
 
 export type PostItemProps = {
-    id: string;
-    created_at: Date;
-    file_url?: string[];
+    _id: string;
     description: string;
-    media_type?: 'image' | 'video' | 'text';
+    file_url?: string[];
+}
+
+export type PostDetail = {
+    _id: string;
+    created_at: string;
+    description: string;
+    uploader_name: string;
+    file_url?: string[];
     user_id: string;
 }
 

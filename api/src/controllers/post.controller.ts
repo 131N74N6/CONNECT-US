@@ -3,7 +3,7 @@ import { Post } from "../models/post.model";
 
 async function getAllPosts(_: Request, res: Response): Promise<void> {
     try {
-        const allPost = await Post.find();
+        const allPost = await Post.find({}, { _id: 1, description: 1, file_url: 1 });
         res.json(allPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -13,7 +13,7 @@ async function getAllPosts(_: Request, res: Response): Promise<void> {
 async function getSignedUserPosts(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
-        const userPosts = await Post.find({ user_id: getUserId });
+        const userPosts = await Post.find({ user_id: getUserId }, { _id: 1, description: 1, file_url: 1 });
         res.json(userPosts);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

@@ -15,12 +15,10 @@ export default function PostList(props: PostListProps) {
             <div className="gap-[0.5rem] grid grid-cols-3">
                 {props.data.map((post) => (
                     <PostItem 
-                        key={`post_${post.id}`} 
-                        id={post.id} 
-                        created_at={post.created_at}
+                        key={`post_${post._id}`} 
+                        _id={post._id} 
                         file_url={post.file_url}
                         description={post.description}
-                        user_id={post.user_id}
                     />
                 ))}
             </div>

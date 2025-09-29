@@ -24,13 +24,11 @@ export default function PostItem(props: PostItemProps) {
     
     if (fileUrls.length === 0 || mediaType === 'text') {
         return (
-            <Link to={`/post/${props.id}`} className="block">
+            <Link to={`/post/${props._id}`} className="block">
                 <div className="rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-purple-400 bg-[#1a1a1a]">
                     <div className="w-full aspect-square flex items-center justify-center p-4">
                         <div className="text-center">
-                            <p className="text-purple-400 line-clamp-3">
-                                {props.description}
-                            </p>
+                            <p className="text-purple-400 line-clamp-3">{props.description}</p>
                         </div>
                     </div>
                 </div>
@@ -39,7 +37,7 @@ export default function PostItem(props: PostItemProps) {
     }
     
     return (
-        <Link to={`/post/${props.id}`} className="block h-full">
+        <Link to={`/post/${props._id}`} className="block h-full">
             <div className="rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 bg-gray-800">
                 <div className="w-full aspect-square overflow-hidden relative">
                     {mediaType === 'image' && !imageError ? (

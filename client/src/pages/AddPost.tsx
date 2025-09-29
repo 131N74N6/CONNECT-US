@@ -140,15 +140,15 @@ export default function AddPost() {
                             <div key={index} className="relative group">
                             {media.type === 'image' ? (
                                 <img 
-                                src={media.previewUrl} 
-                                alt={`Preview ${index + 1}`}
-                                className="w-full h-32 object-cover rounded-lg"
+                                    src={media.previewUrl} 
+                                    alt={`Preview ${index + 1}`}
+                                    className="w-full h-32 object-cover rounded-lg"
                                 />
                             ) : (
                                 <video 
-                                src={media.previewUrl}
-                                className="w-full h-32 object-cover rounded-lg"
-                                controls
+                                    src={media.previewUrl}
+                                    className="w-full h-32 object-cover rounded-lg"
+                                    controls
                                 />
                             )}
                             
