@@ -109,7 +109,7 @@ export default function AddPost() {
     }
 
     return (
-        <div className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">
+        <section className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">
             <Navbar1/>
             <Navbar2/>
             <form 
@@ -183,6 +183,6 @@ export default function AddPost() {
                     {isUploading ? 'Uploading...' : 'Add Post'}
                 </button>
             </form>
-        </div>
+        </section>
     );
 }

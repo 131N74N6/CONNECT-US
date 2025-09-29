@@ -26,10 +26,10 @@ export default function About() {
     if (signedUserPosts?.length === 0) return <Error message={"No posts found."}/>;
 
     return (
-        <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
+        <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
             <Navbar1/>
             <Navbar2/>
             <PostList data={signedUserPosts ? signedUserPosts : []}/>
-        </div>
+        </section>
     );
 }

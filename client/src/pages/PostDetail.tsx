@@ -22,7 +22,7 @@ export default function PostDetail() {
     const { deleteData: dislike, getData: getLikeData, insertData: giveLike } = DataModifier();
     const { deleteData: deleteComment, getData: getCommentData, insertData: insertComment } = DataModifier();
 
-    const { data: selectedPost, isLoading: postLoading, mutate: selectedPostMutate } = useSWR<PostDetail>(
+    const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',
         getSelectedPost,
         {
@@ -115,8 +115,8 @@ export default function PostDetail() {
         if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
 
         try {
-            if (selectedPost.file_url && selectedPost.file_url.length > 0) {
-                const deletePromises = selectedPost.file_url.map(url => {
+            if (selectedPost[0].file_url && selectedPost[0].file_url.length > 0) {
+                const deletePromises = selectedPost[0].file_url.map(url => {
                     const parts = url.split('/');
                     const publicId = parts[parts.length - 1].split('.')[0];
                     return deleteFromCloudinary(publicId, url.includes('.mp4') ? 'video' : 'image');
@@ -126,7 +126,7 @@ export default function PostDetail() {
             }
 
             await deletePost(`http://localhost:1234/posts/erase/${_id}`);
-            selectedPostMutate();
+            mutatePost();
 
             await dislike(`http://localhost:1234/likes/erase-all/${_id}`);
             likeMutate();
@@ -146,12 +146,12 @@ export default function PostDetail() {
     if (!selectedPost) return <Error message={'404 | NOT FOUND'} />;
 
     // Check if the current user is the post owner
-    const isPostOwner = user && user.info.id === selectedPost.user_id;
+    const isPostOwner = user && user.info.id === selectedPost[0].user_id;
 
     // Separate images and videos
-    const images = selectedPost.file_url?.filter(url => url.match(/\.(jpeg|jpg|gif|png)$/) !== null) || [];
+    const images = selectedPost[0].file_url?.filter(url => url.match(/\.(jpeg|jpg|gif|png)$/) !== null) || [];
 
-    const videos = selectedPost.file_url?.filter(url => url.match(/\.(mp4|webm|ogg)$/) !== null) || [];
+    const videos = selectedPost[0].file_url?.filter(url => url.match(/\.(mp4|webm|ogg)$/) !== null) || [];
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
@@ -162,11 +162,11 @@ export default function PostDetail() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {selectedPost.uploader_name}
+                            {selectedPost[0].uploader_name.charAt(0)}
                         </div>
                         <div>
-                            <h3 className="font-semibold">{selectedPost.uploader_name || 'Unknown User'}</h3>
-                            <p className="text-gray-400 text-sm">{new Date(selectedPost.created_at).toLocaleString()}</p>
+                            <h3 className="font-semibold">{selectedPost[0].uploader_name || 'Unknown User'}</h3>
+                            <p className="text-gray-400 text-sm">{new Date(selectedPost[0].created_at).toLocaleString()}</p>
                         </div>
                     </div>
                     
@@ -194,7 +194,7 @@ export default function PostDetail() {
                     ))}
             
                     <div>
-                        <div className="text-gray-200 h-[90%] overflow-y-auto">{selectedPost.description}</div>
+                        <div className="text-gray-200 h-[90%] overflow-y-auto">{selectedPost[0].description}</div>
                         <div className="flex gap-[1rem]">                            
                             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                                 <i 

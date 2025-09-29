@@ -11,7 +11,7 @@ export default function PostList(props: PostListProps) {
     }
 
     return (
-        <div className="bg-[#1a1a1a] p-[1rem] flex flex-col md:w-3/4 w-full overflow-y-auto">
+        <section className="bg-[#1a1a1a] p-[1rem] gap-[1rem] flex flex-col md:w-3/4 w-full h-full overflow-y-auto">
             <div className="gap-[0.5rem] grid grid-cols-3">
                 {props.data.map((post) => (
                     <PostItem 
@@ -22,6 +22,6 @@ export default function PostList(props: PostListProps) {
                     />
                 ))}
             </div>
-        </div>
+        </section>
     );
 }
