@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { getData, deleteData, insertData } from "../services/data-modifier";
+import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
 import type { IComments, ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
@@ -18,10 +18,13 @@ export default function PostDetail() {
 
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
+    const { deleteData: deletePost, getData: getSelectedPost } = DataModifier();
+    const { deleteData: dislike, getData: getLikeData, insertData: giveLike } = DataModifier();
+    const { deleteData: deleteComment, getData: getCommentData, insertData: insertComment } = DataModifier();
 
     const { data: selectedPost, isLoading: postLoading, mutate: selectedPostMutate } = useSWR<PostDetail>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',
-        getData,
+        getSelectedPost,
         {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
@@ -32,7 +35,7 @@ export default function PostDetail() {
 
     const { data: likesData, mutate: likeMutate } = useSWR<ILikes[]>(
         _id ? `http://localhost:1234/likes/get-all/${_id}` : '',
-        getData,
+        getLikeData,
         {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
@@ -43,7 +46,7 @@ export default function PostDetail() {
 
     const { data: commentsData, mutate: commentMutate } = useSWR<IComments[]>(
         _id ? `http://localhost:1234/comments/get-all/${_id}` : '',
-        getData,
+        getCommentData,
         {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
@@ -63,7 +66,7 @@ export default function PostDetail() {
             if (!_id) throw 'Failed to get post';
             if (!comment.trim()) throw 'Missing required data';
 
-            await insertData<IComments>({
+            await insertComment<IComments>({
                 api_url: `http://localhost:1234/comments/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
@@ -89,7 +92,7 @@ export default function PostDetail() {
             const existingLike = likesData.find(like => like.user_id === user.info.id && like.post_id === _id);
 
             if (!existingLike) {
-                await insertData<ILikes>({
+                await giveLike<ILikes>({
                     api_url: `http://localhost:1234/likes/add`,
                     data: {
                         created_at: getCurrentDate.toISOString(),
@@ -99,7 +102,7 @@ export default function PostDetail() {
                 });
                 likeMutate();
             } else {
-                await deleteData(`http://localhost:1234/likes/delete/${user.info.id}`);
+                await dislike(`http://localhost:1234/likes/erase/${user.info.id}`);
                 likeMutate();
             }
         } catch (error: any) {
@@ -122,13 +125,13 @@ export default function PostDetail() {
                 await Promise.all(deletePromises);
             }
 
-            await deleteData(`http://localhost:1234/posts/delete/${_id}`);
+            await deletePost(`http://localhost:1234/posts/erase/${_id}`);
             selectedPostMutate();
 
-            await deleteData(`http://localhost:1234/likes/delete/${_id}`);
+            await dislike(`http://localhost:1234/likes/erase-all/${_id}`);
             likeMutate();
 
-            await deleteData(`http://localhost:1234/comments/delete/${_id}`);
+            await deleteComment(`http://localhost:1234/comments/erase-all/${_id}`);
             commentMutate();
 
             navigate('/home');

@@ -3,13 +3,13 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
 import useAuth from "../services/useAuth";
-import { getData } from "../services/data-modifier";
+import DataModifier from "../services/data-modifier";
 import useSWR from "swr";
 import Error from "./Error";
 
 export default function About() {
     const { user } = useAuth();
-    
+    const { getData } = DataModifier();
     const { data: signedUserPosts, isLoading } = useSWR<PostItemProps[]>(
         user ? `http://localhost:1234/posts/signed-user/${user.info.id}` : null,
         getData,

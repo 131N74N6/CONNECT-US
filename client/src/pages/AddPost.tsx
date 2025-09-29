@@ -1,12 +1,13 @@
 import { useState, useRef } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import useAuth from "../services/useAuth";
-import { insertData } from "../services/data-modifier";
+import DataModifier from "../services/data-modifier";
 import { uploadToCloudinary } from "../services/media-storage";
 import type { MediaFile, NewPost } from "../services/custom-types";
 
 export default function AddPost() {
     const { user } = useAuth();
+    const { insertData } = DataModifier();
     const [description, setDescription] = useState<string>('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);

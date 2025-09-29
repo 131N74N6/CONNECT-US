@@ -2,11 +2,12 @@ import type { PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
-import { getData } from '../services/data-modifier';
+import DataModifier from '../services/data-modifier';
 import useSWR from 'swr';
 import Error from "./Error";
 
 export default function Home() {
+    const { getData } = DataModifier();
     const { data: allPosts, isLoading, error } = useSWR<PostItemProps[]>(
         `http://localhost:1234/posts/get-all`, 
         getData,
@@ -21,8 +22,6 @@ export default function Home() {
     if (isLoading) return <Loading />;
 
     if (error) return <Error message="FAILED TO GET POST"/>
-
-    console.log(allPosts);
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
