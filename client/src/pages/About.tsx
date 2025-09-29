@@ -1,4 +1,4 @@
-import type { IFollowers, PostItemProps } from "../services/custom-types";
+import type { IFollowers, PostItemProps, IUser } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 
 export default function About() {
     const { user_id } = useParams();
+    const { getData: getAllUsers } = DataModifier();
     const { getData: getSignedUserFollowers } = DataModifier();
     const { getData: getFollowedUserBySignedUser } = DataModifier();
     const { getData: getSignedUserPosts } = DataModifier();
@@ -46,6 +47,19 @@ export default function About() {
         }
     );
 
+    const { data: allUsers } = useSWR<IUser[]>(
+        `http://localhost:1234/users/get-all/`,
+        getAllUsers,
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000,
+            errorRetryCount: 3
+        }
+    );
+
+    const notOwner = user_id && allUsers && allUsers.filter(user => user._id === user_id);
+
     if (isLoading) return <Loading/>;
 
     if (signedUserPosts?.length === 0) return <Error message={"No posts found."}/>;
@@ -55,6 +69,7 @@ export default function About() {
             <Navbar1/>
             <Navbar2/>
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
+                {notOwner ? null : <button className="bg-white text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]">Follow</button>}
                 <ul className="flex justify-evenly">
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Followers</span>

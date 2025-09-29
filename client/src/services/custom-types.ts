@@ -25,6 +25,10 @@ export type User = {
     }
 }
 
+export type IUser = {
+    _id: string;
+}
+
 export type ILikes = {
     _id: string;
     created_at: string;
