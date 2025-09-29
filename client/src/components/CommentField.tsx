@@ -10,23 +10,23 @@ export default function CommentField(props: CommentProps) {
                         <i className="fa-solid fa-xmark"></i>
                     </button>
                 </div>
-                <div className="flex flex-col gap-[1rem]">
+                <section className="flex flex-col gap-[1rem]">
                     {props.comments_data.length > 0 ?
                         props.comments_data.map((comment) => (
-                            <div className="bg-black p-[0.6rem] rounded-[0.6rem]">
+                            <div className="bg-black p-[0.6rem] rounded-[0.6rem]" key={`cmt: ${comment._id}`}>
                                 <div className="flex justify-between">
                                     <p>{comment.username}</p>
                                     <p className="text-[0.9rem]">{new Date(comment.created_at).toLocaleString()}</p>
                                 </div>
-                                <h3 className="font-[500]">{comment.opinion}</h3>
+                                <h3 className="font-[500]">{comment.opinions}</h3>
                             </div>
                         )) : (
-                            <div className="flex justify-center items-center">
+                            <section className="flex justify-center h-full items-center">
                                 <span className="text-center font-[550] text-[1.6rem]">No Comments</span>
-                            </div>
+                            </section>
                         )
                     }
-                </div>
+                </section>
             </div>
         </div>
     );

@@ -162,7 +162,7 @@ export default function PostDetail() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {selectedPost.uploader_name.charAt(0).toUpperCase() || 'U'}
+                            {selectedPost.uploader_name}
                         </div>
                         <div>
                             <h3 className="font-semibold">{selectedPost.uploader_name || 'Unknown User'}</h3>
