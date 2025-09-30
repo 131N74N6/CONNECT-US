@@ -14,7 +14,7 @@ export default function About() {
     const { getData, insertData, deleteData } = DataModifier();
     
     const { data: currentUserPost, isLoading } = useSWR<PostItemProps[]>(
-        user_id && `http://localhost:1234/posts/signed-user/${user_id}`,
+        user_id ? `http://localhost:1234/posts/signed-user/${user_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -25,7 +25,7 @@ export default function About() {
     );
 
     const { data: currentUserFollower, mutate: currentUserFollowerMutate } = useSWR<IFollowers[]>(
-        user_id && `http://localhost:1234/followers/get-all/${user_id}`,
+        user_id ? `http://localhost:1234/followers/get-all/${user_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -36,7 +36,7 @@ export default function About() {
     );
     
     const { data: currentUserFollowing, mutate: currentUserFollowingMutate } = useSWR<IFollowers[]>(
-        user && `http://localhost:1234/followers/who-followed/${user.info.id}`,
+        user_id ? `http://localhost:1234/followers/who-followed/${user_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -47,7 +47,7 @@ export default function About() {
     );
 
     const notOwner = user_id && user && user.info.id !== user_id;
-    const isFollowed = user && currentUserFollowing ? currentUserFollowing.some(follow => follow.other_user_id === user_id) : false;
+    const isFollowed = user_id && currentUserFollowing ? currentUserFollowing.some(follow => follow.other_user_id === user_id) : false;
 
     const handleFollowBtn = async (): Promise<void> => {
         if (!user_id || !user) return;
