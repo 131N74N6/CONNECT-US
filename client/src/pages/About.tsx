@@ -12,9 +12,9 @@ export default function About() {
     const { user } = useAuth();
     const { user_id } = useParams();
     const { getData: getSignedUserFollowers } = DataModifier();
-    const { getData: getFollowedUserBySignedUser } = DataModifier();
+    const { getData: getFollowedUserBySignedUser, insertData: startFollow, deleteData: unfollow } = DataModifier();
     const { getData: getSignedUserPosts } = DataModifier();
-
+    
     const { data: signedUserPosts, isLoading } = useSWR<PostItemProps[]>(
         user_id ? `http://localhost:1234/posts/signed-user/${user_id}` : null,
         getSignedUserPosts,
@@ -36,8 +36,8 @@ export default function About() {
             errorRetryCount: 3
         }
     );
-
-    const { data: followedUser } = useSWR<IFollowers[]>(
+    
+    const { data: followedUser, mutate: followedUserMutate } = useSWR<IFollowers[]>(
         user_id ? `http://localhost:1234/followers/who-followed/${user_id}` : null,
         getFollowedUserBySignedUser,
         {
@@ -49,6 +49,29 @@ export default function About() {
     );
 
     const notOwner = user_id && user && user.info.id !== user_id;
+    const signedUserHasFollowed = user && followedUser ? followedUser.some(flwd => flwd.user_id === user.info.id) : false;
+
+    const handleFollowBtn = async (): Promise<void> => {
+        if (!user_id || !user) return;
+        const getCurrentDate = new Date();
+
+        if (!signedUserHasFollowed) {
+            await startFollow<IFollowers>({
+                api_url: `http://localhost:1234/followers/add`,
+                data: {
+                    created_at: getCurrentDate.toISOString(),
+                    other_user_id: user_id,
+                    user_id: user.info.id,
+                    username: user.info.username
+                }
+            });
+
+            followedUserMutate();
+        } else {
+            await unfollow(`http://localhost:1234/followers/erase/${user.info.id}`);
+            followedUserMutate();
+        }
+    }
 
     if (isLoading) return <Loading/>;
 
@@ -59,7 +82,18 @@ export default function About() {
             <Navbar1/>
             <Navbar2/>
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
-                {notOwner ? null : <button className="bg-white text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]">Follow</button>}
+                {notOwner ? 
+                    <button 
+                        type="button"
+                        onClick={handleFollowBtn} 
+                        className={
+                            signedUserHasFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]" : 
+                            "bg-white text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
+                        }
+                    >
+                        {signedUserHasFollowed ? 'Followed' : 'Follow' }
+                    </button> 
+                : null}
                 <ul className="flex justify-evenly">
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Followers</span>

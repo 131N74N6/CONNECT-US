@@ -6,15 +6,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-async function getAllUsers(_: Request, res: Response) {
-    try {
-        const getAllUsers = await User.find({}, { _id: 1 });
-        res.json(getAllUsers);
-    } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
-    }
-}
-
 async function signIn(req: Request, res: Response) {
     try {
         const { email, password } = req.body;
@@ -79,4 +70,4 @@ async function signUp(req: Request, res: Response) {
     }
 }
 
-export { getAllUsers, signIn, signUp }
+export { signIn, signUp }
