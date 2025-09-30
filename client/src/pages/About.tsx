@@ -47,7 +47,7 @@ export default function About() {
     );
 
     const notOwner = user_id && user && user.info.id !== user_id;
-    const isFollowed = user_id && currentUserFollowing ? currentUserFollowing.some(follow => follow.other_user_id === user_id) : false;
+    const isFollowed = currentUserFollower && user ? currentUserFollower.some(follow => user.info.id === follow.user_id) : false;
 
     const handleFollowBtn = async (): Promise<void> => {
         if (!user_id || !user) return;

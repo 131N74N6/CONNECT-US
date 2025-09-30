@@ -55,7 +55,7 @@ export default function PostDetail() {
         }
     );
 
-    const userLiked = user && likesData ? likesData.some(like => like.user_id === user.info.id) : [];
+    const userLiked = _id && likesData && user ? likesData.find(like => like.user_id === user.info.id && like.post_id === _id) : false;
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
@@ -91,9 +91,7 @@ export default function PostDetail() {
             if (!user || !likesData) return;
             if (!_id) throw 'Failed to get post';
 
-            const existingLike = likesData.find(like => like.user_id === user.info.id && like.post_id === _id);
-
-            if (!existingLike) {
+            if (!userLiked) {
                 await giveLike<ILikes>({
                     api_url: `http://localhost:1234/likes/add`,
                     data: {
@@ -102,11 +100,10 @@ export default function PostDetail() {
                         user_id: user.info.id,
                     }
                 });
-                likeMutate();
             } else {
                 await dislike(`http://localhost:1234/likes/erase/${user.info.id}`);
-                likeMutate();
             }
+            likeMutate();
         } catch (error: any) {
             console.log(error.message);
         }
