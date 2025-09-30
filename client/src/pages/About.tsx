@@ -1,4 +1,4 @@
-import type { IFollowers, PostItemProps, IUser } from "../services/custom-types";
+import type { IFollowers, PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -6,10 +6,11 @@ import DataModifier from "../services/data-modifier";
 import useSWR from "swr";
 import Error from "./Error";
 import { useParams } from "react-router-dom";
+import useAuth from "../services/useAuth";
 
 export default function About() {
+    const { user } = useAuth();
     const { user_id } = useParams();
-    const { getData: getAllUsers } = DataModifier();
     const { getData: getSignedUserFollowers } = DataModifier();
     const { getData: getFollowedUserBySignedUser } = DataModifier();
     const { getData: getSignedUserPosts } = DataModifier();
@@ -47,22 +48,11 @@ export default function About() {
         }
     );
 
-    const { data: allUsers } = useSWR<IUser[]>(
-        `http://localhost:1234/users/get-all/`,
-        getAllUsers,
-        {
-            revalidateOnFocus: true,
-            revalidateOnReconnect: true,
-            dedupingInterval: 5000,
-            errorRetryCount: 3
-        }
-    );
-
-    const notOwner = user_id && allUsers && allUsers.filter(user => user._id === user_id);
+    const notOwner = user_id && user && user.info.id !== user_id;
 
     if (isLoading) return <Loading/>;
 
-    if (signedUserPosts?.length === 0) return <Error message={"No posts found."}/>;
+    if (!signedUserPosts) return <Error message={"No posts found."}/>;
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
