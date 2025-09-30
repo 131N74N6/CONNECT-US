@@ -14,7 +14,7 @@ export default function About() {
     const { getData, insertData, deleteData } = DataModifier();
     
     const { data: currentUserPost, isLoading } = useSWR<PostItemProps[]>(
-        user_id ? `http://localhost:1234/posts/signed-user/${user_id}` : null,
+        user_id && `http://localhost:1234/posts/signed-user/${user_id}`,
         getData,
         {
             revalidateOnFocus: true,
@@ -25,7 +25,7 @@ export default function About() {
     );
 
     const { data: currentUserFollower, mutate: currentUserFollowerMutate } = useSWR<IFollowers[]>(
-        user_id ? `http://localhost:1234/followers/get-all/${user_id}` : null,
+        user_id && `http://localhost:1234/followers/get-all/${user_id}`,
         getData,
         {
             revalidateOnFocus: true,
@@ -36,7 +36,7 @@ export default function About() {
     );
     
     const { data: currentUserFollowing, mutate: currentUserFollowingMutate } = useSWR<IFollowers[]>(
-        user_id ? `http://localhost:1234/followers/who-followed/${user_id}` : null,
+        user && `http://localhost:1234/followers/who-followed/${user.info.id}`,
         getData,
         {
             revalidateOnFocus: true,
@@ -86,13 +86,13 @@ export default function About() {
                         onClick={handleFollowBtn} 
                         className={
                             isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]" : 
-                            "bg-white text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
+                            "bg-yellow-300 text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
                         }
                     >
-                        {isFollowed ? 'Followed' : 'Follow' }
+                        {isFollowed ? 'Following' : 'Follow' }
                     </button> 
                 : null}
-                <ul className="flex justify-evenly">
+                <ul className="flex justify-evenly border-b border-purple-400 pb-[0.45rem]">
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Followers</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
