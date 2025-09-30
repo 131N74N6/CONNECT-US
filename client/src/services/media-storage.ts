@@ -36,24 +36,23 @@ export async function uploadToCloudinary(file: File): Promise<UploadResult> {
     }
 }
 
-export async function deleteFromCloudinary(publicId: string, resourceType: 'image' | 'video'): Promise<void> {
-    if (!CLOUDINARY_CLOUD_NAME) throw new Error('Cloudinary configuration is missing');
+export async function deleteFromCloudinary(publicId: string): Promise<void> {
+    const formData = new FormData();
+    formData.append('public_id', publicId);
+    formData.append('api_key', import.meta.env.VITE_CLOUDINARY_API_KEY);
+    formData.append('cloud_name', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
 
-    try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/destroy`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                public_id: publicId,
-                api_key: import.meta.env.VITE_CLOUDINARY_API_KEY,
-                timestamp: Date.now(),
-                signature: import.meta.env.VITE_CLOUDINARY_API_SECRET, 
-            })}
-        );
+    const request = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/destroy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: formData
+    });
 
-        if (!response.ok) throw new Error('Failed to delete file');
-    } catch (error) {
-        console.error('Cloudinary delete error:', error);
-        throw new Error('File deletion failed');
-    }
+    const response = await request.json();
+    return response;
+}
+
+export function extractPublicIdFromUrl(url: string): string | null {
+    const matches = url.match(/\/upload\/(?:v\d+\/)?(.+?)\.(?:jpg|jpeg|png|gif|mp4|webm|ogg)/);
+    return matches ? matches[1] : null;
 }

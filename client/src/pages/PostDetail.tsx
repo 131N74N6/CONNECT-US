@@ -6,7 +6,7 @@ import type { IComments, ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import Error from "./Error";
 import PostSlider from "../components/PostSlider";
-import { deleteFromCloudinary } from "../services/media-storage";
+import { deleteFromCloudinary, extractPublicIdFromUrl } from "../services/media-storage";
 import { useState } from "react";
 import CommentField from "../components/CommentField";
 import useSWR from "swr";
@@ -115,13 +115,15 @@ export default function PostDetail() {
 
         try {
             if (selectedPost[0].file_url && selectedPost[0].file_url.length > 0) {
-                const deletePromises = selectedPost[0].file_url.map(url => {
-                    const parts = url.split('/');
-                    const publicId = parts[parts.length - 1].split('.')[0];
-                    return deleteFromCloudinary(publicId, url.includes('.mp4') ? 'video' : 'image');
-                });
-
-                await Promise.all(deletePromises);
+                const deletePromises = selectedPost[0].file_url.map(async (url) => {
+                    const publicId = extractPublicIdFromUrl(url);
+                        if (publicId) {
+                            await deleteFromCloudinary(publicId);
+                            console.log(`Deleted: ${publicId}`);
+                        }
+                    }
+                );
+                await Promise.allSettled(deletePromises);
             }
 
             await deletePost(`http://localhost:1234/posts/erase/${_id}`);
