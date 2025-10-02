@@ -6,7 +6,7 @@ import type { IComments, ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import Error from "./Error";
 import PostSlider from "../components/PostSlider";
-import { deleteFromCloudinary, extractPublicIdFromUrl } from "../services/media-storage";
+import { deleteFromCloudinary,  } from "../services/media-storage";
 import { useState } from "react";
 import CommentField from "../components/CommentField";
 import useSWR from "swr";
@@ -15,6 +15,7 @@ export default function PostDetail() {
     const { _id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const postFolder = 'sns_posts';
 
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
@@ -116,13 +117,9 @@ export default function PostDetail() {
         try {
             if (selectedPost[0].file_url && selectedPost[0].file_url.length > 0) {
                 const deletePromises = selectedPost[0].file_url.map(async (url) => {
-                    const publicId = extractPublicIdFromUrl(url);
-                        if (publicId) {
-                            await deleteFromCloudinary(publicId);
-                            console.log(`Deleted: ${publicId}`);
-                        }
-                    }
-                );
+                    const getPublicId = url.split('/')[8];
+                    await deleteFromCloudinary(getPublicId, postFolder);
+                });
                 await Promise.allSettled(deletePromises);
             }
 

@@ -12,6 +12,7 @@ export default function AddPost() {
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const postFolder = 'sns_posts';
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -77,7 +78,7 @@ export default function AddPost() {
             
             for (const mediaFile of mediaFiles) {
                 try {
-                    const result = await uploadToCloudinary(mediaFile.file);
+                    const result = await uploadToCloudinary(mediaFile.file, postFolder);
                     mediaUrls.push(result.url);
                 } catch (error) {
                     console.error('Failed to upload media:', error);
@@ -101,7 +102,7 @@ export default function AddPost() {
             setDescription('');
             setMediaFiles([]);
         } catch (error) {
-            console.error('Failed to create post:', error);
+            console.error('Failed to create post');
             alert('Failed to create post');
         } finally {
             setIsUploading(false);

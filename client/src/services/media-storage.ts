@@ -7,7 +7,7 @@ export interface UploadResult {
     resourceType: 'image' | 'video';
 }
 
-export async function uploadToCloudinary(file: File): Promise<UploadResult> {
+export async function uploadToCloudinary(file: File, folder_name: string): Promise<UploadResult> {
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) throw new Error('Cloudinary configuration is missing');
 
     const formData = new FormData();
@@ -15,6 +15,7 @@ export async function uploadToCloudinary(file: File): Promise<UploadResult> {
     formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
     formData.append('cloud_name', CLOUDINARY_CLOUD_NAME);
     formData.append('public_id', `${Date.now()}_${file.name}`);
+    formData.append('folder', folder_name);
 
     try {
         const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
@@ -36,23 +37,12 @@ export async function uploadToCloudinary(file: File): Promise<UploadResult> {
     }
 }
 
-export async function deleteFromCloudinary(publicId: string): Promise<void> {
-    const formData = new FormData();
-    formData.append('public_id', publicId);
-    formData.append('api_key', import.meta.env.VITE_CLOUDINARY_API_KEY);
-    formData.append('cloud_name', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
-
-    const request = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/destroy`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: formData
+export async function deleteFromCloudinary(publicId: string, folder_name: string): Promise<void> {
+    const request = await fetch(`http://localhost:1234/posts/remove-selected-file`, {
+        method: 'DELETE',
+        body: JSON.stringify({ folder_name, public_id: publicId })
     });
 
     const response = await request.json();
     return response;
-}
-
-export function extractPublicIdFromUrl(url: string): string | null {
-    const matches = url.match(/\/upload\/(?:v\d+\/)?(.+?)\.(?:jpg|jpeg|png|gif|mp4|webm|ogg)/);
-    return matches ? matches[1] : null;
 }

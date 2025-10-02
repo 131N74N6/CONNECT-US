@@ -1,5 +1,15 @@
-import { Request, Response } from "express";
-import { Post } from "../models/post.model";
+import { Request, Response } from 'express';
+import { Post } from '../models/post.model';
+import dotenv from 'dotenv';
+import { v2 } from 'cloudinary';
+
+dotenv.config();
+
+v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 async function getAllPosts(_: Request, res: Response): Promise<void> {
     try {
@@ -70,7 +80,17 @@ async function deleteSelectedPost(req: Request, res: Response): Promise<void> {
     }
 }
 
+async function deleteSelectedFile(req: Request, res: Response) {
+    try {
+        const { folder_name, public_id } = req.body;
+        await v2.uploader.destroy(`${folder_name}/${public_id}`);
+        res.status(201).json({ message: 'file successfully removed from cloudinary' });
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
 export { 
-    deleteAllPosts, deleteSelectedPost, getAllPosts, getSearchedPost, 
+    deleteAllPosts, deleteSelectedFile, deleteSelectedPost, getAllPosts, getSearchedPost, 
     getSelectedPost, getSignedUserPosts, insertNewPost 
 }
