@@ -117,7 +117,7 @@ export default function PostDetail() {
         try {
             if (selectedPost[0].file_url && selectedPost[0].file_url.length > 0) {
                 const deletePromises = selectedPost[0].file_url.map(async (url) => {
-                    const getPublicId = url.split('/')[8];
+                    const getPublicId = url.split('/')[8].replace(/\.[^/.]+$/, "");
                     await deleteFromCloudinary(getPublicId, postFolder);
                 });
                 await Promise.allSettled(deletePromises);
@@ -143,7 +143,6 @@ export default function PostDetail() {
 
     if (!selectedPost) return <Error message={'404 | NOT FOUND'} />;
 
-    // Check if the current user is the post owner
     const isPostOwner = user && user.info.id === selectedPost[0].user_id;
 
     // Separate images and videos

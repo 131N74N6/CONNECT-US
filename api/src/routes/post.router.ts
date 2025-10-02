@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { 
-    deleteAllPosts, deleteSelectedFile, getAllPosts, getSelectedPost, getSignedUserPosts, insertNewPost 
+    deleteAllPosts, deleteSelectedFile, getAllPosts, getSearchedPost, getSelectedPost, getSignedUserPosts, insertNewPost 
 } from "../controllers/post.controller";
 
 const postRoutes = Router();
@@ -12,6 +12,8 @@ postRoutes.get('/signed-user/:id', getSignedUserPosts);
 postRoutes.get('/selected/:id', getSelectedPost);
 
 postRoutes.post('/add', insertNewPost);
+
+postRoutes.post('/searched', getSearchedPost);
 
 postRoutes.delete('/erase-all/:id', deleteAllPosts);
 

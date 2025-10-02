@@ -39,10 +39,10 @@ export async function uploadToCloudinary(file: File, folder_name: string): Promi
 
 export async function deleteFromCloudinary(publicId: string, folder_name: string): Promise<void> {
     const request = await fetch(`http://localhost:1234/posts/remove-selected-file`, {
+        body: JSON.stringify({ folder_name, public_id: publicId }),
+        headers: { 'Content-Type': 'application/json' },
         method: 'DELETE',
-        body: JSON.stringify({ folder_name, public_id: publicId })
     });
 
-    const response = await request.json();
-    return response;
+    await request.json();
 }

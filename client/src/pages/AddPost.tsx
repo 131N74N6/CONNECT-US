@@ -102,7 +102,6 @@ export default function AddPost() {
             setDescription('');
             setMediaFiles([]);
         } catch (error) {
-            console.error('Failed to create post');
             alert('Failed to create post');
         } finally {
             setIsUploading(false);

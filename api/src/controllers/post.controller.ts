@@ -23,8 +23,8 @@ async function getAllPosts(_: Request, res: Response): Promise<void> {
 async function getSearchedPost(req: Request, res: Response): Promise<void> {
     try {
         const { searched } = req.body;
-        const getSearchedPost = await Post.find({ $text: { $search: searched } });
-        res.json(getSearchedPost);
+        const searchedPost = await Post.find({ $text: { $search: searched } });
+        res.json(searchedPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

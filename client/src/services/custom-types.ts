@@ -25,8 +25,10 @@ export type User = {
     }
 }
 
-export type IUser = {
+export type IUserInfo = {
     _id: string;
+    email: string;
+    username: string;
 }
 
 export type ILikes = {

@@ -39,7 +39,7 @@ async function signIn(req: Request, res: Response) {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'internail server error' });
+        res.status(500).json({ message: 'internal server error' });
     }
 }
 
@@ -66,8 +66,31 @@ async function signUp(req: Request, res: Response) {
         await newUser.save();
         res.status(201).json({ message: 'new user added' });
     } catch (error) {
-        res.status(500).json({ message: 'internail server error' });
+        res.status(500).json({ message: 'internal server error' });
     }
 }
 
-export { signIn, signUp }
+async function getSelectedUser(req: Request, res: Response) {
+    try {
+        const getUserId = req.params.id;
+        const findUser = await User.find({ _id: getUserId }, { email: 1, username: 1 });
+        res.json(findUser);
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
+async function updateSelectedUser(req: Request, res: Response) {
+    try {
+        const getUserId = req.params.id;
+        await User.updateOne({ _id: getUserId }, {
+            $set: {
+                username: req.body.username
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
+export { getSelectedUser, signIn, signUp, updateSelectedUser }

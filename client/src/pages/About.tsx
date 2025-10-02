@@ -5,7 +5,7 @@ import PostList from "../components/PostList";
 import DataModifier from "../services/data-modifier";
 import useSWR from "swr";
 import Error from "./Error";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
 
 export default function About() {
@@ -80,18 +80,27 @@ export default function About() {
             <Navbar1/>
             <Navbar2/>
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
-                {notOwner ? 
-                    <button 
-                        type="button"
-                        onClick={handleFollowBtn} 
-                        className={
-                            isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]" : 
-                            "bg-yellow-300 text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
-                        }
-                    >
-                        {isFollowed ? 'Following' : 'Follow' }
-                    </button> 
-                : null}
+                <div>
+                    {notOwner ? (
+                        <button 
+                            type="button"
+                            onClick={handleFollowBtn} 
+                            className={
+                                isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]" : 
+                                "bg-yellow-300 text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
+                            }
+                        >
+                            {isFollowed ? 'Following' : 'Follow' }
+                        </button> 
+                    ) : (
+                        <Link 
+                            to={user ? `/setting/${user.info.id}` : '/home'} 
+                            className="bg-purple-400 text-[#1a1a1a] font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
+                        >
+                            Setting
+                        </Link>
+                    )}
+                </div>
                 <ul className="flex justify-evenly border-b border-purple-400 pb-[0.45rem]">
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Followers</span>

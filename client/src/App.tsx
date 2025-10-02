@@ -7,6 +7,7 @@ import PostDetail from "./pages/PostDetail";
 import AddPost from "./pages/AddPost";
 import SearchPost from "./pages/SearchPost";
 import About from "./pages/About";
+import Setting from "./pages/Setting";
 
 export default function App() {
     return (
@@ -17,6 +18,7 @@ export default function App() {
                     <Route path="/signup" element={<SignUp/>}/>
                     <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
                     <Route path="/about/:user_id" element={<ProtectedRoute><About/></ProtectedRoute>}/>
+                    <Route path="/setting/:user_id" element={<ProtectedRoute><Setting/></ProtectedRoute>}/>
                     <Route path="/add-post" element={<ProtectedRoute><AddPost/></ProtectedRoute>}/>
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
                     <Route path="/post/:_id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
