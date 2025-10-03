@@ -6,7 +6,6 @@ import type { IComments, ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import Error from "./Error";
 import PostSlider from "../components/PostSlider";
-import { deleteFromCloudinary,  } from "../services/media-storage";
 import { useState } from "react";
 import CommentField from "../components/CommentField";
 import useSWR from "swr";
@@ -15,17 +14,14 @@ export default function PostDetail() {
     const { _id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
-    const postFolder = 'sns_posts';
 
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
-    const { deleteData: deletePost, getData: getSelectedPost } = DataModifier();
-    const { deleteData: dislike, getData: getLikeData, insertData: giveLike } = DataModifier();
-    const { deleteData: deleteComment, getData: getCommentData, insertData: insertComment } = DataModifier();
+    const { deleteData, getData, insertData } = DataModifier();
 
     const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',
-        getSelectedPost,
+        getData,
         {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
@@ -36,7 +32,7 @@ export default function PostDetail() {
 
     const { data: likesData, mutate: likeMutate } = useSWR<ILikes[]>(
         _id ? `http://localhost:1234/likes/get-all/${_id}` : '',
-        getLikeData,
+        getData,
         {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
@@ -47,7 +43,7 @@ export default function PostDetail() {
 
     const { data: commentsData, mutate: commentMutate } = useSWR<IComments[]>(
         _id ? `http://localhost:1234/comments/get-all/${_id}` : '',
-        getCommentData,
+        getData,
         {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
@@ -67,7 +63,7 @@ export default function PostDetail() {
             if (!_id) throw 'Failed to get post';
             if (!comment.trim()) throw 'Missing required data';
 
-            await insertComment<IComments>({
+            await insertData<IComments>({
                 api_url: `http://localhost:1234/comments/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
@@ -93,16 +89,17 @@ export default function PostDetail() {
             if (!_id) throw 'Failed to get post';
 
             if (!userLiked) {
-                await giveLike<ILikes>({
+                await insertData<ILikes>({
                     api_url: `http://localhost:1234/likes/add`,
                     data: {
                         created_at: getCurrentDate.toISOString(),
                         post_id: _id,
                         user_id: user.info.id,
+                        username: user.info.username
                     }
                 });
             } else {
-                await dislike(`http://localhost:1234/likes/erase/${user.info.id}`);
+                await deleteData(`http://localhost:1234/likes/erase/${user.info.id}`);
             }
             likeMutate();
         } catch (error: any) {
@@ -115,23 +112,8 @@ export default function PostDetail() {
         if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
 
         try {
-            if (selectedPost[0].file_url && selectedPost[0].file_url.length > 0) {
-                const deletePromises = selectedPost[0].file_url.map(async (url) => {
-                    const getPublicId = url.split('/')[8].replace(/\.[^/.]+$/, "");
-                    await deleteFromCloudinary(getPublicId, postFolder);
-                });
-                await Promise.allSettled(deletePromises);
-            }
-
-            await deletePost(`http://localhost:1234/posts/erase/${_id}`);
+            await deleteData(`http://localhost:1234/posts/erase/${_id}`);
             mutatePost();
-
-            await dislike(`http://localhost:1234/likes/erase-all/${_id}`);
-            likeMutate();
-
-            await deleteComment(`http://localhost:1234/comments/erase-all/${_id}`);
-            commentMutate();
-
             navigate('/home');
         } catch (error) {
             console.error('Error deleting post:', error);

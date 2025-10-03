@@ -14,8 +14,7 @@ export default function DataModifier() {
             method: 'DELETE'
         });
 
-        const response = await request.json();
-        return response;
+        await request.json();
     }
 
     const getData = async (api_url: string) => {
@@ -41,8 +40,7 @@ export default function DataModifier() {
             method: 'POST',
         });
 
-        const response = await request.json();
-        return response;
+        await request.json();
     }
 
     const updateData = async <TSX>(props: IPutData<TSX>) => {
@@ -55,8 +53,7 @@ export default function DataModifier() {
             method: 'PUT',
         });
 
-        const response = await request.json();
-        return response;
+        await request.json();
     }
 
     return { deleteData, getData, insertData, updateData }

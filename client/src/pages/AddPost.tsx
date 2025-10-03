@@ -4,6 +4,7 @@ import useAuth from "../services/useAuth";
 import DataModifier from "../services/data-modifier";
 import { uploadToCloudinary } from "../services/media-storage";
 import type { MediaFile, NewPost } from "../services/custom-types";
+import { useNavigate } from "react-router-dom";
 
 export default function AddPost() {
     const { user } = useAuth();
@@ -12,6 +13,7 @@ export default function AddPost() {
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
     const postFolder = 'sns_posts';
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,6 +103,7 @@ export default function AddPost() {
             
             setDescription('');
             setMediaFiles([]);
+            navigate('/home');
         } catch (error) {
             alert('Failed to create post');
         } finally {

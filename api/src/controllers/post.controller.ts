@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { Post } from '../models/post.model';
 import dotenv from 'dotenv';
 import { v2 } from 'cloudinary';
+import { Like } from '../models/like.model';
+import { Comment } from '../models/comment.model';
 
 dotenv.config();
 
@@ -73,8 +75,30 @@ async function deleteAllPosts(req: Request, res: Response): Promise<void> {
 async function deleteSelectedPost(req: Request, res: Response): Promise<void> {
     try {
         const getPostId = req.params.id;
-        await Post.deleteOne({ _id: getPostId });
-        res.status(201).json({ message: 'post deleted' });
+        const selectedPost = await Post.findById(getPostId);
+
+        if (!selectedPost) {
+            res.status(404).json({ message: 'Post not found.' });
+            return;
+        }
+
+        if (selectedPost.file_url && selectedPost.file_url.length > 0) {
+            const deletePromises = selectedPost.file_url.map(url => {
+                const urlParts = url.split('/');
+                const publicIdWithExt = urlParts.slice(7).join('/').replace(/\.[^/.]+$/, "");
+                const publicId = publicIdWithExt.startsWith('sns_posts/') ? publicIdWithExt : `sns_posts/${publicIdWithExt}`;
+                return v2.uploader.destroy(publicId);
+            });
+            await Promise.allSettled(deletePromises);
+        }
+        
+        await Promise.all([
+            Post.deleteOne({ _id: getPostId }),
+            Comment.deleteMany({ post_id: getPostId }),
+            Like.deleteMany({ post_id: getPostId })
+        ]);
+
+        res.status(200).json({ message: 'post deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
