@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 export default function SearchPost() {
     const [searchedPost, setSearchedPost] = useState<PostItemProps[]>([]);
     const searchRef = useRef<HTMLInputElement>(null);
-    
+
     const searchPosts = async () => {
             const request = await fetch(`http://localhost:1234/posts/searched`, {
             body: JSON.stringify({ searched: searchRef.current?.value }),
@@ -29,6 +29,7 @@ export default function SearchPost() {
                         type="text" 
                         className="p-[0.45rem] font-[550] text-purple-400 outline-0 border w-full border-purple-400"
                     />
+                    <button>Search</button>
                 </form>
                 <div className="bg-[#1a1a1a] text-purple-400 p-[1rem] h-screen overflow-y-auto">
                     <PostList data={searchedPost}/>

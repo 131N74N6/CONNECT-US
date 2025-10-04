@@ -1,16 +1,6 @@
 import { Request, Response } from "express";
 import { Comment } from "../models/comment.model";
 
-async function deleteAllComments(req: Request, res: Response) {
-    try {
-        const getPostId = req.params.id;
-        await Comment.deleteMany({ post_id: getPostId });
-        res.status(201).json({ message: 'all comments deleted' });
-    } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
-    }
-}
-
 async function getAllComments(req: Request, res: Response) {
     try {
         const getPostId = req.params.id;
@@ -31,4 +21,4 @@ async function insertComment(req: Request, res: Response) {
     }
 }
 
-export { deleteAllComments, getAllComments, insertComment }
+export { getAllComments, insertComment }

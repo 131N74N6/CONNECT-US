@@ -1,16 +1,6 @@
 import { Request, Response } from "express";
 import { Like } from "../models/like.model";
 
-async function deleteAllLikes(req: Request, res: Response) {
-    try {
-        const getPostId = req.params.id;
-        await Like.deleteMany({ post_id: getPostId });
-        res.status(201).json({ message: 'all likes deleted' });
-    } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
-    }
-}
-
 async function dislike(req: Request, res:Response) {
     try {
         const getUserId = req.params.id;
@@ -41,4 +31,4 @@ async function giveLike(req: Request, res: Response) {
     }
 }
 
-export { deleteAllLikes, dislike, getAllLikes, giveLike }
+export { dislike, getAllLikes, giveLike }

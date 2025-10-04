@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Post } from '../models/post.model';
+import { IPost, Post } from '../models/post.model';
 import dotenv from 'dotenv';
 import { v2 } from 'cloudinary';
 import { Like } from '../models/like.model';
@@ -64,8 +64,29 @@ async function insertNewPost(req: Request, res: Response): Promise<void> {
 
 async function deleteAllPosts(req: Request, res: Response): Promise<void> {
     try {
-        const getUserId = req.params.id;
-        await Post.deleteMany({ user_id: getUserId });
+        const signedUserId = req.params.id;
+        const signedUserPost = await Post.find({ user_id: signedUserId });
+        const gatherPublicIds: string[] = [];
+
+        signedUserPost.forEach(post => {
+            post.posts_file.forEach(file => {
+                const urlParts: string[] = file.file_url.split('/');
+                const getPublicId: string = urlParts.slice(urlParts.indexOf('upload') + 2).join('/').replace(/\.[^/.]+$/, "");
+                gatherPublicIds.push(getPublicId);
+            });
+        });
+
+        const deletePromises = gatherPublicIds.map(public_id => {
+            return v2.uploader.destroy(public_id);
+        });
+
+        await Promise.all(deletePromises);
+
+        await Promise.all([
+            Post.deleteMany({ user_id: signedUserId }),
+            Like.deleteMany({ post_owner_id: signedUserId }),
+            Comment.deleteMany({ post_owner_id: signedUserId })
+        ]);
         res.status(201).json({ message: 'all post deleted' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

@@ -60,7 +60,7 @@ export default function PostDetail() {
         const getCurrentDate = new Date();
 
         try {    
-            if (!user) throw 'Invalid user data';
+            if (!user || !selectedPost) throw 'Invalid user data';
             if (!_id) throw 'Failed to get post';
             if (!comment.trim()) throw 'Missing required data';
 
@@ -71,7 +71,8 @@ export default function PostDetail() {
                     opinions: comment.trim(),
                     post_id: _id,
                     user_id: user.info.id,
-                    username: user.info.username
+                    username: user.info.username,
+                    post_owner_id: selectedPost[0].user_id
                 }
             });
 
@@ -86,7 +87,7 @@ export default function PostDetail() {
     async function givingLikes() {
         const getCurrentDate = new Date();
         try {
-            if (!user || !likesData || !_id) return;
+            if (!user || !likesData || !_id || !selectedPost) return;
 
             if (!userLiked) {
                 await insertData<ILikes>({
@@ -95,7 +96,8 @@ export default function PostDetail() {
                         created_at: getCurrentDate.toISOString(),
                         post_id: _id,
                         user_id: user.info.id,
-                        username: user.info.username
+                        username: user.info.username,
+                        post_owner_id: selectedPost[0].user_id
                     }
                 });
             } else {
