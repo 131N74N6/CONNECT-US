@@ -6,23 +6,23 @@ export default function PostItem(props: PostItemProps) {
     const [imageError, setImageError] = useState<boolean>(false);
     const [videoError, setVideoError] = useState<boolean>(false);
     
-    const fileUrls = props.posts_file ? props.posts_file : [];
+    const getPostFiles = props.posts_file ? props.posts_file : [];
     
     const mediaType = useMemo(() => {
-        if (fileUrls.length === 0) return 'text';
+        if (getPostFiles.length === 0) return 'text';
         
-        const firstFile = fileUrls[0].file_url;
-        if (!firstFile) return 'text';
+        const getFirstUrl = getPostFiles[0].file_url;
+        if (!getFirstUrl) return 'text';
         
-        if (firstFile.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/i.test(firstFile)) {
+        if (getFirstUrl.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/i.test(getFirstUrl)) {
             return 'image';
-        } else if (firstFile.includes('video') || /\.(mp4|mov|avi|wmv|flv|webm)$/i.test(firstFile)) {
+        } else if (getFirstUrl.includes('video') || /\.(mp4|mov|avi|wmv|flv|webm)$/i.test(getFirstUrl)) {
             return 'video';
         }
         return 'text';
-    }, [fileUrls]);
+    }, [getPostFiles]);
     
-    if (fileUrls.length === 0 || mediaType === 'text') {
+    if (getPostFiles.length === 0 || mediaType === 'text') {
         return (
             <Link to={`/post/${props._id}`} className="block">
                 <div className="rounded-lg border border-purple-400 bg-[#1a1a1a] aspect-square flex items-center justify-center p-4">
@@ -40,7 +40,7 @@ export default function PostItem(props: PostItemProps) {
                 {mediaType === 'image' && !imageError ? (
                     <img 
                         className="w-full h-full object-cover"
-                        src={fileUrls[0].file_url}
+                        src={getPostFiles[0].file_url}
                         onError={() => setImageError(true)}
                     />
                 ) : mediaType === 'video' && !videoError ? (
@@ -50,7 +50,7 @@ export default function PostItem(props: PostItemProps) {
                         className="w-full h-full object-cover"
                         onError={() => setVideoError(true)}
                     >
-                        <source src={fileUrls[0].file_url} type="video/mp4" />
+                        <source src={getPostFiles[0].file_url} type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
                 ) : (
@@ -59,9 +59,9 @@ export default function PostItem(props: PostItemProps) {
                     </div>
                 )}
                 
-                {fileUrls.length > 1 ? (
+                {getPostFiles.length > 1 ? (
                     <div className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full w-6 h-6 flex items-center justify-center">
-                        <span className="text-white text-xs">+{fileUrls.length - 1}</span>
+                        <span className="text-white text-xs">+{getPostFiles.length - 1}</span>
                     </div>
                 ) : null}
             </div>
