@@ -1,5 +1,8 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+// other_user_id => yang diikuti
+// user_id => pengikut
+
 interface IFollower {
     created_at: string;
     user_id: Types.ObjectId;

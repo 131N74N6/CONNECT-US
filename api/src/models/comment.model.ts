@@ -1,5 +1,8 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+// post_owner_id => id user dari postingan
+// user_id => id user yang sedang sign in
+
 interface IComment {
     created_at: string;
     opinions: string;

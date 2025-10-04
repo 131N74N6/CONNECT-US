@@ -7,7 +7,7 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 
 export default function Setting() {
     const { user } = useAuth();
-    const { getData, updateData } = DataModifier();
+    const { deleteData, getData, updateData } = DataModifier();
     const [newUsername, setNewUsername] = useState<string>('');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     
@@ -38,6 +38,11 @@ export default function Setting() {
 
         mutateUserData();
         setIsEditing(false);
+    }
+
+    const deleteAllSignedUserPosts = async () => {
+        if (!user) return;
+        await deleteData(`http://localhost:1234/posts/erase-all/${user.info.id}`);
     }
 
     return (
@@ -84,6 +89,7 @@ export default function Setting() {
                             </button>
                             <button 
                                 type="button"
+                                onClick={deleteAllSignedUserPosts}
                                 className="bg-purple-400 cursor-pointer font-[500] text-gray-800 text-[0.9rem] p-[0.4rem]"
                             >
                                 Delete All Posts

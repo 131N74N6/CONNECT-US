@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { IPost, Post } from '../models/post.model';
+import { Post } from '../models/post.model';
 import dotenv from 'dotenv';
 import { v2 } from 'cloudinary';
 import { Like } from '../models/like.model';
@@ -15,7 +15,9 @@ v2.config({
 
 async function getAllPosts(_: Request, res: Response): Promise<void> {
     try {
-        const allPost = await Post.find({}, { _id: 1, description: 1, posts_file: 1, user_id: 1 });
+        const allPost = await Post.find({}, { 
+            _id: 1, description: 1, posts_file: 1, user_id: 1 
+        });
         res.json(allPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -35,7 +37,9 @@ async function getSearchedPost(req: Request, res: Response): Promise<void> {
 async function getSignedUserPosts(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
-        const signedUserPosts = await Post.find({ user_id: getUserId }, { _id: 1, description: 1, posts_file: 1, user_id: 1 });
+        const signedUserPosts = await Post.find({ user_id: getUserId }, { 
+            _id: 1, description: 1, posts_file: 1, user_id: 1 
+        });
         res.json(signedUserPosts);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -71,7 +75,10 @@ async function deleteAllPosts(req: Request, res: Response): Promise<void> {
         signedUserPost.forEach(post => {
             post.posts_file.forEach(file => {
                 const urlParts: string[] = file.file_url.split('/');
-                const getPublicId: string = urlParts.slice(urlParts.indexOf('upload') + 2).join('/').replace(/\.[^/.]+$/, "");
+                const getPublicId: string = urlParts.slice(urlParts.indexOf('upload') + 2)
+                .join('/')
+                .replace(/\.[^/.]+$/, "");
+
                 gatherPublicIds.push(getPublicId);
             });
         });

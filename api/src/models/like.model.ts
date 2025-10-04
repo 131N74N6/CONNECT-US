@@ -1,5 +1,8 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+// post_owner_id => id user dari postingan
+// user_id => id user yang sedang sign in
+
 interface ILikes {
     created_at: string;
     post_id: Types.ObjectId;
