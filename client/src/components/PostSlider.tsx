@@ -1,31 +1,31 @@
 import { useState } from "react";
 
 interface PostSliderProps {
-    images: string[];
+    images: { file_url: string; }[];
 }
 
-export default function PostSlider({ images }: PostSliderProps) {
+export default function PostSlider(props: PostSliderProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const goToPrevious = () => {
-        setCurrentIndex(prevIndex => prevIndex === 0 ? images.length - 1 : prevIndex - 1);
+        setCurrentIndex(prevIndex => prevIndex === 0 ? props.images.length - 1 : prevIndex - 1);
     }
 
     const goToNext = () => {
-        setCurrentIndex(prevIndex => prevIndex === images.length - 1 ? 0 : prevIndex + 1);
+        setCurrentIndex(prevIndex => prevIndex === props.images.length - 1 ? 0 : prevIndex + 1);
     }
 
-    if (images.length === 0) return null;
+    if (props.images.length === 0) return null;
 
     return (
         <div className="relative w-full h-96 bg-gray-900 rounded-lg overflow-hidden">
             <img 
-                src={images[currentIndex]} 
+                src={props.images[currentIndex].file_url} 
                 alt={`Slide ${currentIndex + 1}`}
                 className="w-full h-full object-contain"
             />
             
-            {images.length > 1 ? (
+            {props.images.length > 1 ? (
                 <>
                     <button
                         type="button"
@@ -43,7 +43,7 @@ export default function PostSlider({ images }: PostSliderProps) {
                     </button>
                     
                     <div className="absolute bottom-2 left-0 right-0 flex justify-center space-x-1">
-                        {images.map((_, index) => (
+                        {props.images.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
@@ -53,7 +53,7 @@ export default function PostSlider({ images }: PostSliderProps) {
                     </div>
                     
                     <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                        {currentIndex + 1} / {images.length}
+                        {currentIndex + 1} / {props.images.length}
                     </div>
                 </>
             ) : null}

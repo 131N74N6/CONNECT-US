@@ -6,12 +6,12 @@ export default function PostItem(props: PostItemProps) {
     const [imageError, setImageError] = useState<boolean>(false);
     const [videoError, setVideoError] = useState<boolean>(false);
     
-    const fileUrls = props.posts_file ? props.posts_file[0].file_url : [];
+    const fileUrls = props.posts_file ? props.posts_file : [];
     
     const mediaType = useMemo(() => {
         if (fileUrls.length === 0) return 'text';
         
-        const firstFile = fileUrls[0];
+        const firstFile = fileUrls[0].file_url;
         if (!firstFile) return 'text';
         
         if (firstFile.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/i.test(firstFile)) {
@@ -40,7 +40,7 @@ export default function PostItem(props: PostItemProps) {
                 {mediaType === 'image' && !imageError ? (
                     <img 
                         className="w-full h-full object-cover"
-                        src={fileUrls[0]}
+                        src={fileUrls[0].file_url}
                         onError={() => setImageError(true)}
                     />
                 ) : mediaType === 'video' && !videoError ? (
@@ -50,7 +50,7 @@ export default function PostItem(props: PostItemProps) {
                         className="w-full h-full object-cover"
                         onError={() => setVideoError(true)}
                     >
-                        <source src={fileUrls[0]} type="video/mp4" />
+                        <source src={fileUrls[0].file_url} type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
                 ) : (

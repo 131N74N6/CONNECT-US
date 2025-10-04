@@ -76,7 +76,7 @@ export default function PostDetail() {
 
             commentMutate();
         } catch (error: any) {
-            console.log(error.message);
+            alert(error.message);
         } finally {
             setComment('');
         }
@@ -85,8 +85,7 @@ export default function PostDetail() {
     async function givingLikes() {
         const getCurrentDate = new Date();
         try {
-            if (!user || !likesData) return;
-            if (!_id) throw 'Failed to get post';
+            if (!user || !likesData || !_id) return;
 
             if (!userLiked) {
                 await insertData<ILikes>({
@@ -103,7 +102,7 @@ export default function PostDetail() {
             }
             likeMutate();
         } catch (error: any) {
-            console.log(error.message);
+            alert('Failed to give like');
         }
     }
 
@@ -116,7 +115,6 @@ export default function PostDetail() {
             mutatePost();
             navigate('/home');
         } catch (error) {
-            console.error('Error deleting post:', error);
             alert('Failed to delete post. Please try again.');
         }
     };
@@ -128,8 +126,11 @@ export default function PostDetail() {
     const isPostOwner = user && user.info.id === selectedPost[0].user_id;
 
     // Separate images and videos
-    const images = selectedPost[0].posts_file ? selectedPost[0].posts_file.filter(file => file.file_url.match(/\.(jpeg|jpg|gif|png)$/) !== null) : [];
-    const videos = selectedPost[0].posts_file ? selectedPost[0].posts_file.filter(url => url.file_url.match(/\.(mp4|webm|ogg)$/) !== null) : [];
+    const images = selectedPost[0].posts_file ? 
+        selectedPost[0].posts_file.filter(file => file.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/) !== null) : [];
+
+    const videos = selectedPost[0].posts_file ? 
+        selectedPost[0].posts_file.filter(url => url.file_url.match(/\.(mp4|mov|avi|wmv|flv|webm)$/) !== null) : [];
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
@@ -161,7 +162,7 @@ export default function PostDetail() {
                 </div>
                 
                 <div className="flex flex-col gap-[1rem]">
-                    {images.length > 0 ? <PostSlider images={images[0].file_url}} /> : null}
+                    {images.length > 0 ? <PostSlider images={images} /> : null}
                     
                     {videos.map((video, index) => (
                         <div key={index} className="w-full bg-gray-900 rounded-lg overflow-hidden">
@@ -173,43 +174,29 @@ export default function PostDetail() {
                         </div>
                     ))}
             
-                    <div>
-                        <div className="text-gray-200 h-[90%] overflow-y-auto">{selectedPost[0].description}</div>
-                        <div className="flex gap-[1rem]">                            
-                            <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
-                                <i 
-                                    className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
-                                    onClick={givingLikes}
-                                ></i>
-                                <span>{likesData ? likesData.length : 0}</span>
-                            </div>
-                            <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
-                                <i className="fa-regular fa-comment cursor-pointer" onClick={() => setOpenComments(true)}></i>
-                                <span>{commentsData ? commentsData.length : 0}</span>
-                            </div>
+                    <div className="flex gap-[1rem]">
+                        <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
+                            <i 
+                                className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
+                                onClick={givingLikes}
+                            ></i>
+                            <span>{likesData ? likesData.length : 0}</span>
+                        </div>
+                        <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
+                            <i className="fa-regular fa-comment cursor-pointer" onClick={() => setOpenComments(true)}></i>
+                            <span>{commentsData ? commentsData.length : 0}</span>
                         </div>
                     </div>
+                    <div className="text-gray-200">{selectedPost[0].description}</div>
                 </div>
-                
-                <form className="flex flex-col gap-[1rem]" onSubmit={sendComment}>
-                    <h3 className="text-center">Write your comment here</h3>
-                    <textarea 
-                        value={comment}
-                        onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => setComment(event.target.value)}
-                        className="resize-none w-full h-[70px] outline-0 border-white border p-[0.3rem]"
-                    ></textarea>
-                    <button 
-                        type="submit" 
-                        className="cursor-pointer bg-purple-400 p-[0.45rem] rounded-[0.45rem]"
-                    >
-                        <span className="text-[1rem] font-[550] text-black">Send</span>
-                    </button>
-                </form>
 
                 {openComments ? 
                     <CommentField 
                         onClose={() => setOpenComments(false)} 
                         comments_data={commentsData ? commentsData : []}
+                        comment={comment}
+                        setComment={setComment}
+                        sendComment={sendComment}
                     /> 
                 : null}
             </div>

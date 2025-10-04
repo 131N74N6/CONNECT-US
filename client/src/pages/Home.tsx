@@ -27,7 +27,9 @@ export default function Home() {
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
             <Navbar1/>
             <Navbar2/>
-            <PostList data={allPosts ? allPosts : []}/>
+            <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
+                <PostList data={allPosts ? allPosts : []}/>
+            </div>
         </section>
     );
 }

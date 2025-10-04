@@ -81,7 +81,7 @@ export default function AddPost() {
             for (const mediaFile of mediaFiles) {
                 try {
                     const result = await uploadToCloudinary(mediaFile.file, postFolder);
-                    postsFiles.push({ file_url: result.publicId, public_id: result.publicId });
+                    postsFiles.push({ file_url: result.url, public_id: result.publicId });
                 } catch (error) {
                     console.error('Failed to upload media:', error);
                     alert('Failed to upload one or more media files');

@@ -6,7 +6,7 @@ type ProtectedRouteProps = {
     children: ReactNode;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function ProtectedRoute(props: ProtectedRouteProps) {
     const { loading, user } = useAuth();
 
     if (loading) {
@@ -17,5 +17,5 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         );
     }
 
-    return user ? <>{children}</> : <Navigate to={'/signin'} replace/>
+    return user ? <>{props.children}</> : <Navigate to={'/signin'} replace/>
 }
