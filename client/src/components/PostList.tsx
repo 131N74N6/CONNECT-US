@@ -18,7 +18,7 @@ export default function PostList(props: PostListProps) {
                         key={`post_${post._id}`} 
                         _id={post._id} 
                         description={post.description}
-                        file_url={post.file_url}
+                        posts_file={post.posts_file}
                         user_id={post.user_id}
                     />
                 ))}

@@ -128,9 +128,8 @@ export default function PostDetail() {
     const isPostOwner = user && user.info.id === selectedPost[0].user_id;
 
     // Separate images and videos
-    const images = selectedPost[0].file_url?.filter(url => url.match(/\.(jpeg|jpg|gif|png)$/) !== null) || [];
-
-    const videos = selectedPost[0].file_url?.filter(url => url.match(/\.(mp4|webm|ogg)$/) !== null) || [];
+    const images = selectedPost[0].posts_file ? selectedPost[0].posts_file.filter(file => file.file_url.match(/\.(jpeg|jpg|gif|png)$/) !== null) : [];
+    const videos = selectedPost[0].posts_file ? selectedPost[0].posts_file.filter(url => url.file_url.match(/\.(mp4|webm|ogg)$/) !== null) : [];
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
@@ -162,15 +161,15 @@ export default function PostDetail() {
                 </div>
                 
                 <div className="flex flex-col gap-[1rem]">
-                    {images.length > 0 ? <PostSlider images={images} /> : null}
+                    {images.length > 0 ? <PostSlider images={images[0].file_url}} /> : null}
                     
-                    {videos.map((videoUrl, index) => (
+                    {videos.map((video, index) => (
                         <div key={index} className="w-full bg-gray-900 rounded-lg overflow-hidden">
                             <video 
                                 controls 
                                 className="w-full h-auto max-h-96 object-contain"
                             >
-                            <source src={videoUrl} type="video/mp4" />Your browser does not support the video tag.</video>
+                            <source src={video.file_url} type="video/mp4" />Your browser does not support the video tag.</video>
                         </div>
                     ))}
             

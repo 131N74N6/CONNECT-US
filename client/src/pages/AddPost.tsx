@@ -3,7 +3,7 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import useAuth from "../services/useAuth";
 import DataModifier from "../services/data-modifier";
 import { uploadToCloudinary } from "../services/media-storage";
-import type { MediaFile, NewPost } from "../services/custom-types";
+import type { MediaFile, PostDetail } from "../services/custom-types";
 import { useNavigate } from "react-router-dom";
 
 export default function AddPost() {
@@ -76,12 +76,12 @@ export default function AddPost() {
         setIsUploading(true);
         
         try {
-            const mediaUrls: string[] = [];
+            const postsFiles: { file_url: string; public_id: string; }[] = [];
             
             for (const mediaFile of mediaFiles) {
                 try {
                     const result = await uploadToCloudinary(mediaFile.file, postFolder);
-                    mediaUrls.push(result.url);
+                    postsFiles.push({ file_url: result.publicId, public_id: result.publicId });
                 } catch (error) {
                     console.error('Failed to upload media:', error);
                     alert('Failed to upload one or more media files');
@@ -90,12 +90,12 @@ export default function AddPost() {
                 }
             }
             
-            await insertData<NewPost>({
+            await insertData<PostDetail>({
                 api_url: `http://localhost:1234/posts/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
                     description: description.trim(),
-                    file_url: mediaUrls,
+                    posts_file: postsFiles,
                     uploader_name: user.info.username,
                     user_id: user.info.id,
                 }

@@ -48,24 +48,10 @@ export type IComments = {
     username: string;
 }
 
-export type IGetSelectedData = {
-    collection_name: string;
-    values: string;
-}
-
-export type NewPost = {
-    _id: string;
-    created_at: string;
-    file_url?: string[];
-    description: string;
-    user_id: string;
-    uploader_name: string;
-}
-
 export type PostItemProps = {
     _id: string;
     description: string;
-    file_url?: string[];
+    posts_file?: { file_url: string; public_id: string; }[];
     user_id: string;
 }
 
@@ -74,7 +60,7 @@ export type PostDetail = {
     created_at: string;
     description: string;
     uploader_name: string;
-    file_url?: string[];
+    posts_file?: { file_url: string; public_id: string; }[];
     user_id: string;
 }
 

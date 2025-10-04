@@ -6,7 +6,7 @@ export default function PostItem(props: PostItemProps) {
     const [imageError, setImageError] = useState<boolean>(false);
     const [videoError, setVideoError] = useState<boolean>(false);
     
-    const fileUrls = props.file_url || [];
+    const fileUrls = props.posts_file ? props.posts_file[0].file_url : [];
     
     const mediaType = useMemo(() => {
         if (fileUrls.length === 0) return 'text';

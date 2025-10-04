@@ -82,14 +82,11 @@ async function deleteSelectedPost(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        if (selectedPost.file_url && selectedPost.file_url.length > 0) {
-            const deletePromises = selectedPost.file_url.map(url => {
-                const urlParts = url.split('/');
-                const publicIdWithExt = urlParts.slice(7).join('/').replace(/\.[^/.]+$/, "");
-                const publicId = publicIdWithExt.startsWith('sns_posts/') ? publicIdWithExt : `sns_posts/${publicIdWithExt}`;
-                return v2.uploader.destroy(publicId);
+        if (selectedPost.posts_file && selectedPost.posts_file.length > 0) {
+            const deletePromises = selectedPost.posts_file.map(file => {
+                return v2.uploader.destroy(file.public_id);
             });
-            await Promise.allSettled(deletePromises);
+            await Promise.all(deletePromises);
         }
         
         await Promise.all([
@@ -104,17 +101,7 @@ async function deleteSelectedPost(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function deleteSelectedFile(req: Request, res: Response) {
-    try {
-        const { folder_name, public_id } = req.body;
-        await v2.uploader.destroy(`${folder_name}/${public_id}`);
-        res.status(201).json({ message: 'file successfully removed from cloudinary' });
-    } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
-    }
-}
-
 export { 
-    deleteAllPosts, deleteSelectedFile, deleteSelectedPost, getAllPosts, getSearchedPost, 
+    deleteAllPosts, deleteSelectedPost, getAllPosts, getSearchedPost, 
     getSelectedPost, getSignedUserPosts, insertNewPost 
 }
