@@ -83,9 +83,3 @@ export type IFollowers = {
     user_id: string;
     username: string;
 }
-
-export type NotificationProps = {
-    className: string;
-    message: string;
-    onClose: () => void;
-}

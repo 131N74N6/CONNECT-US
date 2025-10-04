@@ -9,6 +9,7 @@ import PostSlider from "../components/PostSlider";
 import { useState } from "react";
 import CommentField from "../components/CommentField";
 import useSWR from "swr";
+import LikeField from "../components/LikeField";
 
 export default function PostDetail() {
     const { _id } = useParams();
@@ -175,17 +176,13 @@ export default function PostDetail() {
                     ))}
             
                     <div className="flex gap-[1rem]">
-                        <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
-                            <i 
-                                className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
-                                onClick={givingLikes}
-                            ></i>
-                            <span>{likesData ? likesData.length : 0}</span>
-                        </div>
-                        <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
-                            <i className="fa-regular fa-comment cursor-pointer" onClick={() => setOpenComments(true)}></i>
-                            <span>{commentsData ? commentsData.length : 0}</span>
-                        </div>
+                        <LikeField
+                            commentsData={commentsData}
+                            givingLikes={givingLikes}
+                            likesData={likesData}
+                            setOpenComments={setOpenComments}
+                            userLiked={userLiked}
+                        />
                     </div>
                     <div className="text-gray-200">{selectedPost[0].description}</div>
                 </div>
