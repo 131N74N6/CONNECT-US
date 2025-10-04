@@ -50,25 +50,29 @@ export default function About() {
     const isFollowed = currentUserFollower && user ? currentUserFollower.some(follow => user.info.id === follow.user_id) : false;
 
     const handleFollowBtn = async (): Promise<void> => {
-        if (!user_id || !user) return;
-        const getCurrentDate = new Date();
+        try {
+            if (!user_id || !user) return;
+            const getCurrentDate = new Date();
 
-        if (!isFollowed) {
-            await insertData<IFollowers>({
-                api_url: `http://localhost:1234/followers/add`,
-                data: {
-                    created_at: getCurrentDate.toISOString(),
-                    other_user_id: user_id,
-                    user_id: user.info.id,
-                    username: user.info.username
-                }
-            });
-        } else {
-            await deleteData(`http://localhost:1234/followers/erase/${user.info.id}`);
+            if (!isFollowed) {
+                await insertData<IFollowers>({
+                    api_url: `http://localhost:1234/followers/add`,
+                    data: {
+                        created_at: getCurrentDate.toISOString(),
+                        other_user_id: user_id,
+                        user_id: user.info.id,
+                        username: user.info.username
+                    }
+                });
+            } else {
+                await deleteData(`http://localhost:1234/followers/erase/${user.info.id}`);
+            }
+
+            currentUserFollowingMutate();
+            currentUserFollowerMutate();
+        } catch (error) {
+            alert('Failed to follow');
         }
-
-        currentUserFollowingMutate();
-        currentUserFollowerMutate();
     }
 
     if (isLoading) return <Loading/>;

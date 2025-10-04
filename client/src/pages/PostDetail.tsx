@@ -175,15 +175,13 @@ export default function PostDetail() {
                         </div>
                     ))}
             
-                    <div className="flex gap-[1rem]">
-                        <LikeField
-                            commentsData={commentsData}
-                            givingLikes={givingLikes}
-                            likesData={likesData}
-                            setOpenComments={setOpenComments}
-                            userLiked={userLiked}
-                        />
-                    </div>
+                    <LikeField
+                        commentsData={commentsData}
+                        givingLikes={givingLikes}
+                        likesData={likesData}
+                        setOpenComments={setOpenComments}
+                        userLiked={userLiked}
+                    />
                     <div className="text-gray-200">{selectedPost[0].description}</div>
                 </div>
 

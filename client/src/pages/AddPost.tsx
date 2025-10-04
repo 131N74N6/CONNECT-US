@@ -140,35 +140,36 @@ export default function AddPost() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
-                        {mediaFiles.map((media, index) => (
-                            <div key={index} className="relative group">
-                            {media.type === 'image' ? (
-                                <img 
-                                    src={media.previewUrl} 
-                                    alt={`Preview ${index + 1}`}
-                                    className="w-full h-32 object-cover rounded-lg"
-                                />
-                            ) : (
-                                <video 
-                                    src={media.previewUrl}
-                                    className="w-full h-32 object-cover rounded-lg"
-                                    controls
-                                />
-                            )}
-                            
-                            <button
-                                type="button"
-                                onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                                    e.stopPropagation();
-                                    removeMediaFile(index);
-                                }}
-                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                                x
-                            </button>
-                            </div>
-                        ))}
-                    </div>)}
+                            {mediaFiles.map((media, index) => (
+                                <div key={index} className="relative group">
+                                    {media.type === 'image' ? (
+                                        <img 
+                                            src={media.previewUrl} 
+                                            alt={`Preview ${index + 1}`}
+                                            className="w-full h-32 object-cover rounded-lg"
+                                        />
+                                    ) : (
+                                        <video 
+                                            src={media.previewUrl}
+                                            className="w-full h-32 object-cover rounded-lg"
+                                            controls
+                                        />
+                                    )}
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                                            e.stopPropagation();
+                                            removeMediaFile(index);
+                                        }}
+                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-[1rem] w-6 h-6 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <i className="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </section>
                 
                 <textarea 
