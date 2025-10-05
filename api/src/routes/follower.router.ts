@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { 
-    deleteAllFollowers, followOtherUser, getSignedUserAllFollowers, 
-    getSignedUserWhoFollowed, unfollowOtherUser 
+    deleteAllFollowers, followOtherUser, getCurrentUserFollowers, 
+    getCurrentUserFollowing, unfollowOtherUser 
 } from "../controllers/follower.controller";
 
 const followerRoutes = Router();
@@ -10,9 +10,9 @@ followerRoutes.delete('/erase-all/:id', deleteAllFollowers);
 
 followerRoutes.delete('/erase/:id', unfollowOtherUser);
 
-followerRoutes.get('/get-all/:id', getSignedUserAllFollowers);
+followerRoutes.get('/get-all/:id', getCurrentUserFollowers);
 
-followerRoutes.get('/who-followed/:id', getSignedUserWhoFollowed);
+followerRoutes.get('/who-followed/:id', getCurrentUserFollowing);
 
 followerRoutes.post('/add', followOtherUser);
 

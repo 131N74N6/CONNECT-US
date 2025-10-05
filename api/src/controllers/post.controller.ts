@@ -89,6 +89,7 @@ async function deleteAllPosts(req: Request, res: Response): Promise<void> {
             Like.deleteMany({ post_owner_id: signedUserId }),
             Comment.deleteMany({ post_owner_id: signedUserId })
         ]);
+        
         res.status(201).json({ message: 'all post deleted' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

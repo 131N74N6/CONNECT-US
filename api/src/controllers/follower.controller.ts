@@ -11,20 +11,20 @@ async function deleteAllFollowers(req: Request, res: Response): Promise<void> {
     }
 }
 
-async function getSignedUserAllFollowers(req: Request, res: Response): Promise<void> {
+async function getCurrentUserFollowers(req: Request, res: Response): Promise<void> {
     try {
-        const getSignedUserId = req.params.id;
-        const showFollowers = await Follower.find({ other_user_id: getSignedUserId });
+        const currentUserId = req.params.id;
+        const showFollowers = await Follower.find({ other_user_id: currentUserId });
         res.json(showFollowers);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
 }
 
-async function getSignedUserWhoFollowed(req: Request, res: Response): Promise<void> {
+async function getCurrentUserFollowing(req: Request, res: Response): Promise<void> {
     try {
-        const getSignedUserId = req.params.id;
-        const showFollowed = await Follower.find({ user_id: getSignedUserId });
+        const currentUserId = req.params.id;
+        const showFollowed = await Follower.find({ user_id: currentUserId });
         res.json(showFollowed);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -52,6 +52,6 @@ async function unfollowOtherUser(req: Request, res: Response): Promise<void> {
 }
 
 export { 
-    deleteAllFollowers, getSignedUserAllFollowers, getSignedUserWhoFollowed, 
+    deleteAllFollowers, getCurrentUserFollowers, getCurrentUserFollowing, 
     followOtherUser, unfollowOtherUser 
 }

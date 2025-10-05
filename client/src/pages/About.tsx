@@ -7,11 +7,21 @@ import useSWR from "swr";
 import Error from "./Error";
 import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
+import { useEffect, useState } from "react";
+import Notification from "../components/Notification";
 
 export default function About() {
     const { user } = useAuth();
     const { user_id } = useParams();
     const { getData, insertData, deleteData } = DataModifier();
+    const [error, setError] = useState({ isError: false, message: '' });
+
+    useEffect(() => {
+        if (error.isError) {
+            const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [error.isError]);
     
     const { data: currentUserPost, isLoading } = useSWR<PostItemProps[]>(
         user_id ? `http://localhost:1234/posts/signed-user/${user_id}` : '',
@@ -71,7 +81,7 @@ export default function About() {
             currentUserFollowingMutate();
             currentUserFollowerMutate();
         } catch (error) {
-            alert('Failed to follow');
+            setError({ isError: true, message: 'Failed to follow' });
         }
     }
 
@@ -80,9 +90,15 @@ export default function About() {
     if (!currentUserPost) return <Error message={"No posts found."}/>;
 
     return (
-        <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
+        <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black relative">
             <Navbar1/>
             <Navbar2/>
+            {error.isError ? 
+                <Notification
+                    class_name="border-purple-400 text-white bg-[#1a1a1a] w-[200px] h-[88px] absolute top-[5%] right-[50%]"
+                    message={error.message}
+                /> 
+            : null}
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
                 <div>
                     {notOwner ? (
@@ -97,11 +113,12 @@ export default function About() {
                             {isFollowed ? 'Following' : 'Follow' }
                         </button> 
                     ) : (
-                        <Link 
-                            to={user ? `/setting/${user.info.id}` : '/home'} 
-                            className="bg-purple-400 text-[#1a1a1a] font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
-                        >
-                            Setting
+                        <Link to={user ? `/setting/${user.info.id}` : '/home'}>
+                            <div 
+                                className="bg-purple-400 cursor-pointer w-[88px] text-[0.9rem] p-[0.3rem] text-center text-[#1a1a1a] font-[500]"
+                            >
+                                Setting
+                            </div>
                         </Link>
                     )}
                 </div>
