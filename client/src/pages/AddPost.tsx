@@ -31,7 +31,6 @@ export default function AddPost() {
         if (!files || files.length === 0) return;
 
         const newMediaFiles: MediaFile[] = [];
-        let hasVideo = mediaFiles.some(file => file.type === 'video');
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
@@ -41,13 +40,6 @@ export default function AddPost() {
                 setError({ isError: true, message: 'Only images and videos are allowed' });
                 continue;
             }
-            
-            if (fileType === 'video' && (hasVideo || newMediaFiles.some(f => f.type === 'video'))) {
-                alert('Only one video is allowed per post');
-                continue;
-            }
-            
-            if (fileType === 'video') hasVideo = true;
             
             newMediaFiles.push({
                 file,

@@ -5,11 +5,13 @@ import useAuth from "../services/useAuth";
 import type { IComments, ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import Error from "./Error";
-import PostSlider from "../components/PostSlider";
-import { useState } from "react";
+import ImageSlider from "../components/ImageSlider";
+import { useEffect, useState } from "react";
 import CommentField from "../components/CommentField";
 import useSWR from "swr";
 import LikeField from "../components/LikeField";
+import VideoSlider from "../components/VideoSlider";
+import Notification from "../components/Notification";
 
 export default function PostDetail() {
     const { _id } = useParams();
@@ -19,6 +21,14 @@ export default function PostDetail() {
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
     const { deleteData, getData, insertData } = DataModifier();
+    const [error, setError] = useState({ isError: false, message: '' });
+
+    useEffect(() => {
+        if (error.isError) {
+            const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [error.isError]);
 
     const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',
@@ -78,7 +88,7 @@ export default function PostDetail() {
 
             commentMutate();
         } catch (error: any) {
-            alert(error.message);
+            setError({ isError: true, message: error.message });
         } finally {
             setComment('');
         }
@@ -105,7 +115,7 @@ export default function PostDetail() {
             }
             likeMutate();
         } catch (error: any) {
-            alert('Failed to give like');
+            setError({ isError: true, message: 'Failed to give like' });
         }
     }
 
@@ -118,7 +128,7 @@ export default function PostDetail() {
             mutatePost();
             navigate('/home');
         } catch (error) {
-            alert('Failed to delete post. Please try again.');
+            setError({ isError: true, message: 'Failed to delete post.' });
         }
     };
 
@@ -139,7 +149,12 @@ export default function PostDetail() {
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
             <Navbar1 />
             <Navbar2 />
-            
+            {error.isError ? 
+                <Notification
+                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] absolute top-[5%] left-[50%] right-[50%]"
+                    message={error.message}
+                /> 
+            : null}
             <div className="md:w-3/4 w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
@@ -165,17 +180,8 @@ export default function PostDetail() {
                 </div>
                 
                 <div className="flex flex-col gap-[1rem]">
-                    {images.length > 0 ? <PostSlider images={images} /> : null}
-                    
-                    {videos.map((video, index) => (
-                        <div key={index} className="w-full bg-gray-900 rounded-lg overflow-hidden">
-                            <video 
-                                controls 
-                                className="w-full h-auto max-h-96 object-contain"
-                            >
-                            <source src={video.file_url} type="video/mp4" />Your browser does not support the video tag.</video>
-                        </div>
-                    ))}
+                    {images.length > 0 ? <ImageSlider images={images} /> : null}
+                    {videos.length > 0 ? <VideoSlider videos={videos}/> : null}
             
                     <LikeField
                         commentsData={commentsData}

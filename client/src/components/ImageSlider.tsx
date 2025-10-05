@@ -4,7 +4,7 @@ interface PostSliderProps {
     images: { file_url: string; }[];
 }
 
-export default function PostSlider(props: PostSliderProps) {
+export default function ImageSlider(props: PostSliderProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const goToPrevious = () => {
