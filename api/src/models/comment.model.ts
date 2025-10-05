@@ -1,6 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-// post_owner_id => id user dari postingan
+// post_owner_id => id user pemilik postingan
 // user_id => id user yang sedang sign in
 
 interface IComment {

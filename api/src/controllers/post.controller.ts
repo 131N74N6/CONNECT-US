@@ -74,12 +74,7 @@ async function deleteAllPosts(req: Request, res: Response): Promise<void> {
 
         signedUserPost.forEach(post => {
             post.posts_file.forEach(file => {
-                const urlParts: string[] = file.file_url.split('/');
-                const getPublicId: string = urlParts.slice(urlParts.indexOf('upload') + 2)
-                .join('/')
-                .replace(/\.[^/.]+$/, "");
-
-                gatherPublicIds.push(getPublicId);
+                gatherPublicIds.push(file.public_id);
             });
         });
 
