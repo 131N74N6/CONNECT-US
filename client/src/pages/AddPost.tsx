@@ -1,20 +1,30 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import useAuth from "../services/useAuth";
 import DataModifier from "../services/data-modifier";
 import { uploadToCloudinary } from "../services/media-storage";
 import type { MediaFile, PostDetail } from "../services/custom-types";
 import { useNavigate } from "react-router-dom";
+import Notification from "../components/Notification";
 
 export default function AddPost() {
+    const postFolder = 'sns_posts';
     const { user } = useAuth();
+    const navigate = useNavigate();
     const { insertData } = DataModifier();
+
     const [description, setDescription] = useState<string>('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [error, setError] = useState({ isError: false, message: '' });
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const navigate = useNavigate();
-    const postFolder = 'sns_posts';
+
+    useEffect(() => {
+        if (error.isError) {
+            const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [error.isError]);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -28,7 +38,7 @@ export default function AddPost() {
             const fileType = file.type.split('/')[0];
             
             if (fileType !== 'image' && fileType !== 'video') {
-                alert('Only images and videos are allowed');
+                setError({ isError: true, message: 'Only images and videos are allowed' });
                 continue;
             }
             
@@ -64,12 +74,12 @@ export default function AddPost() {
         const getCurrentDate = new Date();
         
         if (!user) {
-            alert('You must be logged in to create a post');
+            setError({ isError: true, message: 'You must be logged in to create a post' });
             return;
         }
         
         if (description.trim() === '' && mediaFiles.length === 0) {
-            alert('Post must contain either text or media');
+            setError({ isError: true, message: 'Post must contain either text or media' });
             return;
         }
         
@@ -79,15 +89,8 @@ export default function AddPost() {
             const postsFiles: { file_url: string; public_id: string; }[] = [];
             
             for (const mediaFile of mediaFiles) {
-                try {
-                    const result = await uploadToCloudinary(mediaFile.file, postFolder);
-                    postsFiles.push({ file_url: result.url, public_id: result.publicId });
-                } catch (error) {
-                    console.error('Failed to upload media:', error);
-                    alert('Failed to upload one or more media files');
-                    setIsUploading(false);
-                    return;
-                }
+                const result = await uploadToCloudinary(mediaFile.file, postFolder);
+                postsFiles.push({ file_url: result.url, public_id: result.publicId });
             }
             
             await insertData<PostDetail>({
@@ -105,7 +108,7 @@ export default function AddPost() {
             setMediaFiles([]);
             navigate('/home');
         } catch (error) {
-            alert('Failed to create post');
+            setError({ isError: true, message: 'Failed to create post' });
         } finally {
             setIsUploading(false);
         }
@@ -115,6 +118,12 @@ export default function AddPost() {
         <section className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">
             <Navbar1/>
             <Navbar2/>
+            {error.isError ? 
+                <Notification
+                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] absolute top-[5%] left-[50%] right-[50%]"
+                    message={error.message}
+                /> 
+            : null}
             <form 
                 onSubmit={handleSubmit}
                 className="flex gap-[1.3rem] md:w-3/4 w-full p-[1rem] flex-col bg-[#1a1a1a] rounded-lg overflow-y-auto"

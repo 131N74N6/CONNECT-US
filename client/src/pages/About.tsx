@@ -90,12 +90,12 @@ export default function About() {
     if (!currentUserPost) return <Error message={"No posts found."}/>;
 
     return (
-        <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black relative">
+        <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black relative z-10">
             <Navbar1/>
             <Navbar2/>
             {error.isError ? 
                 <Notification
-                    class_name="border-purple-400 text-white bg-[#1a1a1a] w-[200px] h-[88px] absolute top-[5%] right-[50%]"
+                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] absolute top-[5%] left-[50%] right-[50%]"
                     message={error.message}
                 /> 
             : null}
