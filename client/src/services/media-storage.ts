@@ -32,7 +32,6 @@ export async function uploadToCloudinary(file: File, folder_name: string): Promi
             resourceType: data.resource_type,
         }
     } catch (error) {
-        console.error('Cloudinary upload error:', error);
         throw new Error('File upload failed');
     }
 }

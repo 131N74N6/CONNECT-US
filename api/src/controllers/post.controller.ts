@@ -24,8 +24,18 @@ async function getAllPosts(req: Request, res: Response): Promise<void> {
         })
         .limit(limit)
         .skip(skip);
+
+        const postTotal = await Post.countDocuments();
+        const hasNextPage = page * limit < postTotal;
         
-        res.json(allPost);
+        res.json({
+            data: allPost,
+            pagination: {
+                current_page: page,
+                has_next_page: hasNextPage,
+                post_total: postTotal,
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -44,10 +54,27 @@ async function getSearchedPost(req: Request, res: Response): Promise<void> {
 async function getSignedUserPosts(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
-        const signedUserPosts = await Post.find({ user_id: getUserId }, { 
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 15;
+        const skip = (page - 1) * limit;
+
+        const signedInUserPosts = await Post.find({ user_id: getUserId }, { 
             _id: 1, description: 1, posts_file: 1, user_id: 1 
+        })
+        .limit(limit)
+        .skip(skip);
+
+        const postTotal = await Post.countDocuments();
+        const hasNextPage = page * limit < postTotal;
+
+        res.json({
+            data: signedInUserPosts,
+            pagination: {
+                current_page: page,
+                has_next_page: hasNextPage,
+                post_total: postTotal
+            }
         });
-        res.json(signedUserPosts);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
