@@ -18,9 +18,9 @@ export default function PostDetail() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
+    const { deleteData, getData, insertData } = DataModifier();
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
-    const { deleteData, getData, insertData } = DataModifier();
     const [error, setError] = useState({ isError: false, message: '' });
 
     useEffect(() => {
@@ -88,7 +88,7 @@ export default function PostDetail() {
 
             commentMutate();
         } catch (error: any) {
-            setError({ isError: true, message: error.message });
+            setError({ isError: true, message: error.message || 'Failed to send comment' });
         } finally {
             setComment('');
         }
