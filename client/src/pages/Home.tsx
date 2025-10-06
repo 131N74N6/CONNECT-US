@@ -3,13 +3,19 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
 import DataModifier from '../services/data-modifier';
-import useSWR from 'swr';
 import Error from "./Error";
+import useSWRInfinite from "swr/infinite";
 
 export default function Home() {
     const { getData } = DataModifier();
-    const { data: allPosts, isLoading, error } = useSWR<PostItemProps[]>(
-        `http://localhost:1234/posts/get-all`, 
+    const getKey = (pageIndex: number) => {
+        
+        if (pageIndex === 0) return `http://localhost:1234/posts/get-all?page=1&limit=${15}`;
+        
+        return `http://localhost:1234/posts/get-all?page=${pageIndex + 1}&limit=${15}`;
+    }
+    const { data: allPosts, isLoading, error, size, setSize } = useSWRInfinite<PostItemProps>(
+        getKey, 
         getData,
         {
             revalidateOnFocus: true,

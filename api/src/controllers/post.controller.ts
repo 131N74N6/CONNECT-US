@@ -13,11 +13,18 @@ v2.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-async function getAllPosts(_: Request, res: Response): Promise<void> {
+async function getAllPosts(req: Request, res: Response): Promise<void> {
     try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 15;
+        const skip = (page - 1) * limit;
+
         const allPost = await Post.find({}, { 
             _id: 1, description: 1, posts_file: 1, user_id: 1 
-        });
+        })
+        .limit(limit)
+        .skip(skip);
+        
         res.json(allPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
