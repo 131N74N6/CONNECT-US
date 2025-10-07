@@ -8,7 +8,7 @@ import { useRef } from "react";
 
 export default function Home() {
     const { getData } = DataModifier();
-    const observerRef = useRef<IntersectionObserver>();
+    const observerRef = useRef<IntersectionObserver | null>(null);
 
     const { 
         data: homePosts, 
@@ -61,8 +61,8 @@ export default function Home() {
                     <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
                         <PostList 
                             data={getPost}
-                            hasMore={hasNextPage || false}
-                            isLoadingMore={isFetchingNextPage || false}
+                            hasMore={hasNextPage}
+                            isLoadingMore={isFetchingNextPage}
                             lastPostRef={lastPostRef}
                         />
                     </div>
