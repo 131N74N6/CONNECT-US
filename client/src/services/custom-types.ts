@@ -40,6 +40,11 @@ export type ILikes = {
     username: string;
 }
 
+export type LikesData = {
+    data: ILikes[];
+    like_total: number;
+}
+
 export type IComments = {
     _id: string;
     created_at: string;
@@ -48,6 +53,11 @@ export type IComments = {
     post_owner_id: string;
     user_id: string;
     username: string;
+}
+
+export type CommentsData = {
+    data: IComments[];
+    comment_total: number;
 }
 
 export type PostItemProps = {
@@ -98,4 +108,9 @@ export type IFollowers = {
     other_user_id: string;
     user_id: string;
     username: string;
+}
+
+export type FollowersData = {
+    data: IFollowers[];
+    followers_total: number;
 }

@@ -1,19 +1,20 @@
-import type { IFollowers, PostItemProps } from "../services/custom-types";
+import type { IFollowers, PostsResponse } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
 import DataModifier from "../services/data-modifier";
-import Error from "./Error";
 import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Notification from "../components/Notification";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export default function About() {
     const { user } = useAuth();
     const { user_id } = useParams();
     const { getData, insertData, deleteData } = DataModifier();
     const [error, setError] = useState({ isError: false, message: '' });
+    const observerRef = useRef<IntersectionObserver | null>(null);
 
     useEffect(() => {
         if (error.isError) {
@@ -22,16 +23,42 @@ export default function About() {
         }
     }, [error.isError]);
     
-    const { data: currentUserPost, isLoading } = useSWR<PostItemProps[]>(
-        user_id ? `http://localhost:1234/posts/signed-user/${user_id}` : '',
-        getData,
-        {
-            revalidateOnFocus: true,
-            revalidateOnReconnect: true,
-            dedupingInterval: 5000,
-            errorRetryCount: 3
-        }
-    );
+
+    const { 
+        data: signedInUserPost, 
+        error: signedInUserError, 
+        fetchNextPage, 
+        hasNextPage, 
+        isFetchingNextPage, 
+        status 
+    } = useInfiniteQuery({
+        initialPageParam: 1,
+        getNextPageParam: (lastPage: PostsResponse) => {
+            return lastPage.pagination.has_next_page ? lastPage.pagination.current_page + 1 : undefined;
+        },
+        queryFn: async ({ pageParam = 1 }): Promise<PostsResponse> => {
+            const response = await getData(`http://localhost:1234/posts/signed-user/${user_id}?page=${pageParam}&limit=6`);
+            return response;
+        },
+        queryKey: [`signed-user-posts-${user_id}`],
+        refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000, 
+    });
+
+    const getPost = signedInUserPost ? signedInUserPost.pages.flatMap(page => page.data) : [];
+    const getPostTotal = signedInUserPost ? signedInUserPost.pages.flatMap(page => page.pagination.post_total) : 0;
+
+    const lastPostRef = (node: HTMLDivElement | null) => {
+        if (isFetchingNextPage) return;
+        
+        if (observerRef.current) observerRef.current.disconnect();
+        
+        observerRef.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasNextPage) fetchNextPage();
+        });
+        
+        if (node) observerRef.current.observe(node);
+    }
 
     const { data: currentUserFollower, mutate: currentUserFollowerMutate } = useSWR<IFollowers[]>(
         user_id ? `http://localhost:1234/followers/get-all/${user_id}` : '',
@@ -84,10 +111,6 @@ export default function About() {
         }
     }
 
-    if (isLoading) return <Loading/>;
-
-    if (!currentUserPost) return <Error message={"No posts found."}/>;
-
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black relative z-10">
             <Navbar1/>
@@ -137,11 +160,32 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {currentUserPost ? currentUserPost.length : 0}
+                            {getPostTotal}
                         </span>
                     </li>
                 </ul>
-                <PostList data={currentUserPost ? currentUserPost : []}/>
+                {status === 'error' ? 
+                    <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
+                        <span className="text-[2rem] font-[600] text-purple-700">{signedInUserError.message}</span>
+                    </div>
+                    : status === 'pending' ? 
+                        <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
+                            <Loading/> 
+                        </div>
+                    : status === 'success' ?
+                        <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
+                            <PostList 
+                                data={getPost}
+                                hasMore={hasNextPage}
+                                isLoadingMore={isFetchingNextPage}
+                                lastPostRef={lastPostRef}
+                            />
+                        </div>
+                    :
+                    <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
+                        <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>
+                    </div>
+                }
             </div>
         </section>
     );

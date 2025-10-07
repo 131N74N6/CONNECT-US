@@ -14,15 +14,19 @@ export default function PostList(props: PostListProps) {
     return (
         <section className="bg-[#1a1a1a] gap-[1rem] flex flex-col overflow-y-auto">
             <div className="gap-[0.5rem] grid md:grid-cols-3 grid-cols-2">
-                {props.data.map((post) => (
-                    <PostItem 
-                        key={`post_${post._id}`} 
-                        _id={post._id} 
-                        description={post.description}
-                        posts_file={post.posts_file}
-                        user_id={post.user_id}
-                    />
-                ))}
+                {props.data.map((post, index) => {
+                    const isLastElement = index === props.data.length - 1;
+                    return (
+                        <div key={`post_${post._id}`} ref={isLastElement ? props.lastPostRef : null}>
+                            <PostItem 
+                                _id={post._id} 
+                                description={post.description}
+                                posts_file={post.posts_file}
+                                user_id={post.user_id}
+                            />
+                        </div>
+                    )
+                })}
             </div>
             <div className="flex justify-center">
                 {props.isLoadingMore ? (

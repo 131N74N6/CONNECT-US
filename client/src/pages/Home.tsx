@@ -23,7 +23,7 @@ export default function Home() {
             return lastPage.pagination.has_next_page ? lastPage.pagination.current_page + 1 : undefined;
         },
         queryFn: async ({ pageParam = 1 }): Promise<PostsResponse> => {
-            const response = await getData(`http://localhost:1234/posts/get-paginated?page=${pageParam}&limit=6`);
+            const response = await getData(`http://localhost:1234/posts/get-all?page=${pageParam}&limit=6`);
             return response;
         },
         queryKey: ['all-posts'],

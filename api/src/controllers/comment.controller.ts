@@ -5,7 +5,11 @@ async function getAllComments(req: Request, res: Response) {
     try {
         const getPostId = req.params.id;
         const getComments = await Comment.find({ post_id: getPostId });
-        res.json(getComments);
+        const commentsTotal = await Comment.find({ post_id: getPostId }).countDocuments();
+        res.json({
+            data: getComments,
+            comment_total: commentsTotal
+        });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

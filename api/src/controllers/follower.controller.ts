@@ -5,7 +5,11 @@ async function getCurrentUserFollowers(req: Request, res: Response): Promise<voi
     try {
         const currentUserId = req.params.id;
         const showFollowers = await Follower.find({ other_user_id: currentUserId });
-        res.json(showFollowers);
+        const followersTotal = await Follower.find({ other_user_id: currentUserId }).countDocuments();
+        res.json({
+            data: showFollowers,
+            followers_total: followersTotal
+        });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -15,7 +19,11 @@ async function getCurrentUserFollowing(req: Request, res: Response): Promise<voi
     try {
         const currentUserId = req.params.id;
         const showFollowed = await Follower.find({ user_id: currentUserId });
-        res.json(showFollowed);
+        const followedTotal = await Follower.find({ user_id: currentUserId }).countDocuments();
+        res.json({
+            data: showFollowed,
+            followed_total: followedTotal
+        });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
