@@ -1,3 +1,4 @@
+import useSWRInfinite from "swr/infinite";
 import type { IPostData, IPutData } from "./custom-types";
 import useAuth from "./useAuth";
 
@@ -56,5 +57,32 @@ export default function DataModifier() {
         await request.json();
     }
 
-    return { deleteData, getData, insertData, updateData }
+    const infiniteScrollPagination = <TSX>(api_url: string, limit: number) => {
+        const getKey = (pageIndex: number, previousPageData: TSX[]) => {
+            pageIndex = pageIndex + 1;
+            if (previousPageData && !previousPageData.length) return null;
+            return `${api_url}?page=1&limit=${limit}`;
+        }
+
+        const { data, error, isLoading, mutate, size, setSize } =  useSWRInfinite(getKey, {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000,
+            errorRetryCount: 3
+        });
+        
+        const getPaginatedData: TSX[] = data ? data.flat() : [];
+        const isReachedEnd = data && data[data.length - 1].length < limit;
+        const loadMore = data && typeof data[size - 1] === 'undefined';
+
+        return { data, error, getPaginatedData, isLoading, isReachedEnd, loadMore, mutate, setSize, size }
+    }
+
+    return { 
+        deleteData, 
+        getData, 
+        infiniteScrollPagination, 
+        insertData, 
+        updateData 
+    }
 }

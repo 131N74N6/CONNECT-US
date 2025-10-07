@@ -78,9 +78,10 @@ export type PostDetail = {
 
 export type PostListProps = {
     data: PostItemProps[];
-    hasMore: boolean;
-    isLoadingMore: boolean;
-    lastPostRef: (node: HTMLDivElement | null) => void
+    isReachedEnd: boolean;
+    loadMore: boolean;
+    size: number;
+    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
 }
 
 export type PaginationInfo = {
@@ -91,6 +92,11 @@ export type PaginationInfo = {
 
 export type PostsResponse = {
     data: PostItemProps[];
+    pagination: PaginationInfo;
+}
+
+export type Response<T> = {
+    data: T[];
     pagination: PaginationInfo;
 }
 

@@ -15,11 +15,7 @@ async function getAllLikes(req: Request, res: Response) {
     try {
         const getPostId = req.params.id;
         const getPostLike = await Like.find({ post_id: getPostId });
-        const likeTotal = await Like.find({ post_id: getPostId }).countDocuments();
-        res.json({
-            data: getPostLike,
-            like_total: likeTotal
-        });
+        res.json(getPostLike);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

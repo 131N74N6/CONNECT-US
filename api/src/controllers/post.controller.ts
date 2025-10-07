@@ -24,18 +24,8 @@ async function getAllPosts(req: Request, res: Response): Promise<void> {
         })
         .limit(limit)
         .skip(skip);
-
-        const postTotal = await Post.countDocuments();
-        const hasNextPage = page * limit < postTotal;
         
-        res.json({
-            data: allPost,
-            pagination: {
-                current_page: page,
-                has_next_page: hasNextPage,
-                post_total: postTotal,
-            }
-        });
+        res.json(allPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -64,17 +54,7 @@ async function getSignedUserPosts(req: Request, res: Response): Promise<void> {
         .limit(limit)
         .skip(skip);
 
-        const postTotal = await Post.countDocuments();
-        const hasNextPage = page * limit < postTotal;
-
-        res.json({
-            data: signedInUserPosts,
-            pagination: {
-                current_page: page,
-                has_next_page: hasNextPage,
-                post_total: postTotal
-            }
-        });
+        res.json(signedInUserPosts);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
