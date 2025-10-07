@@ -27,7 +27,13 @@ export default function PostList(props: PostListProps) {
             <div className="flex justify-center">
                 {props.loadMore ? <Loading/> : null}
                 {!props.isReachedEnd ? 
-                    <button onClick={() => props.setSize(props.size + 1)}>Load More</button> : 
+                    <button 
+                        type="button"
+                        onClick={() => props.setSize(props.size + 1)}
+                        className="bg-purple-400 text-gray-800 font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
+                    >
+                        Load More
+                    </button> : 
                     <p className="text-purple-400 font-[500] text-center text-[1rem]">No More Data to Show</p>
                 }
             </div>
