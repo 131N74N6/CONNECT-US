@@ -1,4 +1,5 @@
 import type { PostListProps } from "../services/custom-types";
+import Loading from "./Loading";
 import PostItem from "./PostItem";
 
 export default function PostList(props: PostListProps) {
@@ -25,7 +26,7 @@ export default function PostList(props: PostListProps) {
             </div>
             <div className="flex justify-center">
                 {props.isLoadingMore ? (
-                    <div className="text-purple-400">Loading more posts...</div>
+                    <Loading/>
                 ) : null}
                 {!props.hasMore && props.data.length > 0 ? (
                     <div className="text-gray-400">No more posts to load</div>

@@ -160,6 +160,11 @@ async function deleteSelectedPost(req: Request, res: Response): Promise<void> {
 }
 
 export { 
-    deleteAllPosts, deleteSelectedPost, getAllPosts, getSearchedPost, 
-    getSelectedPost, getSignedUserPosts, insertNewPost 
+    deleteAllPosts, 
+    deleteSelectedPost, 
+    getAllPosts, 
+    getSearchedPost, 
+    getSelectedPost, 
+    getSignedUserPosts, 
+    insertNewPost 
 }

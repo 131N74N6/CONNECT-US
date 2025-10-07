@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
 import type { IUserInfo } from "../services/custom-types";

@@ -1,16 +1,6 @@
 import { Request, Response } from 'express';
 import { Follower } from '../models/follower.model';
 
-async function deleteAllFollowers(req: Request, res: Response): Promise<void> {
-    try {
-        const getSignedUserId = req.params.id;
-        await Follower.deleteMany({ other_user_id: getSignedUserId });
-        res.status(201).json({ message: 'successfully unfollow' });
-    } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
-    }
-}
-
 async function getCurrentUserFollowers(req: Request, res: Response): Promise<void> {
     try {
         const currentUserId = req.params.id;
@@ -52,6 +42,8 @@ async function unfollowOtherUser(req: Request, res: Response): Promise<void> {
 }
 
 export { 
-    deleteAllFollowers, getCurrentUserFollowers, getCurrentUserFollowing, 
-    followOtherUser, unfollowOtherUser 
+    getCurrentUserFollowers, 
+    getCurrentUserFollowing, 
+    followOtherUser, 
+    unfollowOtherUser 
 }

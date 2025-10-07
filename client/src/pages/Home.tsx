@@ -53,7 +53,7 @@ export default function Home() {
                 <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
                     <span className="text-[2rem] font-[600] text-purple-700">{homePostsError.message}</span>
                 </div>
-                : isFetchingNextPage ? 
+                : status === 'pending' ? 
                     <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
                         <Loading/> 
                     </div>
