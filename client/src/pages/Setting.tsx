@@ -2,6 +2,7 @@ import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
 import type { IUserInfo } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
+import useSWR from "swr";
 
 export default function Setting() {
     const { user } = useAuth();

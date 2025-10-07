@@ -59,12 +59,11 @@ export default function DataModifier() {
 
     const infiniteScrollPagination = <TSX>(api_url: string, limit: number) => {
         const getKey = (pageIndex: number, previousPageData: TSX[]) => {
-            pageIndex = pageIndex + 1;
             if (previousPageData && !previousPageData.length) return null;
-            return `${api_url}?page=1&limit=${limit}`;
+            return `${api_url}?page=${pageIndex}&limit=${limit}`;
         }
 
-        const { data, error, isLoading, mutate, size, setSize } =  useSWRInfinite(getKey, {
+        const { data, error, isLoading, mutate, size, setSize } =  useSWRInfinite(getKey, getData, {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
             dedupingInterval: 5000,
@@ -72,8 +71,8 @@ export default function DataModifier() {
         });
         
         const getPaginatedData: TSX[] = data ? data.flat() : [];
-        const isReachedEnd = data && data[data.length - 1].length < limit;
-        const loadMore = data && typeof data[size - 1] === 'undefined';
+        const isReachedEnd = !data || data.length === 0 || data[data.length - 1].length < limit;
+        const loadMore = (size > 0 && data && typeof data[size - 1] === 'undefined');
 
         return { data, error, getPaginatedData, isLoading, isReachedEnd, loadMore, mutate, setSize, size }
     }

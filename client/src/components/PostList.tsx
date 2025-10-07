@@ -17,6 +17,7 @@ export default function PostList(props: PostListProps) {
             <div className="gap-[0.5rem] grid md:grid-cols-3 grid-cols-2">
                 {props.data.map((post) => (
                     <PostItem 
+                        key={`posts_${post._id}`}
                         _id={post._id} 
                         description={post.description}
                         posts_file={post.posts_file}
@@ -25,12 +26,12 @@ export default function PostList(props: PostListProps) {
                 ))}
             </div>
             <div className="flex justify-center">
-                {props.loadMore ? <Loading/> : null}
+                {props.loadMore ? <div className="flex justify-center"><Loading/></div> : null}
                 {!props.isReachedEnd ? 
                     <button 
                         type="button"
                         onClick={() => props.setSize(props.size + 1)}
-                        className="bg-purple-400 text-gray-800 font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
+                        className="bg-purple-400 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
                     >
                         Load More
                     </button> : 
