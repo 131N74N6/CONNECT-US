@@ -22,7 +22,6 @@ export default function About() {
             return () => clearTimeout(timeout);
         }
     }, [error.isError]);
-    
 
     const { 
         data: signedInUserPost, 
@@ -46,7 +45,7 @@ export default function About() {
     });
 
     const getPost = signedInUserPost ? signedInUserPost.pages.flatMap(page => page.data) : [];
-    const getPostTotal = signedInUserPost ? signedInUserPost.pages.flatMap(page => page.pagination.post_total) : 0;
+    const getPostTotal = signedInUserPost ? signedInUserPost.pages.flatMap(page => page.pagination.post_total) : [];
 
     const lastPostRef = (node: HTMLDivElement | null) => {
         if (isFetchingNextPage) return;
@@ -160,7 +159,7 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {getPostTotal}
+                            {getPostTotal[0]}
                         </span>
                     </li>
                 </ul>
