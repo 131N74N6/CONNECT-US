@@ -70,7 +70,13 @@ export type PostListProps = {
     data: PostItemProps[];
     hasMore: boolean;
     isLoadingMore: boolean;
-    onLoadMore: () => void;
+    lastPostRef: (node: HTMLDivElement | null) => void
+}
+
+export type PaginationInfo = {
+    current_page: number;
+    has_next_page: boolean;
+    post_total: number;
 }
 
 export type PostsResponse = {
@@ -92,10 +98,4 @@ export type IFollowers = {
     other_user_id: string;
     user_id: string;
     username: string;
-}
-
-export type PaginationInfo = {
-    current_page: number;
-    has_next_page: boolean;
-    post_total: number;
 }

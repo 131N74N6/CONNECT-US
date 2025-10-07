@@ -1,4 +1,4 @@
-import type { IFollowers, PostItemProps } from "../services/custom-types";
+import type { IFollowers, PostsResponse, PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -55,6 +55,23 @@ export default function About() {
             errorRetryCount: 3
         }
     );
+
+        const allPosts: PostItemProps[] | undefined = useMemo(() => {
+            if (!response) return;
+            return response.flatMap(page => page.data);
+        }, [response]);
+
+        const hasMore: boolean | undefined = useMemo(() => {
+            if (!response) return;
+            if (!response[response.length - 1].pagination.has_next_page) return false;
+            return true;
+        }, [response]);
+
+        const isLoadingMore = isLoading || (size > 0 && response && typeof response[size - 1] === 'undefined');
+
+        const loadMore = () => {
+            if (hasMore && !isLoadingMore) setSize(size + 1);
+        }
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = currentUserFollower && user ? currentUserFollower.some(follow => user.info.id === follow.user_id) : false;

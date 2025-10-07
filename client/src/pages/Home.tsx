@@ -1,65 +1,76 @@
-import type { PostItemProps, PostsResponse } from "../services/custom-types";
+import type { PostsResponse } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
 import DataModifier from '../services/data-modifier';
-import useSWRInfinite from "swr/infinite";
-import { useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 
 export default function Home() {
-    const postsLimit = 15;
     const { getData } = DataModifier();
+    const observerRef = useRef<IntersectionObserver>();
 
-    const getKey = (pageIndex: number, previousPageData: PostsResponse | null) => {
-        if (previousPageData && !previousPageData.pagination.has_next_page) return null;
-        if (pageIndex === 0) return `http://localhost:1234/posts/get-all?page=1&limit=${postsLimit}`;
-        return `http://localhost:1234/posts/get-all?page=${pageIndex + 1}&limit=${postsLimit}`;
-    }
-
-    const { data: response, isLoading, error, size, setSize } = useSWRInfinite<PostsResponse>(getKey, getData, {
-        revalidateOnFocus: true,
-        revalidateOnReconnect: true,
-        dedupingInterval: 5000, // Reduce unnecessary requests
-        errorRetryCount: 3,
+    const { 
+        data: homePosts, 
+        error: homePostsError, 
+        fetchNextPage, 
+        hasNextPage, 
+        isFetchingNextPage, 
+        status 
+    } = useInfiniteQuery({
+        initialPageParam: 1,
+        getNextPageParam: (lastPage: PostsResponse) => {
+            return lastPage.pagination.has_next_page ? lastPage.pagination.current_page + 1 : undefined;
+        },
+        queryFn: async ({ pageParam = 1 }): Promise<PostsResponse> => {
+            const response = await getData(`http://localhost:1234/posts/get-paginated?page=${pageParam}&limit=6`);
+            return response;
+        },
+        queryKey: ['all-posts'],
+        refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000, 
     });
 
-    const allPosts: PostItemProps[] | undefined = useMemo(() => {
-        if (!response) return;
-        return response.flatMap(page => page.data);
-    }, [response]);
+    const getPost = homePosts ? homePosts.pages.flatMap(page => page.data) : [];
 
-    const hasMore: boolean | undefined = useMemo(() => {
-        if (!response) return;
-        if (!response[response.length - 1].pagination.has_next_page) return false;
-        return true;
-    }, [response]);
-
-    const isLoadingMore = isLoading || (size > 0 && response && typeof response[size - 1] === 'undefined');
-
-    const loadMore = () => {
-        if (hasMore && !isLoadingMore) setSize(size + 1);
+    const lastPostRef = (node: HTMLDivElement | null) => {
+        if (isFetchingNextPage) return;
+        
+        if (observerRef.current) observerRef.current.disconnect();
+        
+        observerRef.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasNextPage) fetchNextPage();
+        });
+        
+        if (node) observerRef.current.observe(node);
     }
-
-    if (isLoading) return <Loading/>;
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
             <Navbar1/>
             <Navbar2/>
-            <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
-                {error ? (
-                    <div className="flex justify-center items-center h-[100%]">
-                        <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>
+            {status === 'error' ? 
+                <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
+                    <span className="text-[2rem] font-[600] text-purple-700">{homePostsError.message}</span>
+                </div>
+                : isFetchingNextPage ? 
+                    <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
+                        <Loading/> 
                     </div>
-                ) : (
-                    <PostList 
-                        data={allPosts ? allPosts : []}
-                        hasMore={hasMore || false}
-                        isLoadingMore={isLoadingMore || false}
-                        onLoadMore={loadMore}
-                    />
-                )}
-            </div>
+                : status === 'success' ?
+                    <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
+                        <PostList 
+                            data={getPost}
+                            hasMore={hasNextPage || false}
+                            isLoadingMore={isFetchingNextPage || false}
+                            lastPostRef={lastPostRef}
+                        />
+                    </div>
+                :
+                <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
+                    <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>
+                </div>
+            }
         </section>
     );
 }

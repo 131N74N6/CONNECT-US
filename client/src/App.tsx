@@ -8,10 +8,13 @@ import AddPost from "./pages/AddPost";
 import SearchPost from "./pages/SearchPost";
 import About from "./pages/About";
 import Setting from "./pages/Setting";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function App() {
     return (
-        <>
+        <QueryClientProvider client={queryClient}>
             <BrowserRouter>
                 <Routes>
                     <Route path="/signin" element={<SignIn/>}/>
@@ -26,6 +29,6 @@ export default function App() {
                     <Route path="*" element={<Navigate to="/signin" replace/>}/>
                 </Routes>
             </BrowserRouter>
-        </>
+        </QueryClientProvider>
     )
 }

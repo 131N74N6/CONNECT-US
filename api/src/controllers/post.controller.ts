@@ -16,7 +16,7 @@ v2.config({
 async function getAllPosts(req: Request, res: Response): Promise<void> {
     try {
         const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 15;
+        const limit = parseInt(req.query.limit as string) || 6;
         const skip = (page - 1) * limit;
 
         const allPost = await Post.find({}, { 
@@ -55,7 +55,7 @@ async function getSignedUserPosts(req: Request, res: Response): Promise<void> {
     try {
         const getUserId = req.params.id;
         const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 15;
+        const limit = parseInt(req.query.limit as string) || 6;
         const skip = (page - 1) * limit;
 
         const signedInUserPosts = await Post.find({ user_id: getUserId }, { 

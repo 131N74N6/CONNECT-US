@@ -1,33 +1,7 @@
-import { useEffect, useRef } from "react";
 import type { PostListProps } from "../services/custom-types";
 import PostItem from "./PostItem";
 
 export default function PostList(props: PostListProps) {
-    const observerRef = useRef<IntersectionObserver | null>(null);
-    const loadMoreTriggerRef = useRef<HTMLDivElement>(null);
-
-    const handleLoadMore = () => {
-        if (props.hasMore && !props.isLoadingMore) props.onLoadMore();
-    }
-
-    useEffect(() => {
-        if (!props.hasMore || props.isLoadingMore) return;
-
-        observerRef.current = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting) handleLoadMore();
-            },
-            { threshold: 0.1 }
-        );
-
-        const currentTrigger = loadMoreTriggerRef.current;
-        if (currentTrigger) observerRef.current.observe(currentTrigger);
-
-        return () => {
-            if (observerRef.current && currentTrigger) observerRef.current.unobserve(currentTrigger);
-        }
-    }, [props.hasMore, props.isLoadingMore, handleLoadMore]);
-    
     if (!props.data || props.data.length === 0) {
         return (
              <section className="flex h-full items-center justify-center">
@@ -38,7 +12,7 @@ export default function PostList(props: PostListProps) {
 
     return (
         <section className="bg-[#1a1a1a] gap-[1rem] flex flex-col overflow-y-auto">
-            <div className="gap-[0.5rem] grid grid-cols-3">
+            <div className="gap-[0.5rem] grid md:grid-cols-3 grid-cols-2">
                 {props.data.map((post) => (
                     <PostItem 
                         key={`post_${post._id}`} 
@@ -49,7 +23,7 @@ export default function PostList(props: PostListProps) {
                     />
                 ))}
             </div>
-            <div ref={loadMoreTriggerRef} className="flex justify-center py-4">
+            <div className="flex justify-center">
                 {props.isLoadingMore ? (
                     <div className="text-purple-400">Loading more posts...</div>
                 ) : null}
