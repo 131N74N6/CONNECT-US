@@ -126,3 +126,12 @@ export type FollowersData = {
     setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
     onClose: (value: React.SetStateAction<boolean>) => void
 }
+
+export type FollowingData = {
+    following: Pick<IFollowers, 'created_at' | 'followed_user_id' | 'followed_username'>[];
+    isReachedEnd: boolean;
+    loadMore: boolean;
+    size: number;
+    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
+    onClose: (value: React.SetStateAction<boolean>) => void
+}

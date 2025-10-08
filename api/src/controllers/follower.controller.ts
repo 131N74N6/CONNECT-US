@@ -27,7 +27,7 @@ async function getCurrentUserFollowing(req: Request, res: Response): Promise<voi
         const currentUserId = req.params.id;
         const showFollowed = await Follower.find(
             { user_id: currentUserId },
-            { user_id: 1, username: 1, created_at: 1 }
+            { followed_user_id: 1, followed_username: 1, created_at: 1 }
         ).limit(limit).skip(skip);
         res.json(showFollowed);
     } catch (error) {

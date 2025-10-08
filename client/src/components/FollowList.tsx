@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { FollowersData } from "../services/custom-types";
+import type { FollowersData, FollowingData } from "../services/custom-types";
 import Loading from "./Loading";
 
 export function FollowerList(props: FollowersData) {
@@ -9,7 +9,7 @@ export function FollowerList(props: FollowersData) {
                 <div className="flex flex-col gap-[1rem] border-b border-purple-400 h-[100%] overflow-y-auto">
                     {props.followers.length > 0 ? (
                         props.followers.map(follower => (
-                            <div className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">
+                            <div key={`fld_${follower.user_id}`} className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">
                                 <div className="text-white text-[1.1rem]">
                                     <i className="fa-regular fa-user"></i>
                                 </div>
@@ -48,20 +48,20 @@ export function FollowerList(props: FollowersData) {
     );
 }
 
-export function FollowingList(props: FollowersData) {
+export function FollowingList(props: FollowingData) {
     return (
         <section className="flex justify-center items-center fixed inset-0 z-20 bg-[rgba(0,0,0,0.66)] p-[0.7rem]">
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-purple-400 w-[450px] h-[600px]">
                 <div className="flex flex-col gap-[1rem] border-b border-purple-400 h-[100%] overflow-y-auto">
-                    {props.followers.length > 0 ? (
-                        props.followers.map(follower => (
-                            <div className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">
+                    {props.following.length > 0 ? (
+                        props.following.map(flg => (
+                            <div key={`fld_${flg.followed_user_id}`} className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">
                                 <div className="text-white text-[1.1rem]">
                                     <i className="fa-regular fa-user"></i>
                                 </div>
                                 <div className="flex flex-col gap-[0.5rem] text-white">
-                                    <Link to={`/about/${follower.user_id}`} onClick={() => props.onClose(false)}>{follower.username}</Link>
-                                    <p className="text-[0.9rem]">{new Date(follower.created_at).toLocaleString()}</p>
+                                    <Link to={`/about/${flg.followed_user_id}`} onClick={() => props.onClose(false)}>{flg.followed_username}</Link>
+                                    <p className="text-[0.9rem]">{new Date(flg.created_at).toLocaleString()}</p>
                                 </div>
                             </div>
                         ))

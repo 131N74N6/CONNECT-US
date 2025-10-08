@@ -14,7 +14,7 @@ export default function Home() {
         loadMore, 
         setSize, 
         size 
-    } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/get-all`, 6);
+    } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/get-all`, 12);
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">

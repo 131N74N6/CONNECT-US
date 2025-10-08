@@ -32,7 +32,7 @@ export default function About() {
         loadMore: loadPostOwner, 
         setSize: setSignedInUserPosts, 
         size: signedInUserPostsSize 
-    } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/signed-user/${user_id}`, 6);
+    } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/signed-user/${user_id}`, 12);
 
     const { 
         mutate: currentUserFollowerMutate,
@@ -104,7 +104,7 @@ export default function About() {
             : null}
             {showFollowing ? 
                 <FollowingList
-                    followers={paginatedCurrentUserFollowing}
+                    following={paginatedCurrentUserFollowing}
                     isReachedEnd={currentUserFollowingReachEnd}
                     loadMore={loadCurrentUserFollowing || false}
                     onClose={setShowFollowing}
@@ -127,9 +127,7 @@ export default function About() {
                         </button> 
                     ) : (
                         <Link to={user ? `/setting/${user.info.id}` : '/home'}>
-                            <div 
-                                className="bg-purple-400 cursor-pointer w-[88px] text-[0.9rem] p-[0.3rem] text-center text-[#1a1a1a] font-[500]"
-                            >
+                            <div className="bg-purple-400 cursor-pointer w-[88px] text-[0.9rem] p-[0.3rem] text-center text-[#1a1a1a] font-[500]">
                                 Setting
                             </div>
                         </Link>
