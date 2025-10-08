@@ -16,6 +16,14 @@ export default function FollowerList(props: FollowersData) {
                         </div>
                     </div>
                 ))}
+                <div className="flex gap-[0.5rem]">
+                    <button type="button" onClick={() => props.onClose(false)} className="bg-orange-400 text-gray-800 cursor-pointer p-[0.4rem] text-[0.9rem]">
+                        <i className="fa-solid fa-xmark"></i>
+                    </button>
+                    <button type="button" className="bg-purple-400 text-gray-800 cursor-pointer p-[0.4rem] text-[0.9rem]">
+                        <span>Load More</span>
+                    </button>
+                </div>
             </div>
         </div>
     );

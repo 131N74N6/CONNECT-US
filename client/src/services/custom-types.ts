@@ -122,4 +122,5 @@ export type FollowersData = {
     loadMore: boolean;
     size: number;
     setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
+    onClose: (value: React.SetStateAction<boolean>) => void
 }

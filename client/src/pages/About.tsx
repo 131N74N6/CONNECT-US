@@ -7,12 +7,15 @@ import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
 import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
+import FollowerList from "../components/FollowerList";
 
 export default function About() {
     const { user } = useAuth();
     const { user_id } = useParams();
     const { infiniteScrollPagination, insertData, deleteData } = DataModifier();
     const [error, setError] = useState({ isError: false, message: '' });
+    const [showFollowers, setShowFollowers] = useState<boolean>(false);
+    const [showFollowing, setShowFollowing] = useState<boolean>(false);
     
     useEffect(() => {
         if (error.isError) {
@@ -34,12 +37,22 @@ export default function About() {
 
     const { 
         data: currentUserFollower,
-        mutate: currentUserFollowerMutate 
+        mutate: currentUserFollowerMutate,
+        getPaginatedData: paginatedCurrentUserFollower,
+        isReachedEnd: currentUserFollowerReachEnd, 
+        loadMore: loadCurrentUserFollower, 
+        setSize: setCurrentUserFollower, 
+        size: currentUserFollowerSize 
     } = infiniteScrollPagination<IFollowers>(`http://localhost:1234/followers/get-all/${user_id}`, 12);
 
     const { 
         data: currentUserFollowing,
-        mutate: currentUserFollowingMutate 
+        mutate: currentUserFollowingMutate,
+        getPaginatedData: paginatedCurrentUserFollowing,
+        isReachedEnd: currentUserFollowingReachEnd, 
+        loadMore: loadCurrentUserFollowing, 
+        setSize: setCurrentUserFollowing, 
+        size: currentUserFollowingSize 
     } = infiniteScrollPagination<IFollowers>(`http://localhost:1234/followers/who-followed/${user_id}`, 12);
 
     const notOwner = user_id && user && user.info.id !== user_id;
@@ -81,6 +94,26 @@ export default function About() {
                     message={error.message}
                 /> 
             : null}
+            {showFollowers ? 
+                <FollowerList
+                    followers={paginatedCurrentUserFollower}
+                    isReachedEnd={currentUserFollowerReachEnd}
+                    loadMore={loadCurrentUserFollower || false}
+                    onClose={setShowFollowers}
+                    size={currentUserFollowerSize}
+                    setSize={setCurrentUserFollower}
+                /> 
+            : null}
+            {showFollowing ? 
+                <FollowerList
+                    followers={paginatedCurrentUserFollowing}
+                    isReachedEnd={currentUserFollowingReachEnd}
+                    loadMore={loadCurrentUserFollowing || false}
+                    onClose={setShowFollowing}
+                    size={currentUserFollowingSize}
+                    setSize={setCurrentUserFollowing}
+                /> 
+            : null}
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
                 <div>
                     {notOwner ? (
@@ -107,13 +140,13 @@ export default function About() {
                 <ul className="flex justify-evenly border-b border-purple-400 pb-[0.45rem]">
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Followers</span>
-                        <span className="text-purple-400 font-[500] text-[1rem]">
+                        <span className="text-purple-400 font-[500] text-[1rem]" onClick={() => setShowFollowers(true)}>
                             {currentUserFollower ? currentUserFollower.length : 0}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Following</span>
-                        <span className="text-purple-400 font-[500] text-[1rem]">
+                        <span className="text-purple-400 font-[500] text-[1rem]" onClick={() => setShowFollowing(true)}>
                             {currentUserFollowing ? currentUserFollowing.length : 0}
                         </span>
                     </li>
