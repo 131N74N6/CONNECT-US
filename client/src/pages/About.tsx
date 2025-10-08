@@ -7,7 +7,7 @@ import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
 import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
-import FollowerList from "../components/FollowerList";
+import { FollowerList, FollowingList } from "../components/FollowList";
 
 export default function About() {
     const { user } = useAuth();
@@ -25,7 +25,6 @@ export default function About() {
     }, [error.isError]);
 
     const { 
-        data: postOwnerTotal,
         error: postOwnerError,
         getPaginatedData: signedInUserPosts, 
         isLoading: loadPosts, 
@@ -36,7 +35,6 @@ export default function About() {
     } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/signed-user/${user_id}`, 6);
 
     const { 
-        data: currentUserFollower,
         mutate: currentUserFollowerMutate,
         getPaginatedData: paginatedCurrentUserFollower,
         isReachedEnd: currentUserFollowerReachEnd, 
@@ -46,7 +44,6 @@ export default function About() {
     } = infiniteScrollPagination<IFollowers>(`http://localhost:1234/followers/get-all/${user_id}`, 12);
 
     const { 
-        data: currentUserFollowing,
         mutate: currentUserFollowingMutate,
         getPaginatedData: paginatedCurrentUserFollowing,
         isReachedEnd: currentUserFollowingReachEnd, 
@@ -56,7 +53,7 @@ export default function About() {
     } = infiniteScrollPagination<IFollowers>(`http://localhost:1234/followers/who-followed/${user_id}`, 12);
 
     const notOwner = user_id && user && user.info.id !== user_id;
-    const isFollowed = currentUserFollower && user ? currentUserFollower.some(follow => user.info.id === follow.user_id) : false;
+    const isFollowed = paginatedCurrentUserFollower && user ? paginatedCurrentUserFollower.some(follow => user.info.id === follow.user_id) : false;
 
     const handleFollowBtn = async (): Promise<void> => {
         try {
@@ -68,7 +65,8 @@ export default function About() {
                     api_url: `http://localhost:1234/followers/add`,
                     data: {
                         created_at: getCurrentDate.toISOString(),
-                        other_user_id: user_id,
+                        followed_user_id: user_id,
+                        followed_username: signedInUserPosts[0].uploader_name,
                         user_id: user.info.id,
                         username: user.info.username
                     }
@@ -105,7 +103,7 @@ export default function About() {
                 /> 
             : null}
             {showFollowing ? 
-                <FollowerList
+                <FollowingList
                     followers={paginatedCurrentUserFollowing}
                     isReachedEnd={currentUserFollowingReachEnd}
                     loadMore={loadCurrentUserFollowing || false}
@@ -114,15 +112,15 @@ export default function About() {
                     setSize={setCurrentUserFollowing}
                 /> 
             : null}
-            <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] w-full bg-[#1a1a1a]">
+            <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
                 <div>
                     {notOwner ? (
                         <button 
                             type="button"
                             onClick={handleFollowBtn} 
                             className={
-                                isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]" : 
-                                "bg-yellow-300 text-gray-800 font-[500] cursor-pointer text-[0.9rem] p-[0.45rem]"
+                                isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] w-[120px] cursor-pointer text-[0.9rem] p-[0.45rem]" : 
+                                "bg-yellow-300 text-gray-800 font-[500] cursor-pointer w-[120px] text-[0.9rem] p-[0.45rem]"
                             }
                         >
                             {isFollowed ? 'Following' : 'Follow' }
@@ -139,21 +137,21 @@ export default function About() {
                 </div>
                 <ul className="flex justify-evenly border-b border-purple-400 pb-[0.45rem]">
                     <li className="flex flex-col gap-[0.2rem] text-center">
-                        <span className="text-purple-400 font-[500] text-[1rem]">Followers</span>
-                        <span className="text-purple-400 font-[500] text-[1rem]" onClick={() => setShowFollowers(true)}>
-                            {currentUserFollower ? currentUserFollower.length : 0}
+                        <span className="text-purple-400 font-[500] text-[1rem] cursor-pointer" onClick={() => setShowFollowers(true)}>Followers</span>
+                        <span className="text-purple-400 font-[500] text-[1rem]">
+                            {paginatedCurrentUserFollower ? paginatedCurrentUserFollower.length : 0}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
-                        <span className="text-purple-400 font-[500] text-[1rem]">Following</span>
-                        <span className="text-purple-400 font-[500] text-[1rem]" onClick={() => setShowFollowing(true)}>
-                            {currentUserFollowing ? currentUserFollowing.length : 0}
+                        <span className="text-purple-400 font-[500] text-[1rem] cursor-pointer" onClick={() => setShowFollowing(true)}>Following</span>
+                        <span className="text-purple-400 font-[500] text-[1rem]">
+                            {paginatedCurrentUserFollowing ? paginatedCurrentUserFollowing.length : 0}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {postOwnerTotal ? postOwnerTotal.length : 0}
+                            {signedInUserPosts ? signedInUserPosts.length : 0}
                         </span>
                     </li>
                 </ul>

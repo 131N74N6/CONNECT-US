@@ -49,7 +49,7 @@ async function getSignedUserPosts(req: Request, res: Response): Promise<void> {
         const skip = (page - 1) * limit;
 
         const signedInUserPosts = await Post.find({ user_id: getUserId }, { 
-            _id: 1, description: 1, posts_file: 1, user_id: 1 
+            _id: 1, description: 1, posts_file: 1, user_id: 1, uploader_name: 1 
         })
         .limit(limit)
         .skip(skip);

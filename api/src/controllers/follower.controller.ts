@@ -9,7 +9,7 @@ async function getCurrentUserFollowers(req: Request, res: Response): Promise<voi
         
         const currentUserId = req.params.id;
         const showFollowers = await Follower.find(
-            { other_user_id: currentUserId }, 
+            { followed_user_id: currentUserId }, 
             { user_id: 1, username: 1, created_at: 1 }
         ).limit(limit).skip(skip);
         res.json(showFollowers);

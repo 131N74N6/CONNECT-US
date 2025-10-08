@@ -63,6 +63,7 @@ export type CommentsData = {
 export type PostItemProps = {
     _id: string;
     description: string;
+    uploader_name: string;
     posts_file?: { file_url: string; public_id: string; }[];
     user_id: string;
 }
@@ -111,7 +112,8 @@ export type CommentProps = {
 export type IFollowers = {
     _id: string;
     created_at: string;
-    other_user_id: string;
+    followed_user_id: string;
+    followed_username: string;
     user_id: string;
     username: string;
 }
