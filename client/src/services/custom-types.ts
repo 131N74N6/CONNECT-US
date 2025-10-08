@@ -91,16 +91,6 @@ export type PaginationInfo = {
     post_total: number;
 }
 
-export type PostsResponse = {
-    data: PostItemProps[];
-    pagination: PaginationInfo;
-}
-
-export type Response<T> = {
-    data: T[];
-    pagination: PaginationInfo;
-}
-
 export type CommentProps = {
     comments_data: IComments[];
     comment: string;
