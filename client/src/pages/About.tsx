@@ -124,24 +124,16 @@ export default function About() {
                         </span>
                     </li>
                 </ul>
-                {postOwnerError ? 
-                    <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
-                        <span className="text-[2rem] font-[600] text-purple-700">{postOwnerError}</span>
-                    </div>
-                    : loadPosts ? 
-                        <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
-                            <Loading/> 
-                        </div>
+                {postOwnerError ? <span className="text-[2rem] font-[600] text-purple-700">{postOwnerError}</span>
+                    : loadPosts ? <Loading/> 
                     : signedInUserPosts ?
-                        <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
-                            <PostList 
-                                data={signedInUserPosts}
-                                loadMore={loadPostOwner || false}
-                                isReachedEnd={postReachEnd || false}
-                                size={signedInUserPostsSize}
-                                setSize={setSignedInUserPosts}
-                            />
-                        </div>
+                        <PostList 
+                            data={signedInUserPosts}
+                            loadMore={loadPostOwner || false}
+                            isReachedEnd={postReachEnd || false}
+                            size={signedInUserPostsSize}
+                            setSize={setSignedInUserPosts}
+                        />
                     :
                     <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
                         <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>

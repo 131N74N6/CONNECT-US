@@ -3,12 +3,15 @@ import { Follower } from '../models/follower.model';
 
 async function getCurrentUserFollowers(req: Request, res: Response): Promise<void> {
     try {
-        const page = parseInt(req.query.page as string) || 1;
+        const page = parseInt(req.query.page as string) || 0;
         const limit = parseInt(req.query.limit as string) || 12;
-        const skip = (page - 1) * limit;
+        const skip = page * limit;
         
         const currentUserId = req.params.id;
-        const showFollowers = await Follower.find({ other_user_id: currentUserId }).limit(limit).skip(skip);
+        const showFollowers = await Follower.find(
+            { other_user_id: currentUserId }, 
+            { user_id: 1, username: 1, created_at: 1 }
+        ).limit(limit).skip(skip);
         res.json(showFollowers);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -17,13 +20,16 @@ async function getCurrentUserFollowers(req: Request, res: Response): Promise<voi
 
 async function getCurrentUserFollowing(req: Request, res: Response): Promise<void> {
     try {
+        const page = parseInt(req.query.page as string) || 0;
+        const limit = parseInt(req.query.limit as string) || 12;
+        const skip = page * limit;
+
         const currentUserId = req.params.id;
-        const showFollowed = await Follower.find({ user_id: currentUserId });
-        const followedTotal = await Follower.find({ user_id: currentUserId }).countDocuments();
-        res.json({
-            data: showFollowed,
-            followed_total: followedTotal
-        });
+        const showFollowed = await Follower.find(
+            { user_id: currentUserId },
+            { user_id: 1, username: 1, created_at: 1 }
+        ).limit(limit).skip(skip);
+        res.json(showFollowed);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

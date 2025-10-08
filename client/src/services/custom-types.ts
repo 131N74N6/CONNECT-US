@@ -117,6 +117,9 @@ export type IFollowers = {
 }
 
 export type FollowersData = {
-    data: IFollowers[];
-    followers_total: number;
+    followers: Pick<IFollowers, 'created_at' | 'user_id' | 'username'>[];
+    isReachedEnd: boolean;
+    loadMore: boolean;
+    size: number;
+    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
 }
