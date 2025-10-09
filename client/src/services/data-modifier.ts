@@ -63,7 +63,7 @@ export default function DataModifier() {
             return `${api_url}?page=${pageIndex}&limit=${limit}`;
         }
 
-        const { data, error, isLoading, mutate, size, setSize } =  useSWRInfinite(getKey, getData, {
+        const { data, error, isLoading, mutate, size, setSize } =  useSWRInfinite<TSX[]>(getKey, getData, {
             revalidateOnFocus: true,
             revalidateOnReconnect: true,
             dedupingInterval: 5000,
