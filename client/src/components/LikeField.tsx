@@ -6,6 +6,7 @@ type LikeFieldPorps = {
     likesData: ILikes[] | undefined;
     setOpenComments: (value: React.SetStateAction<boolean>) => void;
     userLiked: false | ILikes | undefined;
+    setShowLikes: (value: React.SetStateAction<boolean>) => void;
 }
 
 export default function LikeField(props: LikeFieldPorps) {
@@ -16,7 +17,7 @@ export default function LikeField(props: LikeFieldPorps) {
                     className={`fa-${props.userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${props.userLiked ? 'text-red-500' : ''}`} 
                     onClick={props.givingLikes}
                 ></i>
-                <span>{props.likesData ? props.likesData.length : 0}</span>
+                <span onClick={() => props.setShowLikes(true)}>{props.likesData ? props.likesData.length : 0}</span>
             </div>
             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                 <i className="fa-regular fa-comment cursor-pointer" onClick={() => props.setOpenComments(true)}></i>

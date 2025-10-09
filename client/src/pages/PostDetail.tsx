@@ -12,14 +12,16 @@ import useSWR from "swr";
 import LikeField from "../components/LikeField";
 import VideoSlider from "../components/VideoSlider";
 import Notification from "../components/Notification";
+import LikeList from "../components/LikeList";
 
 export default function PostDetail() {
     const { _id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const { deleteData, getData, insertData } = DataModifier();
+    const { deleteData, getData, infiniteScrollPagination, insertData } = DataModifier();
     const [comment, setComment] = useState<string>('');
+    const [showLikes, setShowLikes] = useState<boolean>(false);
     const [openComments, setOpenComments] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
 
@@ -189,9 +191,21 @@ export default function PostDetail() {
                         likesData={likesData}
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
+                        setShowLikes={setShowLikes}
                     />
                     <div className="text-gray-200">{selectedPost[0].description}</div>
                 </div>
+
+                {showLikes ? 
+                    <LikeList
+                        isReachedEnd={}
+                        likes={}
+                        loadMore={}
+                        onClose={setShowLikes}
+                        setSize={}
+                        size={}
+                    /> 
+                : null}
 
                 {openComments ? 
                     <CommentField 
