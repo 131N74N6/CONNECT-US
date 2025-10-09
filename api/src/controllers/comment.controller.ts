@@ -3,9 +3,9 @@ import { Comment } from "../models/comment.model";
 
 async function getAllComments(req: Request, res: Response) {
     try {
-        const page = parseInt(req.query.page as string) || 1;
+        const page = parseInt(req.query.page as string) || 0;
         const limit = parseInt(req.query.limit as string) || 12;
-        const skip = (page - 1) * limit;
+        const skip = page * limit;
 
         const getPostId = req.params.id;
         const getComments = await Comment.find({ post_id: getPostId }).limit(limit).skip(skip);

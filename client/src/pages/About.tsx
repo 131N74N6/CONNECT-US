@@ -25,7 +25,7 @@ export default function About() {
     }, [error.isError]);
 
     const { 
-        error: postOwnerError,
+        error: currentUserPostsError,
         getPaginatedData: currentUserPosts, 
         isLoading: loadPosts, 
         isReachedEnd: postReachEnd, 
@@ -153,7 +153,7 @@ export default function About() {
                         </span>
                     </li>
                 </ul>
-                {postOwnerError ? <span className="text-[2rem] font-[600] text-purple-700">{postOwnerError}</span>
+                {currentUserPostsError ? <span className="text-[2rem] font-[600] text-purple-700">{currentUserPostsError}</span>
                     : loadPosts ? <Loading/> 
                     : currentUserPosts ?
                         <PostList 

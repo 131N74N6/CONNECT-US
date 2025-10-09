@@ -3,9 +3,9 @@ import { Like } from "../models/like.model";
 
 async function dislike(req: Request, res:Response) {
     try {
-        const page = parseInt(req.query.page as string) || 1;
+        const page = parseInt(req.query.page as string) || 0;
         const limit = parseInt(req.query.limit as string) || 12;
-        const skip = (page - 1) * limit;
+        const skip = page * limit;
         
         const getUserId = req.params.id;
         await Like.deleteOne({ user_id: getUserId }).limit(limit).skip(skip);
