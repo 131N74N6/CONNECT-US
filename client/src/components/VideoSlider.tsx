@@ -18,7 +18,7 @@ export default function VideoSlider(props: PostSliderProps) {
     if (props.videos.length === 0) return null;
 
     return (
-        <div className="relative w-full h-96 bg-gray-900 rounded-lg overflow-hidden">
+        <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
             <video 
                 src={props.videos[currentIndex].file_url} 
                 controls 

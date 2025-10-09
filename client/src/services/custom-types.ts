@@ -55,11 +55,6 @@ export type IComments = {
     username: string;
 }
 
-export type CommentsData = {
-    data: IComments[];
-    comment_total: number;
-}
-
 export type PostItemProps = {
     _id: string;
     description: string;
@@ -83,12 +78,6 @@ export type PostListProps = {
     loadMore: boolean;
     size: number;
     setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
-}
-
-export type PaginationInfo = {
-    current_page: number;
-    has_next_page: boolean;
-    post_total: number;
 }
 
 export type CommentProps = {

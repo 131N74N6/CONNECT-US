@@ -26,12 +26,12 @@ export default function About() {
 
     const { 
         error: postOwnerError,
-        getPaginatedData: signedInUserPosts, 
+        getPaginatedData: currentUserPosts, 
         isLoading: loadPosts, 
         isReachedEnd: postReachEnd, 
         loadMore: loadPostOwner, 
-        setSize: setSignedInUserPosts, 
-        size: signedInUserPostsSize 
+        setSize: setCurrentUserPosts, 
+        size: currentUserPostsSize 
     } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/signed-user/${user_id}`, 12);
 
     const { 
@@ -66,7 +66,7 @@ export default function About() {
                     data: {
                         created_at: getCurrentDate.toISOString(),
                         followed_user_id: user_id,
-                        followed_username: signedInUserPosts[0].uploader_name,
+                        followed_username: currentUserPosts[0].uploader_name,
                         user_id: user.info.id,
                         username: user.info.username
                     }
@@ -149,19 +149,19 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {signedInUserPosts ? signedInUserPosts.length : 0}
+                            {currentUserPosts ? currentUserPosts.length : 0}
                         </span>
                     </li>
                 </ul>
                 {postOwnerError ? <span className="text-[2rem] font-[600] text-purple-700">{postOwnerError}</span>
                     : loadPosts ? <Loading/> 
-                    : signedInUserPosts ?
+                    : currentUserPosts ?
                         <PostList 
-                            data={signedInUserPosts}
+                            data={currentUserPosts}
                             loadMore={loadPostOwner || false}
                             isReachedEnd={postReachEnd || false}
-                            size={signedInUserPostsSize}
-                            setSize={setSignedInUserPosts}
+                            size={currentUserPostsSize}
+                            setSize={setCurrentUserPosts}
                         />
                     :
                     <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
