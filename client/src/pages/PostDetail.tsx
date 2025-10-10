@@ -34,6 +34,15 @@ export default function PostDetail() {
         size: likeSize, 
     } = infiniteScrollPagination<ILikes>(`http://localhost:1234/likes/get-all/${_id}`, 12);
 
+    const {
+        getPaginatedData: paginatedComment,
+        isReachedEnd: commentsReachedEnd,
+        loadMore: loadMoreComments,
+        mutate: mutateComment,
+        setSize: setCommentSize,
+        size: commentSize
+    } =  infiniteScrollPagination<IComments>(`http://localhost:1234/comments/get-all/${_id}`, 12);
+
     useEffect(() => {
         if (error.isError) {
             const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
@@ -43,17 +52,6 @@ export default function PostDetail() {
 
     const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',
-        getData,
-        {
-            revalidateOnFocus: true,
-            revalidateOnReconnect: true,
-            dedupingInterval: 5000,
-            errorRetryCount: 3
-        }
-    );
-
-    const { data: commentsData, mutate: commentMutate } = useSWR<IComments[]>(
-        _id ? `http://localhost:1234/comments/get-all/${_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -86,7 +84,7 @@ export default function PostDetail() {
                 }
             });
 
-            commentMutate();
+            mutateComment();
         } catch (error: any) {
             setError({ isError: true, message: error.message || 'Failed to send comment' });
         } finally {
@@ -184,7 +182,7 @@ export default function PostDetail() {
                     {videos.length > 0 ? <VideoSlider videos={videos}/> : null}
             
                     <LikeField
-                        commentsData={commentsData}
+                        commentsData={paginatedComment}
                         givingLikes={givingLikes}
                         likesData={paginatedLikesData}
                         setOpenComments={setOpenComments}
@@ -208,10 +206,14 @@ export default function PostDetail() {
                 {openComments ? 
                     <CommentField 
                         onClose={() => setOpenComments(false)} 
-                        comments_data={commentsData ? commentsData : []}
+                        comments_data={paginatedComment}
                         comment={comment}
+                        isReachedEnd={commentsReachedEnd}
+                        loadMore={loadMoreComments || false}
                         setComment={setComment}
                         sendComment={sendComment}
+                        setSize={setCommentSize}
+                        size={commentSize}
                     /> 
                 : null}
             </div>

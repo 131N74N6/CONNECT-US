@@ -90,6 +90,10 @@ export type CommentProps = {
     sendComment: (event: React.FormEvent) => Promise<void>;
     setComment: (value: React.SetStateAction<string>) => void
     onClose: () => void;
+    isReachedEnd: boolean;
+    loadMore: boolean;
+    size: number;
+    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
 }
 
 export type IFollowers = {

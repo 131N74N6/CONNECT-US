@@ -1,4 +1,5 @@
 import type { CommentProps } from "../services/custom-types";
+import Loading from "./Loading";
 
 export default function CommentField(props: CommentProps) {
     return (
@@ -20,6 +21,20 @@ export default function CommentField(props: CommentProps) {
                             </div>
                         )
                     }
+                    {props.loadMore ? <Loading/> : null}
+                    {props.isReachedEnd ? (
+                        <div className="text-center">
+                            <span>No Comments to Load</span>
+                        </div>
+                    ) : (
+                        <button 
+                            type="button"
+                            onClick={() => props.setSize(props.size + 1)}
+                            className="bg-purple-400 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
+                        >
+                            Load More
+                        </button>
+                    )}
                 </div>
                 <form className="flex flex-col gap-[1rem] h-[21%]" onSubmit={props.sendComment}>
                     <textarea 
