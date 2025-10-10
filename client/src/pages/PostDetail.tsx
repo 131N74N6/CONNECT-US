@@ -20,6 +20,7 @@ export default function PostDetail() {
     const navigate = useNavigate();
 
     const { deleteData, getData, infiniteScrollPagination, insertData } = DataModifier();
+    const [isLiking, setIsLiking] = useState<boolean>(false);
     const [comment, setComment] = useState<string>('');
     const [showLikes, setShowLikes] = useState<boolean>(false);
     const [openComments, setOpenComments] = useState<boolean>(false);
@@ -61,7 +62,7 @@ export default function PostDetail() {
         }
     );
 
-    const userLiked = _id && user && paginatedLikesData.some(like => like.user_id === user.info.id && like.post_id === _id);
+    const userLiked = _id && user && paginatedLikesData.find(like => like.user_id === user.info.id && like.post_id === _id);
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
@@ -84,7 +85,7 @@ export default function PostDetail() {
                 }
             });
 
-            mutateComment();
+            await mutateComment();
         } catch (error: any) {
             setError({ isError: true, message: error.message || 'Failed to send comment' });
         } finally {
@@ -94,6 +95,10 @@ export default function PostDetail() {
     
     async function givingLikes() {
         const getCurrentDate = new Date();
+        if (isLiking) return;
+
+        setIsLiking(true);
+
         try {
             if (!user || !paginatedLikesData || !_id || !selectedPost) return;
 
@@ -110,10 +115,14 @@ export default function PostDetail() {
                 });
             } else {
                 await deleteData(`http://localhost:1234/likes/erase/${user.info.id}`);
-            }
-            mutateLike();
+            } 
+
+            await mutateLike();
         } catch (error: any) {
+            await mutateLike();
             setError({ isError: true, message: 'Failed to give like' });
+        } finally {
+            setIsLiking(false);
         }
     }
 
@@ -160,7 +169,9 @@ export default function PostDetail() {
                             <Link to={`/about/${selectedPost[0].user_id}`} className="font-semibold">
                                 {selectedPost[0].uploader_name || 'Unknown User'}
                             </Link>
-                            <p className="text-gray-400 text-sm">{new Date(selectedPost[0].created_at).toLocaleString()}</p>
+                            <p className="text-gray-400 text-sm">
+                                {new Date(selectedPost[0].created_at).toLocaleString()}
+                            </p>
                         </div>
                     </div>
                     

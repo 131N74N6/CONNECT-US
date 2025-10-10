@@ -5,7 +5,7 @@ type LikeFieldPorps = {
     givingLikes: () => Promise<void>;
     likesData: ILikes[] | undefined;
     setOpenComments: (value: React.SetStateAction<boolean>) => void;
-    userLiked: boolean | "" | null | undefined
+    userLiked: "" | ILikes | null | undefined;
     setShowLikes: (value: React.SetStateAction<boolean>) => void;
 }
 

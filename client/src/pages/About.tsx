@@ -16,6 +16,7 @@ export default function About() {
     const [error, setError] = useState({ isError: false, message: '' });
     const [showFollowers, setShowFollowers] = useState<boolean>(false);
     const [showFollowing, setShowFollowing] = useState<boolean>(false);
+    const [isFollowLoading, setIsFollowLoading] = useState(false);
     
     useEffect(() => {
         if (error.isError) {
@@ -56,8 +57,11 @@ export default function About() {
     const isFollowed = paginatedCurrentUserFollower && user ? paginatedCurrentUserFollower.some(follow => user.info.id === follow.user_id) : false;
 
     const handleFollowBtn = async (): Promise<void> => {
+        if (isFollowLoading) return;
+        setIsFollowLoading(true);
         try {
             if (!user_id || !user) return;
+            
             const getCurrentDate = new Date();
 
             if (!isFollowed) {
@@ -75,10 +79,14 @@ export default function About() {
                 await deleteData(`http://localhost:1234/followers/erase/${user.info.id}`);
             }
 
-            currentUserFollowingMutate();
-            currentUserFollowerMutate();
+            await Promise.all([
+                currentUserFollowingMutate(),
+                currentUserFollowerMutate()
+            ]);
         } catch (error) {
             setError({ isError: true, message: 'Failed to follow' });
+        } finally {
+            setIsFollowLoading(false);
         }
     }
 
@@ -117,13 +125,14 @@ export default function About() {
                     {notOwner ? (
                         <button 
                             type="button"
+                            disabled={isFollowLoading}
                             onClick={handleFollowBtn} 
                             className={
-                                isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] w-[120px] cursor-pointer text-[0.9rem] p-[0.45rem]" : 
-                                "bg-yellow-300 text-gray-800 font-[500] cursor-pointer w-[120px] text-[0.9rem] p-[0.45rem]"
+                                isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] w-[120px] cursor-pointer text-[0.9rem] p-[0.45rem] disabled:cursor-not-allowed disabled:opacity-50" : 
+                                "bg-yellow-300 text-gray-800 font-[500] cursor-pointer w-[120px] text-[0.9rem] p-[0.45rem] disabled:cursor-not-allowed disabled:opacity-50"
                             }
                         >
-                            {isFollowed ? 'Following' : 'Follow' }
+                            {isFollowLoading ? 'loading...' : isFollowed ? 'Following' : 'Follow'}
                         </button> 
                     ) : (
                         <Link to={user ? `/setting/${user.info.id}` : '/home'}>
