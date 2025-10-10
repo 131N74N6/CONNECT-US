@@ -21,7 +21,7 @@ export default function LikeList(props: LikesData) {
                         ))
                     ) : (
                         <div className="flex justify-center items-center h-full text-white">
-                            <span className="text-center font-[550] text-[1.6rem]">No User Followed</span>
+                            <span className="text-center font-[550] text-[1.6rem]">No Likes Currently</span>
                         </div>
                     )}
                     {props.loadMore ? <div className="flex justify-center"><Loading/></div> : null}
