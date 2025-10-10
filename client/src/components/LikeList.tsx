@@ -45,5 +45,5 @@ export default function LikeList(props: LikesData) {
                 </div>
             </div>
         </section>
-    )
+    );
 }
