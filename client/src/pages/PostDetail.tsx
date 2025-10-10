@@ -32,7 +32,7 @@ export default function PostDetail() {
         mutate: mutateLike,
         setSize: setLikeSize,
         size: likeSize, 
-    } = infiniteScrollPagination<ILikes>(`http://localhost:1234/likes/get-all/${_id}`, 12);
+    } = infiniteScrollPagination<ILikes>(_id ? `http://localhost:1234/likes/get-all/${_id}` : '', 12);
 
     const {
         getPaginatedData: paginatedComment,
@@ -41,7 +41,7 @@ export default function PostDetail() {
         mutate: mutateComment,
         setSize: setCommentSize,
         size: commentSize
-    } =  infiniteScrollPagination<IComments>(`http://localhost:1234/comments/get-all/${_id}`, 12);
+    } =  infiniteScrollPagination<IComments>(_id ? `http://localhost:1234/comments/get-all/${_id}` : '', 12);
 
     useEffect(() => {
         if (error.isError) {
@@ -61,7 +61,9 @@ export default function PostDetail() {
         }
     );
 
-    const userLiked = _id && paginatedLikesData && user ? paginatedLikesData.find(like => like.user_id === user.info.id && like.post_id === _id) : false;
+    const ownerLiked = _id && user && paginatedLikesData.some(like => like.post_owner_id === user.info.id && like.post_id === _id);
+    const currentUserLiked = _id && user && paginatedLikesData.some(like => like.user_id === user.info.id && like.post_id === _id);
+    const userLiked = ownerLiked || currentUserLiked;
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
@@ -148,10 +150,7 @@ export default function PostDetail() {
             <Navbar1 />
             <Navbar2 />
             {error.isError ? 
-                <Notification
-                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] absolute top-[5%] left-[50%] right-[50%]"
-                    message={error.message}
-                /> 
+                <Notification class_name="" message={error.message}/> 
             : null}
             <div className="md:w-3/4 w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
                 <div className="flex items-center justify-between mb-4">

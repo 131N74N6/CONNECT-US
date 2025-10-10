@@ -30,7 +30,7 @@ export default function CommentField(props: CommentProps) {
                         <button 
                             type="button"
                             onClick={() => props.setSize(props.size + 1)}
-                            className="bg-purple-400 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
+                            className="bg-pink-300 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
                         >
                             Load More
                         </button>

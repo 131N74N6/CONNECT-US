@@ -137,7 +137,6 @@ export default function AddPost() {
                     {mediaFiles.length === 0 ? (
                         <div className="flex flex-col items-center justify-center text-purple-400">
                             <span className="text-lg">Click to select images or videos</span>
-                            <span className="text-sm mt-2">(Max one video allowed)</span>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
