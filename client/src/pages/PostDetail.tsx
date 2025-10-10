@@ -63,7 +63,6 @@ export default function PostDetail() {
 
     const ownerLiked = _id && user && paginatedLikesData.some(like => like.post_owner_id === user.info.id && like.post_id === _id);
     const currentUserLiked = _id && user && paginatedLikesData.some(like => like.user_id === user.info.id && like.post_id === _id);
-    const userLiked = ownerLiked || currentUserLiked;
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
@@ -99,7 +98,7 @@ export default function PostDetail() {
         try {
             if (!user || !paginatedLikesData || !_id || !selectedPost) return;
 
-            if (!userLiked) {
+            if (!ownerLiked || !currentUserLiked) {
                 await insertData<ILikes>({
                     api_url: `http://localhost:1234/likes/add`,
                     data: {
@@ -111,7 +110,8 @@ export default function PostDetail() {
                     }
                 });
             } else {
-                await deleteData(`http://localhost:1234/likes/erase/${user.info.id}`);
+                if (currentUserLiked) await deleteData(`http://localhost:1234/likes/erased-by-other/${user.info.id}`);
+                else await deleteData(`http://localhost:1234/likes/erased-by-other/${selectedPost[0].user_id}`);
             }
             mutateLike();
         } catch (error: any) {
@@ -185,7 +185,7 @@ export default function PostDetail() {
                         givingLikes={givingLikes}
                         likesData={paginatedLikesData}
                         setOpenComments={setOpenComments}
-                        userLiked={userLiked}
+                        userLiked={ownerLiked || currentUserLiked}
                         setShowLikes={setShowLikes}
                     />
                     <div className="text-gray-200">{selectedPost[0].description}</div>
