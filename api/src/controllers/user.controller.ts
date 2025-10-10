@@ -73,8 +73,8 @@ async function signUp(req: Request, res: Response) {
 async function getSelectedUser(req: Request, res: Response) {
     try {
         const getUserId = req.params.id;
-        const findUser = await User.find({ _id: getUserId }, { email: 1, username: 1 });
-        res.json(findUser);
+        const signedInUser = await User.find({ _id: getUserId });
+        res.json(signedInUser);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

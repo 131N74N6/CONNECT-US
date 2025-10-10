@@ -17,7 +17,9 @@ export default function LikeField(props: LikeFieldPorps) {
                     className={`fa-${props.userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${props.userLiked ? 'text-red-500' : ''}`} 
                     onClick={props.givingLikes}
                 ></i>
-                <span onClick={() => props.setShowLikes(true)}>{props.likesData ? props.likesData.length : 0}</span>
+                <span onClick={() => props.setShowLikes(true)} className="cursor-pointer">
+                    {props.likesData ? props.likesData.length : 0}
+                </span>
             </div>
             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                 <i className="fa-regular fa-comment cursor-pointer" onClick={() => props.setOpenComments(true)}></i>

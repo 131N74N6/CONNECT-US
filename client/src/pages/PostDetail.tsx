@@ -25,6 +25,15 @@ export default function PostDetail() {
     const [openComments, setOpenComments] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
 
+    const { 
+        getPaginatedData: paginatedLikesData,
+        isReachedEnd: likeReachedEnd,
+        loadMore: loadMoreLikes,
+        mutate: mutateLike,
+        setSize: setLikeSize,
+        size: likeSize, 
+    } = infiniteScrollPagination<ILikes>(`http://localhost:1234/likes/get-all/${_id}`, 12);
+
     useEffect(() => {
         if (error.isError) {
             const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
@@ -34,17 +43,6 @@ export default function PostDetail() {
 
     const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',
-        getData,
-        {
-            revalidateOnFocus: true,
-            revalidateOnReconnect: true,
-            dedupingInterval: 5000,
-            errorRetryCount: 3
-        }
-    );
-
-    const { data: likesData, mutate: likeMutate } = useSWR<ILikes[]>(
-        _id ? `http://localhost:1234/likes/get-all/${_id}` : '',
         getData,
         {
             revalidateOnFocus: true,
@@ -65,7 +63,7 @@ export default function PostDetail() {
         }
     );
 
-    const userLiked = _id && likesData && user ? likesData.find(like => like.user_id === user.info.id && like.post_id === _id) : false;
+    const userLiked = _id && paginatedLikesData && user ? paginatedLikesData.find(like => like.user_id === user.info.id && like.post_id === _id) : false;
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
@@ -99,7 +97,7 @@ export default function PostDetail() {
     async function givingLikes() {
         const getCurrentDate = new Date();
         try {
-            if (!user || !likesData || !_id || !selectedPost) return;
+            if (!user || !paginatedLikesData || !_id || !selectedPost) return;
 
             if (!userLiked) {
                 await insertData<ILikes>({
@@ -115,7 +113,7 @@ export default function PostDetail() {
             } else {
                 await deleteData(`http://localhost:1234/likes/erase/${user.info.id}`);
             }
-            likeMutate();
+            mutateLike();
         } catch (error: any) {
             setError({ isError: true, message: 'Failed to give like' });
         }
@@ -188,7 +186,7 @@ export default function PostDetail() {
                     <LikeField
                         commentsData={commentsData}
                         givingLikes={givingLikes}
-                        likesData={likesData}
+                        likesData={paginatedLikesData}
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
                         setShowLikes={setShowLikes}
@@ -198,12 +196,12 @@ export default function PostDetail() {
 
                 {showLikes ? 
                     <LikeList
-                        isReachedEnd={}
-                        likes={}
-                        loadMore={}
+                        isReachedEnd={likeReachedEnd}
+                        likes={paginatedLikesData}
+                        loadMore={loadMoreLikes || false}
                         onClose={setShowLikes}
-                        setSize={}
-                        size={}
+                        setSize={setLikeSize}
+                        size={likeSize}
                     /> 
                 : null}
 
