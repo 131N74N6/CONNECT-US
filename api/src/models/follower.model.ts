@@ -1,6 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-// other_user_id => yang diikuti
+// followed_user_id => yang diikuti
 // user_id => pengikut
 
 interface IFollower {
