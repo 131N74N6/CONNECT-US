@@ -5,8 +5,7 @@ type LikeFieldPorps = {
     givingLikes: () => Promise<void>;
     likesData: ILikes[] | undefined;
     setOpenComments: (value: React.SetStateAction<boolean>) => void;
-    userLiked: "" | ILikes | null | undefined;
-    setShowLikes: (value: React.SetStateAction<boolean>) => void;
+    userLiked: boolean | "" | null | undefined
 }
 
 export default function LikeField(props: LikeFieldPorps) {
@@ -17,7 +16,7 @@ export default function LikeField(props: LikeFieldPorps) {
                     className={`fa-${props.userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${props.userLiked ? 'text-red-500' : ''}`} 
                     onClick={props.givingLikes}
                 ></i>
-                <span onClick={() => props.setShowLikes(true)} className="cursor-pointer">
+                <span>
                     {props.likesData ? props.likesData.length : 0}
                 </span>
             </div>

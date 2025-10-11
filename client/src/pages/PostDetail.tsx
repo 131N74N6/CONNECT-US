@@ -12,7 +12,6 @@ import useSWR from "swr";
 import LikeField from "../components/LikeField";
 import VideoSlider from "../components/VideoSlider";
 import Notification from "../components/Notification";
-import LikeList from "../components/LikeList";
 
 export default function PostDetail() {
     const { _id } = useParams();
@@ -22,18 +21,8 @@ export default function PostDetail() {
     const { deleteData, getData, infiniteScrollPagination, insertData } = DataModifier();
     const [isLiking, setIsLiking] = useState<boolean>(false);
     const [comment, setComment] = useState<string>('');
-    const [showLikes, setShowLikes] = useState<boolean>(false);
     const [openComments, setOpenComments] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
-
-    const { 
-        getPaginatedData: paginatedLikesData,
-        isReachedEnd: likeReachedEnd,
-        loadMore: loadMoreLikes,
-        mutate: mutateLike,
-        setSize: setLikeSize,
-        size: likeSize, 
-    } = infiniteScrollPagination<ILikes>(_id ? `http://localhost:1234/likes/get-all/${_id}` : '', 12);
 
     const {
         getPaginatedData: paginatedComment,
@@ -42,7 +31,7 @@ export default function PostDetail() {
         mutate: mutateComment,
         setSize: setCommentSize,
         size: commentSize
-    } =  infiniteScrollPagination<IComments>(_id ? `http://localhost:1234/comments/get-all/${_id}` : '', 12);
+    } =  infiniteScrollPagination<IComments>(`http://localhost:1234/comments/get-all/${_id}`, 12);
 
     useEffect(() => {
         if (error.isError) {
@@ -62,15 +51,25 @@ export default function PostDetail() {
         }
     );
 
-    const userLiked = _id && user && paginatedLikesData.find(like => like.user_id === user.info.id && like.post_id === _id);
+    const { data: likesData, mutate: mutateLike } = useSWR<ILikes[]>(
+        _id ? `http://localhost:1234/likes/get-all/${_id}` : '',
+        getData,
+        {
+            revalidateOnFocus: true,
+            revalidateOnReconnect: true,
+            dedupingInterval: 5000,
+            errorRetryCount: 3
+        }
+    );
+
+    const userLiked = _id && likesData && user && likesData.some(like => like.user_id === user.info.id && like.post_id === _id);
 
     async function sendComment(event: React.FormEvent) {
         event.preventDefault();
         const getCurrentDate = new Date();
 
         try {    
-            if (!user || !selectedPost) throw 'Invalid user data';
-            if (!_id) throw 'Failed to get post';
+            if (!user || !_id || !selectedPost) return;
             if (!comment.trim()) throw 'Missing required data';
 
             await insertData<IComments>({
@@ -100,7 +99,7 @@ export default function PostDetail() {
         setIsLiking(true);
 
         try {
-            if (!user || !paginatedLikesData || !_id || !selectedPost) return;
+            if (!user || !_id || !selectedPost) return;
 
             if (!userLiked) {
                 await insertData<ILikes>({
@@ -119,7 +118,6 @@ export default function PostDetail() {
 
             await mutateLike();
         } catch (error: any) {
-            await mutateLike();
             setError({ isError: true, message: 'Failed to give like' });
         } finally {
             setIsLiking(false);
@@ -192,24 +190,12 @@ export default function PostDetail() {
                     <LikeField
                         commentsData={paginatedComment}
                         givingLikes={givingLikes}
-                        likesData={paginatedLikesData}
+                        likesData={likesData}
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
-                        setShowLikes={setShowLikes}
                     />
                     <div className="text-gray-200">{selectedPost[0].description}</div>
                 </div>
-
-                {showLikes ? 
-                    <LikeList
-                        isReachedEnd={likeReachedEnd}
-                        likes={paginatedLikesData}
-                        loadMore={loadMoreLikes || false}
-                        onClose={setShowLikes}
-                        setSize={setLikeSize}
-                        size={likeSize}
-                    /> 
-                : null}
 
                 {openComments ? 
                     <CommentField 

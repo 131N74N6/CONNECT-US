@@ -48,7 +48,8 @@ export default function CommentField(props: CommentProps) {
                     <div className="grid grid-cols-2 gap-[0.4rem]">
                         <button 
                             type="submit" 
-                            className="cursor-pointer bg-purple-400 p-[0.45rem] rounded-[0.45rem]"
+                            disabled={!props.comment}
+                            className="cursor-pointer bg-purple-400 p-[0.45rem] rounded-[0.45rem] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span className="text-[1rem] font-[550] text-black">Send</span>
                         </button>

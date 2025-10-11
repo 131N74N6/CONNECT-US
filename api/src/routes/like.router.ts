@@ -7,6 +7,6 @@ likeRoutes.get('/get-all/:id', getAllLikes);
 
 likeRoutes.post('/add', giveLike);
 
-likeRoutes.delete('/erased/:id', dislikeByUser);
+likeRoutes.delete('/erase/:id', dislikeByUser);
 
 export default likeRoutes;
