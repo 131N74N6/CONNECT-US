@@ -1,4 +1,4 @@
-import type { IFollowers, PostItemProps } from "../services/custom-types";
+import type { AddFollowerProps, PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -16,7 +16,7 @@ export default function About() {
     const [error, setError] = useState({ isError: false, message: '' });
     const [showFollowers, setShowFollowers] = useState<boolean>(false);
     const [showFollowing, setShowFollowing] = useState<boolean>(false);
-    const [isFollowLoading, setIsFollowLoading] = useState(false);
+    const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
     
     useEffect(() => {
         if (error.isError) {
@@ -42,7 +42,7 @@ export default function About() {
         loadMore: loadCurrentUserFollower, 
         setSize: setCurrentUserFollower, 
         size: currentUserFollowerSize 
-    } = infiniteScrollPagination<IFollowers>(`http://localhost:1234/followers/get-all/${user_id}`, 12);
+    } = infiniteScrollPagination<AddFollowerProps>(`http://localhost:1234/followers/get-all/${user_id}`, 12);
 
     const { 
         mutate: currentUserFollowingMutate,
@@ -51,7 +51,7 @@ export default function About() {
         loadMore: loadCurrentUserFollowing, 
         setSize: setCurrentUserFollowing, 
         size: currentUserFollowingSize 
-    } = infiniteScrollPagination<IFollowers>(`http://localhost:1234/followers/who-followed/${user_id}`, 12);
+    } = infiniteScrollPagination<AddFollowerProps>(`http://localhost:1234/followers/who-followed/${user_id}`, 12);
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = paginatedCurrentUserFollower && user ? paginatedCurrentUserFollower.some(follow => user.info.id === follow.user_id) : false;
@@ -65,7 +65,7 @@ export default function About() {
             const getCurrentDate = new Date();
 
             if (!isFollowed) {
-                await insertData<IFollowers>({
+                await insertData<AddFollowerProps>({
                     api_url: `http://localhost:1234/followers/add`,
                     data: {
                         created_at: getCurrentDate.toISOString(),

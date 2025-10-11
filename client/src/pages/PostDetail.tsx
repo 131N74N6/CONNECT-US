@@ -24,6 +24,13 @@ export default function PostDetail() {
     const [openComments, setOpenComments] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
 
+    useEffect(() => {
+        if (error.isError) {
+            const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [error.isError]);
+
     const {
         getPaginatedData: paginatedComment,
         isReachedEnd: commentsReachedEnd,
@@ -32,13 +39,6 @@ export default function PostDetail() {
         setSize: setCommentSize,
         size: commentSize
     } =  infiniteScrollPagination<IComments>(`http://localhost:1234/comments/get-all/${_id}`, 12);
-
-    useEffect(() => {
-        if (error.isError) {
-            const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
-            return () => clearTimeout(timeout);
-        }
-    }, [error.isError]);
 
     const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',
@@ -199,7 +199,7 @@ export default function PostDetail() {
 
                 {openComments ? 
                     <CommentField 
-                        onClose={() => setOpenComments(false)} 
+                        onClose={setOpenComments} 
                         comments_data={paginatedComment}
                         comment={comment}
                         isReachedEnd={commentsReachedEnd}

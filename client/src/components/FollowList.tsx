@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import type { FollowersData, FollowingData } from "../services/custom-types";
+import type { FollowersDataProps, FollowingDataProps } from "../services/custom-types";
 import Loading from "./Loading";
 
-export function FollowerList(props: FollowersData) {
+export function FollowerList(props: FollowersDataProps) {
     return (
         <section className="flex justify-center items-center fixed inset-0 z-20 bg-[rgba(0,0,0,0.66)] p-[0.7rem]">
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-purple-400 w-[450px] h-[600px]">
@@ -48,7 +48,7 @@ export function FollowerList(props: FollowersData) {
     );
 }
 
-export function FollowingList(props: FollowingData) {
+export function FollowingList(props: FollowingDataProps) {
     return (
         <section className="flex justify-center items-center fixed inset-0 z-20 bg-[rgba(0,0,0,0.66)] p-[0.7rem]">
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-purple-400 w-[450px] h-[600px]">

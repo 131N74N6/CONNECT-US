@@ -89,14 +89,24 @@ export type CommentProps = {
     comment: string;
     sendComment: (event: React.FormEvent) => Promise<void>;
     setComment: (value: React.SetStateAction<string>) => void
-    onClose: () => void;
+    onClose: (value: React.SetStateAction<boolean>) => void
     isReachedEnd: boolean;
     loadMore: boolean;
     size: number;
     setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
 }
 
-export type IFollowers = {
+export type FollowersResponseProps = {
+    followers: Pick<AddFollowerProps, 'created_at' | 'user_id' | 'username'>[];
+    followers_total: number; 
+}
+
+export type FollowedResponseProps = {
+    followed: Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>[];
+    followed_total: number; 
+}
+
+export type AddFollowerProps = {
     _id: string;
     created_at: string;
     followed_user_id: string;
@@ -105,8 +115,8 @@ export type IFollowers = {
     username: string;
 }
 
-export type FollowersData = {
-    followers: Pick<IFollowers, 'created_at' | 'user_id' | 'username'>[];
+export type FollowersDataProps = {
+    followers: Pick<AddFollowerProps, 'created_at' | 'user_id' | 'username'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
     size: number;
@@ -114,8 +124,8 @@ export type FollowersData = {
     onClose: (value: React.SetStateAction<boolean>) => void
 }
 
-export type FollowingData = {
-    following: Pick<IFollowers, 'created_at' | 'followed_user_id' | 'followed_username'>[];
+export type FollowingDataProps = {
+    following: Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
     size: number;

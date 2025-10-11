@@ -54,7 +54,7 @@ export default function CommentField(props: CommentProps) {
                             <span className="text-[1rem] font-[550] text-black">Send</span>
                         </button>
                         <button 
-                            onClick={props.onClose} 
+                            onClick={() => props.onClose(false)} 
                             type="button" 
                             className="cursor-pointer bg-purple-400 p-[0.45rem] rounded-[0.45rem] text-gray-900"
                         >
