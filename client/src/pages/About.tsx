@@ -102,7 +102,7 @@ export default function About() {
             : null}
             {showFollowers ? 
                 <FollowerList
-                    followers={paginatedCurrentUserFollower}
+                    followers={paginatedCurrentUserFollower[0].followers}
                     isReachedEnd={currentUserFollowerReachEnd}
                     loadMore={loadCurrentUserFollower || false}
                     onClose={setShowFollowers}
@@ -112,7 +112,7 @@ export default function About() {
             : null}
             {showFollowing ? 
                 <FollowingList
-                    following={paginatedCurrentUserFollowing}
+                    following={paginatedCurrentUserFollowing[0].followed}
                     isReachedEnd={currentUserFollowingReachEnd}
                     loadMore={loadCurrentUserFollowing || false}
                     onClose={setShowFollowing}

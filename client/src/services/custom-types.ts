@@ -96,16 +96,6 @@ export type CommentProps = {
     setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
 }
 
-export type FollowersResponseProps = {
-    followers: Pick<AddFollowerProps, 'created_at' | 'user_id' | 'username'>[];
-    followers_total: number; 
-}
-
-export type FollowedResponseProps = {
-    followed: Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>[];
-    followed_total: number; 
-}
-
 export type AddFollowerProps = {
     _id: string;
     created_at: string;
@@ -121,14 +111,24 @@ export type FollowersDataProps = {
     loadMore: boolean;
     size: number;
     setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
-    onClose: (value: React.SetStateAction<boolean>) => void
+    onClose: (value: React.SetStateAction<boolean>) => void;
 }
 
-export type FollowingDataProps = {
-    following: Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>[];
+export type FollowedDataProps = {
+    followed: Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
     size: number;
     setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
-    onClose: (value: React.SetStateAction<boolean>) => void
+    onClose: (value: React.SetStateAction<boolean>) => void;
+}
+
+export type FollowersResponseProps = {
+    followers: FollowedDataProps;
+    followers_total: number; 
+}
+
+export type FollowedResponseProps = {
+    followed: FollowedDataProps;
+    followed_total: number; 
 }

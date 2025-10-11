@@ -14,7 +14,10 @@ async function dislikeByUser(req: Request, res:Response) {
 async function getAllLikes(req: Request, res: Response) {
     try {
         const getPostId = req.params.id;
-        const getPostLike = await Like.find({ post_id: getPostId });
+        const getPostLike = await Like.find(
+            { post_id: getPostId },
+            { created_at: 1, user_id: 1, username: 1 }
+        );
         res.json(getPostLike);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

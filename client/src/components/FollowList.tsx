@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { FollowersDataProps, FollowingDataProps } from "../services/custom-types";
+import type { FollowersDataProps, FollowedDataProps } from "../services/custom-types";
 import Loading from "./Loading";
 
 export function FollowerList(props: FollowersDataProps) {
@@ -48,13 +48,13 @@ export function FollowerList(props: FollowersDataProps) {
     );
 }
 
-export function FollowingList(props: FollowingDataProps) {
+export function FollowingList(props: FollowedDataProps) {
     return (
         <section className="flex justify-center items-center fixed inset-0 z-20 bg-[rgba(0,0,0,0.66)] p-[0.7rem]">
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-purple-400 w-[450px] h-[600px]">
                 <div className="flex flex-col gap-[1rem] border-b border-purple-400 h-[100%] overflow-y-auto">
-                    {props.following.length > 0 ? (
-                        props.following.map(flg => (
+                    {props.followed.length > 0 ? (
+                        props.followed.map(flg => (
                             <div key={`fld_${flg.followed_user_id}`} className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">
                                 <div className="text-white text-[1.1rem]">
                                     <i className="fa-regular fa-user"></i>
