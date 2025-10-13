@@ -90,8 +90,8 @@ export default function AddPost() {
             });
         },
         onSuccess: () => {
-            queryQlient.invalidateQueries({ queryKey: ['all-posts', `http://localhost:1234/posts/get-all`, 12]});
-            queryQlient.invalidateQueries({ queryKey: ['signed-user-posts', `http://localhost:1234/posts/signed-user/${user?.info.id}`, 12]});
+            queryQlient.invalidateQueries({ queryKey: ['all-posts'] });
+            queryQlient.invalidateQueries({ queryKey: ['signed-user-posts'] });
             setDescription('');
             setMediaFiles([]);
             navigate('/home');

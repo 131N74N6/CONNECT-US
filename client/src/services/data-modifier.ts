@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
 import useAuth from "./useAuth";
 
@@ -18,17 +18,29 @@ export default function DataModifier() {
         await request.json();
     }
 
-    const getData = async (api_url: string) => {
-        const request = await fetch(api_url, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+    const getData = (api_url: string, key: string[]) => {
+        const { data, error, isLoading } = useQuery({
+            gcTime: 120000,
+            queryFn: async () => {
+                const request = await fetch(api_url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    method: 'GET'
+                });
+
+                const response = await request.json();
+                return response;
             },
-            method: 'GET'
+            queryKey: key,
+            refetchOnMount: true,
+            refetchOnReconnect: true,
+            refetchOnWindowFocus: false,
+            staleTime: 1000,
         });
 
-        const response = await request.json();
-        return response;
+        return { data, error, isLoading }
     }
 
     const insertData = async <TSX>(props: IPostData<TSX>) => {
@@ -80,7 +92,7 @@ export default function DataModifier() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
-            queryKey: [props.query_key, props.api_url, props.limit],
+            queryKey: [props.query_key],
             queryFn: fetchData,
             getNextPageParam: (lastPage, allPages) => {
                 if (lastPage.length < props.limit) return;
@@ -88,7 +100,10 @@ export default function DataModifier() {
             },
             initialPageParam: 1,
             staleTime: props.stale_time,
+            gcTime: 120000,
+            refetchOnMount: true,
             refetchOnReconnect: true,
+            refetchOnWindowFocus: false,
         });
 
         const paginatedData: T[] = data ? data.pages.flat() : [];
@@ -103,8 +118,8 @@ export default function DataModifier() {
             isReachedEnd,
             fetchNextPage,
             refetch,
-        };
-    };
+        }
+    }
 
     return { deleteData, getData, infiniteScroll, insertData, updateData }
 }

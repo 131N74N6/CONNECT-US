@@ -38,11 +38,10 @@ export default function About() {
         api_url: `http://localhost:1234/posts/signed-user/${user_id}`, 
         limit: 12,
         query_key: `signed-user-posts_${user_id}`,
-        stale_time: 5000
+        stale_time: 1000
     });
 
     const { 
-        refetch: currentUserFollowerMutate,
         data: paginatedCurrentUserFollower,
         isReachedEnd: currentUserFollowerReachEnd, 
         isLoadingMore: loadCurrentUserFollower, 
@@ -55,7 +54,6 @@ export default function About() {
     });
 
     const { 
-        refetch: currentUserFollowingMutate,
         data: paginatedCurrentUserFollowing,
         isReachedEnd: currentUserFollowingReachEnd, 
         isLoadingMore: loadCurrentUserFollowing, 
@@ -92,12 +90,8 @@ export default function About() {
             }
         },
         onSuccess: () => {
-            queryQlient.invalidateQueries({ 
-                queryKey: [`followers-${user_id}`, `http://localhost:1234/followers/get-all/${user_id}`, 12] 
-            });
-            queryQlient.invalidateQueries({ 
-                queryKey: [`who-followed-${user_id}`, `http://localhost:1234/followers/who-followed/${user_id}`, 12] 
-            });
+            queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
         }
     });
 
@@ -106,10 +100,6 @@ export default function About() {
         setIsFollowLoading(true);
         try {
             insertMutation.mutate();
-            await Promise.all([
-                currentUserFollowingMutate(),
-                currentUserFollowerMutate()
-            ]);
         } catch (error) {
             setError({ isError: true, message: 'Failed to follow' });
         } finally {
