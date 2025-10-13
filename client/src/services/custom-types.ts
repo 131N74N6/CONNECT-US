@@ -100,8 +100,7 @@ export type CommentProps = {
     onClose: (value: React.SetStateAction<boolean>) => void
     isReachedEnd: boolean;
     loadMore: boolean;
-    size: number;
-    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
+    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
 export type AddFollowerProps = {

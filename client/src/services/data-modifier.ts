@@ -20,7 +20,6 @@ export default function DataModifier() {
 
     const getData = (api_url: string, key: string[]) => {
         const { data, error, isLoading } = useQuery({
-            gcTime: 120000,
             queryFn: async () => {
                 const request = await fetch(api_url, {
                     headers: {
@@ -29,7 +28,7 @@ export default function DataModifier() {
                     },
                     method: 'GET'
                 });
-
+                
                 const response = await request.json();
                 return response;
             },
@@ -37,6 +36,7 @@ export default function DataModifier() {
             refetchOnMount: true,
             refetchOnReconnect: true,
             refetchOnWindowFocus: false,
+            gcTime: 120000,
             staleTime: 1000,
         });
 
