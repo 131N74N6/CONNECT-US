@@ -32,12 +32,11 @@ export default function PostDetail() {
     }, [error.isError]);
 
     const {
-        getPaginatedData: paginatedComment,
+        data: paginatedComment,
         isReachedEnd: commentsReachedEnd,
-        loadMore: loadMoreComments,
-        mutate: mutateComment,
-        setSize: setCommentSize,
-        size: commentSize
+        isLoadingMore: loadMoreComments,
+        refetch: mutateComment,
+        fetchNextPage: fetchMoreComments,
     } =  infiniteScroll<IComments>(`http://localhost:1234/comments/get-all/${_id}`, 12);
 
     const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
@@ -206,7 +205,7 @@ export default function PostDetail() {
                         loadMore={loadMoreComments || false}
                         setComment={setComment}
                         sendComment={sendComment}
-                        setSize={setCommentSize}
+                        setSize={fetchMoreComments}
                         size={commentSize}
                     /> 
                 : null}

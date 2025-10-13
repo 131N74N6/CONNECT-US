@@ -92,9 +92,14 @@ export default function About() {
             }
         },
         onSuccess: () => {
-
+            queryQlient.invalidateQueries({ 
+                queryKey: [`followers-${user_id}`, `http://localhost:1234/followers/get-all/${user_id}`, 12] 
+            });
+            queryQlient.invalidateQueries({ 
+                queryKey: [`who-followed-${user_id}`, `http://localhost:1234/followers/who-followed/${user_id}`, 12] 
+            });
         }
-    })
+    });
 
     const handleFollowBtn = async (): Promise<void> => {
         if (isFollowLoading) return;
@@ -124,7 +129,7 @@ export default function About() {
             : null}
             {showFollowers ? 
                 <FollowerList
-                    followers={paginatedCurrentUserFollower[0].followers}
+                    followers={paginatedCurrentUserFollower}
                     isReachedEnd={currentUserFollowerReachEnd}
                     loadMore={loadCurrentUserFollower || false}
                     onClose={setShowFollowers}
@@ -133,7 +138,7 @@ export default function About() {
             : null}
             {showFollowing ? 
                 <FollowingList
-                    following={paginatedCurrentUserFollowing[0].followed}
+                    followed={paginatedCurrentUserFollowing}
                     isReachedEnd={currentUserFollowingReachEnd}
                     loadMore={loadCurrentUserFollowing || false}
                     onClose={setShowFollowing}
