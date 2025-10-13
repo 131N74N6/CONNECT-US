@@ -5,16 +5,20 @@ import PostList from "../components/PostList";
 import DataModifier from '../services/data-modifier';
 
 export default function Home() {
-    const { infiniteScrollPagination } = DataModifier();
+    const { infiniteScroll } = DataModifier();
     const { 
         error, 
-        getPaginatedData, 
+        data, 
         isLoading, 
         isReachedEnd, 
-        loadMore, 
-        setSize, 
-        size 
-    } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/get-all`, 12);
+        isLoadingMore, 
+        fetchNextPage
+    } = infiniteScroll<PostItemProps>({
+        api_url: `http://localhost:1234/posts/get-all`, 
+        limit: 12,
+        query_key: 'all-posts',
+        stale_time: 5000
+    });
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
@@ -22,20 +26,19 @@ export default function Home() {
             <Navbar2/>
             {error ? 
                 <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
-                    <span className="text-[2rem] font-[600] text-purple-700">{error}</span>
+                    <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
                 </div>
                 : isLoading ? 
                     <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-black">
                         <Loading/>
                     </div>
-                : getPaginatedData ?
+                : data ?
                     <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
                         <PostList 
-                            data={getPaginatedData}
-                            isReachedEnd={isReachedEnd || false}
-                            loadMore={loadMore || false}
-                            size={size}
-                            setSize={setSize}
+                            data={data}
+                            isReachedEnd={isReachedEnd}
+                            loadMore={isLoadingMore}
+                            setSize={fetchNextPage}
                         />
                     </div>
                 : <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>

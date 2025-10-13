@@ -18,7 +18,7 @@ export default function PostDetail() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const { deleteData, getData, infiniteScrollPagination, insertData } = DataModifier();
+    const { deleteData, getData, infiniteScroll, insertData } = DataModifier();
     const [isLiking, setIsLiking] = useState<boolean>(false);
     const [comment, setComment] = useState<string>('');
     const [openComments, setOpenComments] = useState<boolean>(false);
@@ -38,7 +38,7 @@ export default function PostDetail() {
         mutate: mutateComment,
         setSize: setCommentSize,
         size: commentSize
-    } =  infiniteScrollPagination<IComments>(`http://localhost:1234/comments/get-all/${_id}`, 12);
+    } =  infiniteScroll<IComments>(`http://localhost:1234/comments/get-all/${_id}`, 12);
 
     const { data: selectedPost, isLoading: postLoading, mutate: mutatePost } = useSWR<PostDetail[]>(
         _id ? `http://localhost:1234/posts/selected/${_id}` : '',

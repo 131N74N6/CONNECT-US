@@ -37,7 +37,7 @@ export function FollowerList(props: FollowersDataProps) {
                     <button 
                         type="button" 
                         disabled={props.isReachedEnd || !props.loadMore}
-                        onClick={() => props.setSize(props.size + 1)}
+                        onClick={() => props.setSize()}
                         className="bg-purple-400 font-[500] rounded text-gray-800 cursor-pointer p-[0.4rem] text-[0.9rem] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span>Load More</span>
@@ -83,7 +83,7 @@ export function FollowingList(props: FollowedDataProps) {
                     <button 
                         type="button" 
                         disabled={props.isReachedEnd || !props.loadMore}
-                        onClick={() => props.setSize(props.size + 1)}
+                        onClick={() => props.setSize()}
                         className="bg-purple-400 font-[500] rounded text-gray-800 cursor-pointer p-[0.4rem] text-[0.9rem] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span>Load More</span>

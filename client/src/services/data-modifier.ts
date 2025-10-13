@@ -1,5 +1,5 @@
-import useSWRInfinite from "swr/infinite";
-import type { IPostData, IPutData } from "./custom-types";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import type { InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
 import useAuth from "./useAuth";
 
 export default function DataModifier() {
@@ -57,31 +57,54 @@ export default function DataModifier() {
         await request.json();
     }
 
-    const infiniteScrollPagination = <TSX>(api_url: string, limit: number) => {
-        const getKey = (pageIndex: number, previousPageData: TSX[]) => {
-            if (previousPageData && !previousPageData.length) return null;
-            return `${api_url}?page=${pageIndex}&limit=${limit}`;
+    const infiniteScroll = <T>(props: InfiniteScrollProps) => {
+        const fetchData = async ({ pageParam = 1 }: { pageParam?: number }) => {
+            const request = await fetch(`${props.api_url}?page=${pageParam}&limit=${props.limit}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                method: 'GET'
+            });
+            
+            const response = await request.json();
+            return response;
         }
 
-        const { data, error, isLoading, mutate, size, setSize } =  useSWRInfinite<TSX[]>(getKey, getData, {
-            revalidateOnFocus: true,
-            revalidateOnReconnect: true,
-            dedupingInterval: 5000,
-            errorRetryCount: 3
+        const {
+            data,
+            error,
+            fetchNextPage,
+            hasNextPage,
+            isFetchingNextPage,
+            isLoading,
+            refetch,
+        } = useInfiniteQuery({
+            queryKey: [props.query_key, props.api_url, props.limit],
+            queryFn: fetchData,
+            getNextPageParam: (lastPage, allPages) => {
+                if (lastPage.length < props.limit) return;
+                return allPages.length + 1;
+            },
+            initialPageParam: 1,
+            staleTime: props.stale_time,
+            refetchOnReconnect: true,
         });
-        
-        const getPaginatedData: TSX[] = data ? data.flat() : [];
-        const isReachedEnd = !data || data.length === 0 || data[data.length - 1].length < limit;
-        const loadMore = (size > 0 && data && typeof data[size - 1] === 'undefined');
 
-        return { data, error, getPaginatedData, isLoading, isReachedEnd, loadMore, mutate, setSize, size }
-    }
+        const paginatedData: T[] = data ? data.pages.flat() : [];
+        const isReachedEnd = !hasNextPage;
+        const isLoadingMore = isFetchingNextPage;
 
-    return { 
-        deleteData, 
-        getData, 
-        infiniteScrollPagination, 
-        insertData, 
-        updateData 
-    }
+        return {
+            data: paginatedData,
+            error,
+            isLoading,
+            isLoadingMore,
+            isReachedEnd,
+            fetchNextPage,
+            refetch,
+        };
+    };
+
+    return { deleteData, getData, infiniteScroll, insertData, updateData }
 }

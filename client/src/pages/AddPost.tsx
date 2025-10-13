@@ -6,12 +6,14 @@ import { uploadToCloudinary } from "../services/media-storage";
 import type { MediaFile, PostDetail } from "../services/custom-types";
 import { useNavigate } from "react-router-dom";
 import Notification from "../components/Notification";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function AddPost() {
     const postFolder = 'sns_posts';
     const { user } = useAuth();
     const navigate = useNavigate();
     const { insertData } = DataModifier();
+    const queryQlient = useQueryClient();
 
     const [description, setDescription] = useState<string>('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -61,23 +63,9 @@ export default function AddPost() {
         setMediaFiles(prev => prev.filter((_, i) => i !== index));
     }
 
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-        const getCurrentDate = new Date();
-        
-        if (!user) {
-            setError({ isError: true, message: 'You must be logged in to create a post' });
-            return;
-        }
-        
-        if (description.trim() === '' && mediaFiles.length === 0) {
-            setError({ isError: true, message: 'Post must contain either text or media' });
-            return;
-        }
-        
-        setIsUploading(true);
-        
-        try {
+    const insertMutation = useMutation({
+        mutationFn: async () => {
+            const getCurrentDate = new Date();
             const postsFiles: { file_url: string; public_id: string; }[] = [];
             
             for (const mediaFile of mediaFiles) {
@@ -85,6 +73,11 @@ export default function AddPost() {
                 postsFiles.push({ file_url: result.url, public_id: result.publicId });
             }
             
+            if (!user) {
+                setError({ isError: true, message: 'You must be logged in to create a post' });
+                return;
+            }
+
             await insertData<PostDetail>({
                 api_url: `http://localhost:1234/posts/add`,
                 data: {
@@ -95,10 +88,28 @@ export default function AddPost() {
                     user_id: user.info.id,
                 }
             });
-            
+        },
+        onSuccess: () => {
+            queryQlient.invalidateQueries({ queryKey: ['all-posts', `http://localhost:1234/posts/get-all`, 12]});
+            queryQlient.invalidateQueries({ queryKey: ['signed-user-posts', `http://localhost:1234/posts/signed-user/${user?.info.id}`, 12]});
             setDescription('');
             setMediaFiles([]);
             navigate('/home');
+        }
+    });
+
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        
+        if (description.trim() === '' && mediaFiles.length === 0) {
+            setError({ isError: true, message: 'Post must contain either text or media' });
+            return;
+        }
+        
+        setIsUploading(true);
+        
+        try {
+            insertMutation.mutate();
         } catch (error) {
             setError({ isError: true, message: 'Failed to create post' });
         } finally {

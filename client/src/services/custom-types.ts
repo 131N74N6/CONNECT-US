@@ -1,6 +1,15 @@
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult } from "@tanstack/react-query";
+
 export type IPostData<T> = {
     api_url: string;
     data: Omit<T, '_id'>;
+}
+
+export type InfiniteScrollProps = {
+    api_url: string; 
+    limit: number; 
+    query_key: string;
+    stale_time: number;
 }
 
 export type IPutData<T> = {
@@ -80,8 +89,7 @@ export type PostListProps = {
     data: PostItemProps[];
     isReachedEnd: boolean;
     loadMore: boolean;
-    size: number;
-    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
+    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
 export type CommentProps = {
@@ -109,8 +117,7 @@ export type FollowersDataProps = {
     followers: Pick<AddFollowerProps, 'created_at' | 'user_id' | 'username'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
-    size: number;
-    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
+    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
     onClose: (value: React.SetStateAction<boolean>) => void;
 }
 
@@ -118,8 +125,7 @@ export type FollowedDataProps = {
     followed: Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
-    size: number;
-    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
+    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
     onClose: (value: React.SetStateAction<boolean>) => void;
 }
 

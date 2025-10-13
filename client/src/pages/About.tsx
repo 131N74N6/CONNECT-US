@@ -8,11 +8,13 @@ import useAuth from "../services/useAuth";
 import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import { FollowerList, FollowingList } from "../components/FollowList";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function About() {
     const { user } = useAuth();
+    const queryQlient = useQueryClient();
     const { user_id } = useParams();
-    const { infiniteScrollPagination, insertData, deleteData } = DataModifier();
+    const { infiniteScroll, insertData, deleteData } = DataModifier();
     const [error, setError] = useState({ isError: false, message: '' });
     const [showFollowers, setShowFollowers] = useState<boolean>(false);
     const [showFollowing, setShowFollowing] = useState<boolean>(false);
@@ -27,39 +29,49 @@ export default function About() {
 
     const { 
         error: currentUserPostsError,
-        getPaginatedData: currentUserPosts, 
+        data: currentUserPosts, 
         isLoading: loadPosts, 
         isReachedEnd: postReachEnd, 
-        loadMore: loadPostOwner, 
-        setSize: setCurrentUserPosts, 
-        size: currentUserPostsSize 
-    } = infiniteScrollPagination<PostItemProps>(`http://localhost:1234/posts/signed-user/${user_id}`, 12);
+        isLoadingMore: loadPostOwner, 
+        fetchNextPage: setCurrentUserPosts, 
+    } = infiniteScroll<PostItemProps>({
+        api_url: `http://localhost:1234/posts/signed-user/${user_id}`, 
+        limit: 12,
+        query_key: `signed-user-posts_${user_id}`,
+        stale_time: 5000
+    });
 
     const { 
-        mutate: currentUserFollowerMutate,
-        getPaginatedData: paginatedCurrentUserFollower,
+        refetch: currentUserFollowerMutate,
+        data: paginatedCurrentUserFollower,
         isReachedEnd: currentUserFollowerReachEnd, 
-        loadMore: loadCurrentUserFollower, 
-        setSize: setCurrentUserFollower, 
-        size: currentUserFollowerSize 
-    } = infiniteScrollPagination<AddFollowerProps>(`http://localhost:1234/followers/get-all/${user_id}`, 12);
+        isLoadingMore: loadCurrentUserFollower, 
+        fetchNextPage: setCurrentUserFollower, 
+    } = infiniteScroll<AddFollowerProps>({
+        api_url: `http://localhost:1234/followers/get-all/${user_id}`, 
+        limit: 12,
+        query_key: `followers-${user_id}`,
+        stale_time: 1000,
+    });
 
     const { 
-        mutate: currentUserFollowingMutate,
-        getPaginatedData: paginatedCurrentUserFollowing,
+        refetch: currentUserFollowingMutate,
+        data: paginatedCurrentUserFollowing,
         isReachedEnd: currentUserFollowingReachEnd, 
-        loadMore: loadCurrentUserFollowing, 
-        setSize: setCurrentUserFollowing, 
-        size: currentUserFollowingSize 
-    } = infiniteScrollPagination<AddFollowerProps>(`http://localhost:1234/followers/who-followed/${user_id}`, 12);
+        isLoadingMore: loadCurrentUserFollowing, 
+        fetchNextPage: setCurrentUserFollowing, 
+    } = infiniteScroll<AddFollowerProps>({
+        api_url: `http://localhost:1234/followers/who-followed/${user_id}`, 
+        limit: 12,
+        query_key: `who-followed/${user_id}`,
+        stale_time: 1000,
+    });
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = paginatedCurrentUserFollower && user ? paginatedCurrentUserFollower.some(follow => user.info.id === follow.user_id) : false;
 
-    const handleFollowBtn = async (): Promise<void> => {
-        if (isFollowLoading) return;
-        setIsFollowLoading(true);
-        try {
+    const insertMutation = useMutation({
+        mutationFn: async () => {
             if (!user_id || !user) return;
             
             const getCurrentDate = new Date();
@@ -78,7 +90,17 @@ export default function About() {
             } else {
                 await deleteData(`http://localhost:1234/followers/erase/${user.info.id}`);
             }
+        },
+        onSuccess: () => {
 
+        }
+    })
+
+    const handleFollowBtn = async (): Promise<void> => {
+        if (isFollowLoading) return;
+        setIsFollowLoading(true);
+        try {
+            insertMutation.mutate();
             await Promise.all([
                 currentUserFollowingMutate(),
                 currentUserFollowerMutate()
@@ -106,7 +128,6 @@ export default function About() {
                     isReachedEnd={currentUserFollowerReachEnd}
                     loadMore={loadCurrentUserFollower || false}
                     onClose={setShowFollowers}
-                    size={currentUserFollowerSize}
                     setSize={setCurrentUserFollower}
                 /> 
             : null}
@@ -116,7 +137,6 @@ export default function About() {
                     isReachedEnd={currentUserFollowingReachEnd}
                     loadMore={loadCurrentUserFollowing || false}
                     onClose={setShowFollowing}
-                    size={currentUserFollowingSize}
                     setSize={setCurrentUserFollowing}
                 /> 
             : null}
@@ -162,14 +182,13 @@ export default function About() {
                         </span>
                     </li>
                 </ul>
-                {currentUserPostsError ? <span className="text-[2rem] font-[600] text-purple-700">{currentUserPostsError}</span>
+                {currentUserPostsError ? <span className="text-[2rem] font-[600] text-purple-700">{currentUserPostsError.message}</span>
                     : loadPosts ? <Loading/> 
                     : currentUserPosts ?
                         <PostList 
                             data={currentUserPosts}
-                            loadMore={loadPostOwner || false}
-                            isReachedEnd={postReachEnd || false}
-                            size={currentUserPostsSize}
+                            loadMore={loadPostOwner}
+                            isReachedEnd={postReachEnd}
                             setSize={setCurrentUserPosts}
                         />
                     :
