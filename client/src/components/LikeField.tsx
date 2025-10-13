@@ -2,7 +2,7 @@ import type { IComments, ILikes } from "../services/custom-types";
 
 type LikeFieldPorps = {
     commentsData: IComments[] | undefined;
-    givingLikes: () => Promise<void>;
+    givingLikes: () => void;
     likesData: ILikes[] | undefined;
     setOpenComments: (value: React.SetStateAction<boolean>) => void;
     userLiked: boolean | "" | null | undefined

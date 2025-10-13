@@ -95,7 +95,7 @@ export type PostListProps = {
 export type CommentProps = {
     comments_data: IComments[];
     comment: string;
-    sendComment: (event: React.FormEvent) => Promise<void>;
+    sendComment: (event: React.FormEvent) => void;
     setComment: (value: React.SetStateAction<string>) => void
     onClose: (value: React.SetStateAction<boolean>) => void
     isReachedEnd: boolean;
