@@ -106,6 +106,7 @@ export type CommentProps = {
     isReachedEnd: boolean;
     loadMore: boolean;
     setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
+    isSendComment: boolean;
 }
 
 export type AddFollowerProps = {

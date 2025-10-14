@@ -32,7 +32,13 @@ async function getAllPosts(req: Request, res: Response): Promise<void> {
 
 async function getSearchedPost(req: Request, res: Response): Promise<void> {
     try {
-        const { searched } = req.body;
+        const { searched } = req.query;
+        
+        if (!searched || typeof searched !== 'string') {
+            res.status(400).json({ message: 'Search query is required' });
+            return;
+        }
+
         const searchedPost = await Post.find({ $text: { $search: searched } });
         res.json(searchedPost);
     } catch (error) {

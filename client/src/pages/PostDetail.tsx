@@ -5,7 +5,7 @@ import useAuth from "../services/useAuth";
 import type { IComments, ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import ImageSlider from "../components/ImageSlider";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import CommentField from "../components/CommentField";
 import LikeField from "../components/LikeField";
 import VideoSlider from "../components/VideoSlider";
@@ -52,12 +52,7 @@ export default function PostDetail() {
         _id ? `http://localhost:1234/likes/get-all/${_id}` : ``, [`likes-${_id}`]
     );
 
-    const userLiked = useMemo(() => {
-        if (!_id || !likesData?.data || !user) return false;
-        if (!Array.isArray(likesData.data)) return false;
-        
-        return likesData.data.some((like: ILikes) => like.user_id === user.info.id && like.post_id === _id);
-    }, [_id, likesData, user]);
+    const userLiked = _id && likesData && user && likesData.data.some(like => like.user_id === user.info.id && like.post_id === _id);
 
     const likeMutation = useMutation({
         onMutate: () => {
@@ -120,12 +115,7 @@ export default function PostDetail() {
     });
 
     const deletePostMutation = useMutation({
-        mutationFn: async () => {
-            if (!_id) return;
-            if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
-
-            await deleteData(`http://localhost:1234/posts/erase/${_id}`)
-        },
+        mutationFn: async () => await deleteData(`http://localhost:1234/posts/erase/${_id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`selected-post-${_id}`] });
             navigate('/home');
@@ -143,24 +133,23 @@ export default function PostDetail() {
     }
 
     function handleDeletePost(): void {
+        if (!_id) return;
+        if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
+
         deletePostMutation.mutate();
     }
 
     if (postLoading) return <Loading />;
 
-    const postDetail = selectedPost?.data?.[0];
-    const isPostOwner = user && postDetail && user.info.id === postDetail.user_id;
+    const isPostOwner = user && user.info.id === selectedPost?.data[0].user_id;
+    console.log({isPostOwner, selectedPost});
 
     // Separate images and videos
-    const images = postDetail?.posts_file ? 
-        postDetail.posts_file.filter(file => 
-            file.file_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-        ) : [];
+    const images = selectedPost?.data[0].posts_file ? 
+        selectedPost.data[0].posts_file.filter(file => file.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/) !== null) : [];
 
-    const videos = postDetail?.posts_file ? 
-        postDetail.posts_file.filter(file => 
-            file.file_url?.match(/\.(mp4|mov|avi|wmv|flv|webm)$/i)
-        ) : [];
+    const videos = selectedPost?.data[0].posts_file ? 
+        selectedPost.data[0].posts_file.filter(url => url.file_url.match(/\.(mp4|mov|avi|wmv|flv|webm)$/) !== null) : [];
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
@@ -172,11 +161,11 @@ export default function PostDetail() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {postDetail?.uploader_name.charAt(0)}
+                            {selectedPost?.data[0].uploader_name.charAt(0)}
                         </div>
                         <div>
-                            <Link to={`/about/${postDetail?.user_id}`} className="font-semibold">
-                                {postDetail?.uploader_name || 'Unknown User'}
+                            <Link to={`/about/${selectedPost?.data[0].user_id}`} className="font-semibold">
+                                {selectedPost?.data[0].uploader_name || 'Unknown User'}
                             </Link>
                             <p className="text-gray-400 text-sm">
                                 {selectedPost && new Date(selectedPost.data[0].created_at).toLocaleString()}
@@ -201,11 +190,11 @@ export default function PostDetail() {
                     <LikeField
                         commentsData={paginatedComment}
                         givingLikes={givingLikes}
-                        likesData={likesData?.data}
+                        likesData={likesData ? likesData.data : []}
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
                     />
-                    <div className="text-gray-200">{postDetail?.description}</div>
+                    <div className="text-gray-200">{selectedPost?.data[0].description}</div>
                 </div>
 
                 {openComments ? 
@@ -218,6 +207,7 @@ export default function PostDetail() {
                         setComment={setComment}
                         sendComment={sendComment}
                         setSize={fetchMoreComments}
+                        isSendComment={isSendComment}
                     /> 
                 : null}
             </div>
