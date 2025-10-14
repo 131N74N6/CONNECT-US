@@ -64,6 +64,7 @@ export default function AddPost() {
     }
 
     const insertMutation = useMutation({
+        onMutate: () => setIsUploading(true),
         mutationFn: async () => {
             const getCurrentDate = new Date();
             const postsFiles: { file_url: string; public_id: string; }[] = [];
@@ -95,7 +96,9 @@ export default function AddPost() {
             setDescription('');
             setMediaFiles([]);
             navigate('/home');
-        }
+        },
+        onSettled: () => setIsUploading(false),
+        onError: () => setError({ isError: true, message: 'Failed to create post' })
     });
 
     const handleSubmit = (event: React.FormEvent) => {
@@ -106,15 +109,7 @@ export default function AddPost() {
             return;
         }
         
-        setIsUploading(true);
-        
-        try {
-            insertMutation.mutate();
-        } catch (error) {
-            setError({ isError: true, message: 'Failed to create post' });
-        } finally {
-            setIsUploading(false);
-        }
+        insertMutation.mutate();
     }
 
     return (

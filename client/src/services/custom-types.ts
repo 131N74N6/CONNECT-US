@@ -129,11 +129,11 @@ export type FollowedDataProps = {
 }
 
 export type FollowersResponseProps = {
-    followers: FollowedDataProps;
-    followers_total: number; 
+    followers: AddFollowerProps[];
+    follower_total: number; 
 }
 
 export type FollowedResponseProps = {
-    followed: FollowedDataProps;
+    followed: AddFollowerProps[];
     followed_total: number; 
 }

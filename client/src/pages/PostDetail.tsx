@@ -141,7 +141,7 @@ export default function PostDetail() {
 
     if (postLoading) return <Loading />;
 
-    const isPostOwner = user && user.info.id === selectedPost?.data[0].user_id;
+    const isPostOwner = user && selectedPost && user.info.id === selectedPost.data[0].user_id;
 
     // Separate images and videos
     const images = selectedPost?.data[0].posts_file ? 

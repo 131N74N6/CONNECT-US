@@ -8,7 +8,10 @@ async function getAllComments(req: Request, res: Response) {
         const skip = (page - 1) * limit;
 
         const getPostId = req.params.id;
-        const getComments = await Comment.find({ post_id: getPostId }).limit(limit).skip(skip);
+        const getComments = await Comment.find(
+            { post_id: getPostId },
+            { created_at: 1, username: 1, opinions: 1 }
+        ).limit(limit).skip(skip);
         res.json(getComments);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

@@ -5,7 +5,7 @@ import {
 
 const postRoutes = Router();
 
-postRoutes.get('/get-all/', getAllPosts);
+postRoutes.get('/get-all', getAllPosts);
 
 postRoutes.get('/signed-user/:id', getSignedUserPosts);
 

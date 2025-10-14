@@ -1,11 +1,11 @@
-import type { AddFollowerProps, PostItemProps } from "../services/custom-types";
+import type { AddFollowerProps, FollowedResponseProps, FollowersResponseProps, PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
 import DataModifier from "../services/data-modifier";
 import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Notification from "../components/Notification";
 import { FollowerList, FollowingList } from "../components/FollowList";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -42,11 +42,11 @@ export default function About() {
     });
 
     const { 
-        data: paginatedCurrentUserFollower,
+        data: currentUserFollowers,
         isReachedEnd: currentUserFollowerReachEnd, 
         isLoadingMore: loadCurrentUserFollower, 
         fetchNextPage: setCurrentUserFollower, 
-    } = infiniteScroll<AddFollowerProps>({
+    } = infiniteScroll<FollowersResponseProps>({
         api_url: `http://localhost:1234/followers/get-all/${user_id}`, 
         limit: 12,
         query_key: `followers-${user_id}`,
@@ -54,21 +54,40 @@ export default function About() {
     });
 
     const { 
-        data: paginatedCurrentUserFollowing,
+        data: currentUserFollowed,
         isReachedEnd: currentUserFollowingReachEnd, 
         isLoadingMore: loadCurrentUserFollowing, 
         fetchNextPage: setCurrentUserFollowing, 
-    } = infiniteScroll<AddFollowerProps>({
+    } = infiniteScroll<FollowedResponseProps>({
         api_url: `http://localhost:1234/followers/who-followed/${user_id}`, 
         limit: 12,
         query_key: `who-followed/${user_id}`,
         stale_time: 1000,
     });
 
+    const getFollowers = useMemo(() => {
+        if (!currentUserFollowers) return [];
+        return currentUserFollowers.flatMap(page => page.followers);
+    }, [currentUserFollowers]);
+
+    const followersTotal = useMemo(() => {
+        if (currentUserFollowers.length === 0) return 0;
+        return currentUserFollowers[0].follower_total;
+    }, [currentUserFollowers]);
+
+    const followedTotal = useMemo(() => {
+        if (currentUserFollowed.length === 0) return 0;
+        return currentUserFollowed[0].followed_total;
+    }, [currentUserFollowed]);
+
     const notOwner = user_id && user && user.info.id !== user_id;
-    const isFollowed = paginatedCurrentUserFollower && user ? paginatedCurrentUserFollower.some(follow => user.info.id === follow.user_id) : false;
+    const isFollowed = getFollowers && user ? getFollowers.some(follow => user.info.id === follow.user_id) : false;
 
     const insertMutation = useMutation({
+        onMutate: () => {
+            if (isFollowLoading) return;
+            setIsFollowLoading(true);
+        },
         mutationFn: async () => {
             if (!user_id || !user) return;
             
@@ -92,19 +111,13 @@ export default function About() {
         onSuccess: () => {
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
-        }
+        },
+        onError: () => setError({ isError: true, message: 'Failed to follow' }),
+        onSettled: () => setIsFollowLoading(false)
     });
 
     const handleFollowBtn = async (): Promise<void> => {
-        if (isFollowLoading) return;
-        setIsFollowLoading(true);
-        try {
-            insertMutation.mutate();
-        } catch (error) {
-            setError({ isError: true, message: 'Failed to follow' });
-        } finally {
-            setIsFollowLoading(false);
-        }
+        insertMutation.mutate();
     }
 
     return (
@@ -119,7 +132,7 @@ export default function About() {
             : null}
             {showFollowers ? 
                 <FollowerList
-                    followers={paginatedCurrentUserFollower}
+                    followers={currentUserFollowers[0].followers}
                     isReachedEnd={currentUserFollowerReachEnd}
                     loadMore={loadCurrentUserFollower || false}
                     onClose={setShowFollowers}
@@ -128,7 +141,7 @@ export default function About() {
             : null}
             {showFollowing ? 
                 <FollowingList
-                    followed={paginatedCurrentUserFollowing}
+                    followed={currentUserFollowed[0].followed}
                     isReachedEnd={currentUserFollowingReachEnd}
                     loadMore={loadCurrentUserFollowing || false}
                     onClose={setShowFollowing}
@@ -161,13 +174,13 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem] cursor-pointer" onClick={() => setShowFollowers(true)}>Followers</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {paginatedCurrentUserFollower ? paginatedCurrentUserFollower.length : 0}
+                            {followersTotal}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem] cursor-pointer" onClick={() => setShowFollowing(true)}>Following</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {paginatedCurrentUserFollowing ? paginatedCurrentUserFollowing.length : 0}
+                            {followedTotal}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
