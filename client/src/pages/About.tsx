@@ -92,7 +92,6 @@ export default function About() {
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = getFollowers && user ? getFollowers.some(follow => user.info.id === follow.user_id) : false;
-    console.log(currentUserPosts)
 
     const insertMutation = useMutation({
         onMutate: () => {

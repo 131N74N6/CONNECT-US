@@ -12,8 +12,13 @@ async function getAllComments(req: Request, res: Response) {
             { post_id: getPostId },
             { created_at: 1, username: 1, opinions: 1 }
         ).limit(limit).skip(skip);
-        
-        res.json(getComments);
+
+        const commentTotal = await Comment.find({ post_id: getPostId });
+
+        res.json({
+            comment_total: commentTotal,
+            comments: getComments
+        });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
