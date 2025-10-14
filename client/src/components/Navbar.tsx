@@ -45,10 +45,6 @@ export function Navbar2() {
     return (
         <>
             <header className="bg-[#1a1a1a] md:hidden w-full flex justify-between shrink-0 p-[1rem]">
-                <button type="button" className="text-purple-400 cursor-pointer text-left" onClick={handleSignOut}>
-                    <i className="fa-solid fa-door-open"></i>
-                    <span>Sign Out</span>
-                </button>
                 <div className="cursor-pointer text-purple-400 font-[500] text-[1rem]" onClick={() => setOpenBar(true)}>
                     <i className="fa-solid fa-bars"></i>
                 </div>
@@ -62,7 +58,7 @@ export function Navbar2() {
                         <i className="fa-solid fa-house"></i>
                         <span>Home</span>
                     </Link>
-                    <Link to={'/about'} className="outline-0 text-orange-400 flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
+                    <Link to={user ? `/about/${user.info.id}` : '/home'} className="outline-0 text-orange-400 flex items-center gap-[0.5rem] font-[550] text-[1.2rem]">
                         <i className="fa-solid fa-address-card"></i>
                         <span>About</span>
                     </Link>

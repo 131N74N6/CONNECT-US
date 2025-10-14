@@ -52,7 +52,7 @@ async function getSignedUserPosts(req: Request, res: Response): Promise<void> {
             { _id: 1, description: 1, posts_file: 1, user_id: 1, uploader_name: 1 }
         ).limit(limit).skip(skip);
 
-        const totalPost = await Post.find({ user_id: getUserId });
+        const totalPost = await Post.find({ user_id: getUserId }).countDocuments();
 
         res.json({
             total_post: totalPost,
