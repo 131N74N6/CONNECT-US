@@ -19,11 +19,10 @@ async function getAllPosts(req: Request, res: Response): Promise<void> {
         const limit = parseInt(req.query.limit as string) || 12;
         const skip = (page - 1) * limit;
 
-        const allPost = await Post.find({}, { 
-            _id: 1, description: 1, posts_file: 1, user_id: 1 
-        })
-        .limit(limit)
-        .skip(skip);
+        const allPost = await Post.find(
+            {}, 
+            { _id: 1, description: 1, posts_file: 1, user_id: 1 }
+        ).limit(limit).skip(skip);
         
         res.json(allPost);
     } catch (error) {
@@ -48,13 +47,17 @@ async function getSignedUserPosts(req: Request, res: Response): Promise<void> {
         const limit = parseInt(req.query.limit as string) || 12;
         const skip = (page - 1) * limit;
 
-        const signedInUserPosts = await Post.find({ user_id: getUserId }, { 
-            _id: 1, description: 1, posts_file: 1, user_id: 1, uploader_name: 1 
-        })
-        .limit(limit)
-        .skip(skip);
+        const signedInUserPosts = await Post.find(
+            { user_id: getUserId }, 
+            { _id: 1, description: 1, posts_file: 1, user_id: 1, uploader_name: 1 }
+        ).limit(limit).skip(skip);
 
-        res.json(signedInUserPosts);
+        const totalPost = await Post.find({ user_id: getUserId });
+
+        res.json({
+            total_post: totalPost,
+            posts: signedInUserPosts
+        });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

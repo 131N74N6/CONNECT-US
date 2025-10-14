@@ -92,6 +92,11 @@ export type PostListProps = {
     setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
+export type PostResponseProps = {
+    posts: PostItemProps[];
+    total_post: number;
+}
+
 export type CommentProps = {
     comments_data: IComments[];
     comment: string;

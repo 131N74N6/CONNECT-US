@@ -1,4 +1,4 @@
-import type { AddFollowerProps, FollowedResponseProps, FollowersResponseProps, PostItemProps } from "../services/custom-types";
+import type { AddFollowerProps, FollowedResponseProps, FollowersResponseProps, PostResponseProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -34,7 +34,7 @@ export default function About() {
         isReachedEnd: postReachEnd, 
         isLoadingMore: loadPostOwner, 
         fetchNextPage: setCurrentUserPosts, 
-    } = infiniteScroll<PostItemProps>({
+    } = infiniteScroll<PostResponseProps>({
         api_url: `http://localhost:1234/posts/signed-user/${user_id}`, 
         limit: 12,
         query_key: `signed-user-posts_${user_id}`,
@@ -70,10 +70,20 @@ export default function About() {
         return currentUserFollowers.flatMap(page => page.followers);
     }, [currentUserFollowers]);
 
+    const getPostOwnerName = useMemo(() => {
+        if (!currentUserFollowers) return [];
+        return currentUserFollowers.flatMap(page => page.followers);
+    }, [currentUserFollowers]);
+
     const followersTotal = useMemo(() => {
         if (currentUserFollowers.length === 0) return 0;
         return currentUserFollowers[0].follower_total;
     }, [currentUserFollowers]);
+
+    const currentUserPostTotal = useMemo(() => {
+        if (currentUserPosts.length === 0) return 0;
+        return currentUserPosts[0].total_post;
+    }, [currentUserPosts]);
 
     const followedTotal = useMemo(() => {
         if (currentUserFollowed.length === 0) return 0;
@@ -99,7 +109,7 @@ export default function About() {
                     data: {
                         created_at: getCurrentDate.toISOString(),
                         followed_user_id: user_id,
-                        followed_username: currentUserPosts[0].uploader_name,
+                        followed_username: getPostOwnerName[0].username,
                         user_id: user.info.id,
                         username: user.info.username
                     }
@@ -186,7 +196,7 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {currentUserPosts ? currentUserPosts.length : 0}
+                            {currentUserPostTotal}
                         </span>
                     </li>
                 </ul>
@@ -194,7 +204,7 @@ export default function About() {
                     : loadPosts ? <Loading/> 
                     : currentUserPosts ?
                         <PostList 
-                            data={currentUserPosts}
+                            data={currentUserPosts[0].posts}
                             loadMore={loadPostOwner}
                             isReachedEnd={postReachEnd}
                             setSize={setCurrentUserPosts}
