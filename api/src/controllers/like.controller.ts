@@ -20,7 +20,7 @@ async function getAllLikes(req: Request, res: Response) {
         const getPostId = req.params.id;
         const getPostLike = await Like.find(
             { post_id: getPostId },
-            { created_at: 1, user_id: 1, username: 1 }
+            { created_at: 1, post_id: 1, user_id: 1, username: 1 }
         ).limit(limit).skip(skip);
 
         const likesTotal = await Like.find({ post_id: getPostId }).countDocuments();

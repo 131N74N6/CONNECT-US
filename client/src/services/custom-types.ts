@@ -50,7 +50,7 @@ export type ILikes = {
 }
 
 export type LikesData = {
-    likes: Pick<ILikes, 'created_at' | 'user_id' | 'username'>[];
+    likes: Pick<ILikes, 'created_at' | 'user_id' | 'username' | 'post_id'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
     size: number;
@@ -60,7 +60,7 @@ export type LikesData = {
 
 export type LikeResponseProps = {
     likes_total: number;
-    likes: Pick<ILikes, 'created_at' | 'user_id' | 'username'>[];
+    likes: Pick<ILikes, 'created_at' | 'user_id' | 'username' | 'post_id'>[];
 }
 
 export type IComments = {

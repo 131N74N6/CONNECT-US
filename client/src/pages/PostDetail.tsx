@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
-import type { CommentResponseProps, IComments, ILikes, PostDetail } from "../services/custom-types";
+import type { CommentResponseProps, IComments, ILikes, LikeResponseProps, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import ImageSlider from "../components/ImageSlider";
 import { useEffect, useMemo, useState } from "react";
@@ -48,19 +48,27 @@ export default function PostDetail() {
         query_key: `comments-${_id}`
     });
 
-    const { data: likesData } = getData<ILikes[]>(
-        _id ? `http://localhost:1234/likes/get-all/${_id}` : ``, [`likes-${_id}`]
-    );
+    const { data: likesData } = infiniteScroll<LikeResponseProps>({
+        api_url: `http://localhost:1234/likes/get-all/${_id}`,
+        query_key: `likes-${_id}`,
+        limit: 12,
+        stale_time: 1000,
+    });
 
     const userLiked = useMemo(() => {
-        if (!_id || !likesData || !user || !likesData.data) return false;
-        return likesData.data.some(like => like.user_id === user.info.id && like.post_id === _id);
+        if (!_id || !likesData || !user || likesData.length === 0) return false;
+        return likesData[0].likes.some(like => like.user_id === user.info.id && like.post_id === _id);
     }, [_id, likesData, user]);
 
     const commentsTotal = useMemo(() => {
         if (paginatedComment.length === 0) return 0;
         return paginatedComment[0].comment_total;
     }, [paginatedComment]);
+
+    const likesTotal = useMemo(() => {
+        if (likesData.length === 0) return 0;
+        return likesData[0].likes_total;
+    }, [likesData]);
 
     const likeMutation = useMutation({
         onMutate: () => {
@@ -195,7 +203,7 @@ export default function PostDetail() {
                     <LikeField
                         comment_total={commentsTotal}
                         givingLikes={givingLikes}
-                        likesData={likesData ? likesData.data : []}
+                        likes_total={likesTotal}
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
                     />
