@@ -3,7 +3,7 @@ import type { InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
 import useAuth from "./useAuth";
 
 interface ApiResponse<T> {
-    data: T;
+    data: T[];
     message?: string;
 }
 

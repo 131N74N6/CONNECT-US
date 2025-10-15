@@ -32,8 +32,8 @@ export default function PostDetail() {
         }
     }, [error.isError]);
 
-    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>(
-        _id ? `http://localhost:1234/posts/selected/${_id}` : ``, [`selected-post-${_id}`]
+    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail>(
+        `http://localhost:1234/posts/selected/${_id}`, [`selected-post-${_id}`]
     );
 
     const {
@@ -48,17 +48,14 @@ export default function PostDetail() {
         query_key: `comments-${_id}`
     });
 
-    const { data: likesData } = infiniteScroll<LikeResponseProps>({
+    const { data: likesData, isLoading: postLoad } = infiniteScroll<LikeResponseProps>({
         api_url: `http://localhost:1234/likes/get-all/${_id}`,
         query_key: `likes-${_id}`,
         limit: 12,
         stale_time: 1000,
     });
 
-    const getPost = useMemo(() => {
-        if (!selectedPost || !selectedPost.data) return [];
-        return selectedPost.data;
-    }, [_id, selectedPost]);
+    console.log(selectedPost)
 
     const userLiked = useMemo(() => {
         if (!_id || !likesData || !user || likesData.length === 0) return false;
@@ -91,7 +88,7 @@ export default function PostDetail() {
                         post_id: _id,
                         user_id: user.info.id,
                         username: user.info.username,
-                        post_owner_id: selectedPost.data[0].user_id
+                        post_owner_id: selectedPost?.data?.[0]?.user_id
                     }
                 });
             } else {
@@ -121,7 +118,7 @@ export default function PostDetail() {
                     post_id: _id,
                     user_id: user.info.id,
                     username: user.info.username,
-                    post_owner_id: selectedPost.data[0].user_id
+                    post_owner_id: selectedPost?.data?.[0]?.user_id
                 }
             });
         },
@@ -161,10 +158,10 @@ export default function PostDetail() {
 
     if (postLoading) return <Loading/>;
 
-    const isPostOwner = user && getPost ? user.info.id === getPost[0].user_id : false;
+    const isPostOwner = user ? user.info.id === selectedPost?.data?.[0]?.user_id : false;
 
     // Separate images and videos
-    const getSelectedMediaFiles = getPost ? getPost[0].posts_file : []
+    const getSelectedMediaFiles = selectedPost ? selectedPost?.data?.[0]?.posts_file : []
     const images = getSelectedMediaFiles ? getSelectedMediaFiles.filter(file => file.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/) !== null) : [];
     const videos = getSelectedMediaFiles ? getSelectedMediaFiles.filter(url => url.file_url.match(/\.(mp4|mov|avi|wmv|flv|webm)$/) !== null) : [];
 
@@ -175,17 +172,18 @@ export default function PostDetail() {
             {error.isError ? <Notification class_name="" message={error.message}/> : null}
             <div className="md:w-3/4 w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
                 {errorPost ? <span>{errorPost.message}</span> : null}
+                {postLoad ? <div className="flex justify-center items-center h-full"><Loading/></div> : null}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {getPost[0].uploader_name.charAt(0)}
+                            {selectedPost?.data?.[0]?.uploader_name.charAt(0)}
                         </div>
                         <div>
-                            <Link to={`/about/${getPost[0].user_id}`} className="font-semibold">
-                                {getPost[0].uploader_name}
+                            <Link to={`/about/${selectedPost?.data?.[0]?.user_id}`} className="font-semibold">
+                                {selectedPost?.data?.[0]?.uploader_name}
                             </Link>
                             <p className="text-gray-400 text-sm">
-                                {new Date(getPost[0].created_at).toLocaleString()}
+                                {selectedPost && new Date(selectedPost?.data?.[0]?.created_at).toLocaleString()}
                             </p>
                         </div>
                     </div>
@@ -211,7 +209,7 @@ export default function PostDetail() {
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
                     />
-                    <div className="text-gray-200">{getPost[0].description}</div>
+                    <div className="text-gray-200">{selectedPost?.data?.[0]?.description}</div>
                 </div>
 
                 {openComments ? 

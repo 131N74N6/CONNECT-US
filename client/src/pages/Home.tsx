@@ -26,7 +26,7 @@ export default function Home() {
             <Navbar2/>
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[200px] w-full bg-[#1a1a1a]">
                 {error ? <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
-                    : isLoading ? <Loading/>
+                    : isLoading ? <div className="flex justify-center items-center h-full"><Loading/></div>
                     : data ?
                         <PostList 
                             data={data}

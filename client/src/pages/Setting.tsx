@@ -10,7 +10,7 @@ export default function Setting() {
     const queryQlient = useQueryClient();
 
     const getUserId = user ? user.info.id : '';
-    const { data: userData } =  getData<IUserInfo[]>(`http://localhost:1234/users/selected/${getUserId}`, ['signed-in-user']);
+    const { data: userData } =  getData<IUserInfo>(`http://localhost:1234/users/selected/${getUserId}`, ['signed-in-user']);
 
     const deleteAllPostMutation = useMutation({
         mutationFn: async () => {
@@ -30,8 +30,8 @@ export default function Setting() {
             <Navbar2/>
             <div className="flex justify-center p-[1rem] gap-[1rem] bg-[#1a1a1a] w-full md:w-3/4 h-full">
                 <div className="flex flex-col gap-[1rem]">
-                    <p className="text-purple-400 font-[500] text-[1rem]">Email: {userData ? userData.data[0].email : ''}</p>
-                    <p className="text-purple-400 font-[500] text-[1rem]">Username: {userData ? userData.data[0].username : ''}</p>
+                    <p className="text-purple-400 font-[500] text-[1rem]">Email: {userData?.data?.[0]?.email}</p>
+                    <p className="text-purple-400 font-[500] text-[1rem]">Username: {userData?.data?.[0]?.username}</p>
                     <div className="flex gap-[0.4rem]">
                         <button 
                             type="button"
