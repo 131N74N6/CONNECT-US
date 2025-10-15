@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 
 // post_owner_id => id user pemilik postingan sekaligus patokan untuk melakukan penghapusan postingan
+// post_id => id milik postingan
 // user_id => id user yang sedang sign in
 
 interface ILikes {

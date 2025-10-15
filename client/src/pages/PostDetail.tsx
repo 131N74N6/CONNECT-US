@@ -56,7 +56,6 @@ export default function PostDetail() {
 
     const likeMutation = useMutation({
         onMutate: () => {
-            if (isLiking) return;
             setIsLiking(true);
         },
         mutationFn: async () => {
@@ -85,7 +84,6 @@ export default function PostDetail() {
 
     const commentMutation = useMutation({
         onMutate: () => {
-            if (isSendComment) return;
             setIsSendComment(true);
         },
         mutationFn: async () => {
@@ -125,10 +123,12 @@ export default function PostDetail() {
 
     function sendComment(event: React.FormEvent): void {
         event.preventDefault();
+        if (isSendComment) return;
         commentMutation.mutate();
     }
     
     function givingLikes(): void {
+        if (isLiking) return;
         likeMutation.mutate();
     }
 
