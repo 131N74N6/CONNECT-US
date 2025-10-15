@@ -9,7 +9,8 @@ export default function Setting() {
     const { deleteData, getData } = DataModifier();
     const queryQlient = useQueryClient();
 
-    const { data: userData } =  getData<IUserInfo[]>(user ? `http://localhost:1234/users/selected/${user.info.id}` : '', ['signed-in-user']);
+    const getUserId = user ? user.info.id : '';
+    const { data: userData } =  getData<IUserInfo[]>(`http://localhost:1234/users/selected/${getUserId}`, ['signed-in-user']);
 
     const deleteAllPostMutation = useMutation({
         mutationFn: async () => {
