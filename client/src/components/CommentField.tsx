@@ -5,7 +5,7 @@ export default function CommentField(props: CommentProps) {
     return (
         <section className="flex justify-center items-center fixed inset-0 z-20 bg-[rgba(0,0,0,0.66)] p-[0.7rem]">
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-purple-400 w-[450px] h-[600px]">
-                <div className="flex flex-col gap-[1rem] border-b border-purple-400 h-[79%] overflow-y-auto">
+                <div className="flex flex-col gap-[1rem] pb-[1rem] border-b border-purple-400 h-[79%] overflow-y-auto">
                     {props.comments_data.length > 0 ?
                         props.comments_data.map((comment, index) => (
                             <div className="bg-black p-[0.6rem] rounded-[0.6rem]" key={`cmt: ${index}`}>
@@ -27,13 +27,15 @@ export default function CommentField(props: CommentProps) {
                             <span>No Comments to Load</span>
                         </div>
                     ) : (
-                        <button 
-                            type="button"
-                            onClick={() => props.setSize()}
-                            className="bg-pink-300 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
-                        >
-                            Load More
-                        </button>
+                        <div className="flex justify-center">
+                            <button 
+                                type="button"
+                                onClick={() => props.setSize()}
+                                className="bg-pink-300 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
+                            >
+                                Load More
+                            </button>
+                        </div>
                     )}
                 </div>
                 <form className="flex flex-col gap-[1rem] h-[21%]" onSubmit={props.sendComment}>

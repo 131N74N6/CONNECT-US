@@ -24,7 +24,7 @@ export default function Home() {
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
             <Navbar1/>
             <Navbar2/>
-            <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
+            <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[200px] w-full bg-[#1a1a1a]">
                 {error ? <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
                     : isLoading ? <Loading/>
                     : data ?

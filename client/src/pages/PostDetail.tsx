@@ -57,6 +57,11 @@ export default function PostDetail() {
         return likesData.data.some(like => like.user_id === user.info.id && like.post_id === _id);
     }, [_id, likesData, user]);
 
+    const commentsTotal = useMemo(() => {
+        if (paginatedComment.length === 0) return 0;
+        return paginatedComment[0].comment_total;
+    }, [paginatedComment]);
+
     const likeMutation = useMutation({
         onMutate: () => {
             setIsLiking(true);
@@ -188,7 +193,7 @@ export default function PostDetail() {
                     {videos.length > 0 ? <VideoSlider videos={videos}/> : null}
             
                     <LikeField
-                        comment_total={paginatedComment ? paginatedComment[0].comment_total : 0}
+                        comment_total={commentsTotal}
                         givingLikes={givingLikes}
                         likesData={likesData ? likesData.data : []}
                         setOpenComments={setOpenComments}

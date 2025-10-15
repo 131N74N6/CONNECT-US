@@ -58,6 +58,11 @@ export type LikesData = {
     onClose: (value: React.SetStateAction<boolean>) => void
 }
 
+export type LikeResponseProps = {
+    likes_total: number;
+    likes: Pick<ILikes, 'created_at' | 'user_id' | 'username'>[];
+}
+
 export type IComments = {
     _id: string;
     created_at: string;

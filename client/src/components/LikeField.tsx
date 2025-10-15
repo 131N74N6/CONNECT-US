@@ -1,9 +1,7 @@
-import type { ILikes } from "../services/custom-types";
-
 type LikeFieldPorps = {
     comment_total: number;
     givingLikes: () => void;
-    likesData: ILikes[] | undefined;
+    likes_total: number;
     setOpenComments: (value: React.SetStateAction<boolean>) => void;
     userLiked: boolean | "" | null | undefined
 }
@@ -17,7 +15,7 @@ export default function LikeField(props: LikeFieldPorps) {
                     onClick={props.givingLikes}
                 ></i>
                 <span>
-                    {props.likesData ? props.likesData.length : 0}
+                    {props.likes_total}
                 </span>
             </div>
             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
