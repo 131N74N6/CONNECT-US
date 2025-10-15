@@ -55,12 +55,15 @@ export default function PostDetail() {
         stale_time: 1000,
     });
 
+    const getPost = useMemo(() => {
+        if (!selectedPost || !selectedPost.data) return [];
+        return selectedPost.data;
+    }, [_id, selectedPost]);
+
     const userLiked = useMemo(() => {
         if (!_id || !likesData || !user || likesData.length === 0) return false;
         return likesData[0].likes.some(like => like.user_id === user.info.id && like.post_id === _id);
     }, [_id, likesData, user]);
-
-    // const getPostOwnerName
 
     const commentsTotal = useMemo(() => {
         if (paginatedComment.length === 0) return 0;
@@ -156,13 +159,12 @@ export default function PostDetail() {
         deletePostMutation.mutate();
     }
 
-    if (postLoading) return <Loading />;
+    if (postLoading) return <Loading/>;
 
-    const getDetailedPost = selectedPost && selectedPost.data && selectedPost.data[0];
-    const isPostOwner = user && getDetailedPost ? user.info.id === getDetailedPost.user_id : false;
+    const isPostOwner = user && getPost ? user.info.id === getPost[0].user_id : false;
 
     // Separate images and videos
-    const getSelectedMediaFiles = getDetailedPost ? getDetailedPost.posts_file : []
+    const getSelectedMediaFiles = getPost ? getPost[0].posts_file : []
     const images = getSelectedMediaFiles ? getSelectedMediaFiles.filter(file => file.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/) !== null) : [];
     const videos = getSelectedMediaFiles ? getSelectedMediaFiles.filter(url => url.file_url.match(/\.(mp4|mov|avi|wmv|flv|webm)$/) !== null) : [];
 
@@ -176,14 +178,14 @@ export default function PostDetail() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {getDetailedPost && getDetailedPost.uploader_name.charAt(0)}
+                            {getPost[0].uploader_name.charAt(0)}
                         </div>
                         <div>
-                            <Link to={`/about/${getDetailedPost && getDetailedPost.user_id}`} className="font-semibold">
-                                {getDetailedPost && getDetailedPost.uploader_name}
+                            <Link to={`/about/${getPost[0].user_id}`} className="font-semibold">
+                                {getPost[0].uploader_name}
                             </Link>
                             <p className="text-gray-400 text-sm">
-                                {getDetailedPost && new Date(getDetailedPost.created_at).toLocaleString()}
+                                {new Date(getPost[0].created_at).toLocaleString()}
                             </p>
                         </div>
                     </div>
@@ -209,7 +211,7 @@ export default function PostDetail() {
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
                     />
-                    <div className="text-gray-200">{getDetailedPost && getDetailedPost.description}</div>
+                    <div className="text-gray-200">{getPost[0].description}</div>
                 </div>
 
                 {openComments ? 
