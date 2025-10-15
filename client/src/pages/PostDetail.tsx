@@ -60,15 +60,17 @@ export default function PostDetail() {
         return likesData[0].likes.some(like => like.user_id === user.info.id && like.post_id === _id);
     }, [_id, likesData, user]);
 
+    // const getPostOwnerName
+
     const commentsTotal = useMemo(() => {
         if (paginatedComment.length === 0) return 0;
         return paginatedComment[0].comment_total;
-    }, [paginatedComment]);
+    }, [_id, paginatedComment]);
 
     const likesTotal = useMemo(() => {
         if (likesData.length === 0) return 0;
         return likesData[0].likes_total;
-    }, [likesData]);
+    }, [_id, likesData]);
 
     const likeMutation = useMutation({
         onMutate: () => {

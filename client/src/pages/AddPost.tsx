@@ -78,6 +78,11 @@ export default function AddPost() {
                 setError({ isError: true, message: 'You must be logged in to create a post' });
                 return;
             }
+        
+            if (description.trim() === '' && mediaFiles.length === 0) {
+                setError({ isError: true, message: 'Post must contain either text or media' });
+                return;
+            }
 
             await insertData<PostDetail>({
                 api_url: `http://localhost:1234/posts/add`,
@@ -103,12 +108,6 @@ export default function AddPost() {
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        
-        if (description.trim() === '' && mediaFiles.length === 0) {
-            setError({ isError: true, message: 'Post must contain either text or media' });
-            return;
-        }
-        
         insertMutation.mutate();
     }
 
