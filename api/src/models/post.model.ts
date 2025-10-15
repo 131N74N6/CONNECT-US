@@ -1,5 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+// user_id => id dari user yang membuat postingan
+
 interface IPost {
     created_at: string;
     description: string;

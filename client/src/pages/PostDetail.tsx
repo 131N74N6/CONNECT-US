@@ -32,6 +32,10 @@ export default function PostDetail() {
         }
     }, [error.isError]);
 
+    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>(
+        _id ? `http://localhost:1234/posts/selected/${_id}` : ``, [`selected-post-${_id}`]
+    );
+
     const {
         data: paginatedComment,
         isReachedEnd: commentsReachedEnd,
@@ -43,10 +47,6 @@ export default function PostDetail() {
         stale_time: 1000,
         query_key: `comments-${_id}`
     });
-
-    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>(
-        _id ? `http://localhost:1234/posts/selected/${_id}` : ``, [`selected-post-${_id}`]
-    );
 
     const { data: likesData } = getData<ILikes[]>(
         _id ? `http://localhost:1234/likes/get-all/${_id}` : ``, [`likes-${_id}`]
@@ -142,7 +142,6 @@ export default function PostDetail() {
     if (postLoading) return <Loading />;
 
     const isPostOwner = user && user.info.id === selectedPost?.data[0].user_id;
-    console.log({isPostOwner, selectedPost});
 
     // Separate images and videos
     const images = selectedPost?.data[0].posts_file ? 
