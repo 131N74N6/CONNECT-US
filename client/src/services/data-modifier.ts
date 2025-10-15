@@ -41,7 +41,7 @@ export default function DataModifier() {
             refetchOnMount: true,
             refetchOnReconnect: true,
             refetchOnWindowFocus: false,
-            gcTime: 120000,
+            gcTime: 240000,
             staleTime: 1000,
         });
 
@@ -105,7 +105,7 @@ export default function DataModifier() {
             },
             initialPageParam: 1,
             staleTime: props.stale_time,
-            gcTime: 120000,
+            gcTime: 240000,
             refetchOnMount: true,
             refetchOnReconnect: true,
             refetchOnWindowFocus: false,

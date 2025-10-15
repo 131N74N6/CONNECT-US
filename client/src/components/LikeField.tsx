@@ -1,7 +1,7 @@
-import type { IComments, ILikes } from "../services/custom-types";
+import type { ILikes } from "../services/custom-types";
 
 type LikeFieldPorps = {
-    commentsData: IComments[] | undefined;
+    comment_total: number;
     givingLikes: () => void;
     likesData: ILikes[] | undefined;
     setOpenComments: (value: React.SetStateAction<boolean>) => void;
@@ -22,7 +22,7 @@ export default function LikeField(props: LikeFieldPorps) {
             </div>
             <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                 <i className="fa-regular fa-comment cursor-pointer" onClick={() => props.setOpenComments(true)}></i>
-                <span>{props.commentsData ? props.commentsData.length : 0}</span>
+                <span>{props.comment_total}</span>
             </div>
         </div>
     );

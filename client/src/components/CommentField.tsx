@@ -7,8 +7,8 @@ export default function CommentField(props: CommentProps) {
             <div className="bg-[#1a1a1a] p-[1rem] flex flex-col gap-[1rem] border border-purple-400 w-[450px] h-[600px]">
                 <div className="flex flex-col gap-[1rem] border-b border-purple-400 h-[79%] overflow-y-auto">
                     {props.comments_data.length > 0 ?
-                        props.comments_data.map((comment) => (
-                            <div className="bg-black p-[0.6rem] rounded-[0.6rem]" key={`cmt: ${comment._id}`}>
+                        props.comments_data.map((comment, index) => (
+                            <div className="bg-black p-[0.6rem] rounded-[0.6rem]" key={`cmt: ${index}`}>
                                 <div className="flex justify-between">
                                     <p>{comment.username}</p>
                                     <p className="text-[0.9rem]">{new Date(comment.created_at).toLocaleString()}</p>

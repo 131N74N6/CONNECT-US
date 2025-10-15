@@ -39,7 +39,7 @@ async function getSearchedPost(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        const searchedPost = await Post.find({ $text: { $search: searched } });
+        const searchedPost = await Post.find({ $text: { $search: searched.trim() } });
         res.json(searchedPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

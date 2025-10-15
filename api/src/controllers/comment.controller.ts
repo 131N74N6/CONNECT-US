@@ -13,7 +13,7 @@ async function getAllComments(req: Request, res: Response) {
             { created_at: 1, username: 1, opinions: 1 }
         ).limit(limit).skip(skip);
 
-        const commentTotal = await Comment.find({ post_id: getPostId });
+        const commentTotal = await Comment.find({ post_id: getPostId }).countDocuments();
 
         res.json({
             comment_total: commentTotal,

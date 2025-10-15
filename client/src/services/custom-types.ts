@@ -98,7 +98,7 @@ export type PostResponseProps = {
 }
 
 export type CommentProps = {
-    comments_data: IComments[];
+    comments_data: Pick<IComments, "created_at" | "username" | "opinions">[];
     comment: string;
     sendComment: (event: React.FormEvent) => void;
     setComment: (value: React.SetStateAction<string>) => void
@@ -107,6 +107,11 @@ export type CommentProps = {
     loadMore: boolean;
     setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
     isSendComment: boolean;
+}
+
+export type CommentResponseProps = {
+    comment_total: number;
+    comments: Pick<IComments, 'created_at' | 'username' | 'opinions'>[];
 }
 
 export type AddFollowerProps = {
