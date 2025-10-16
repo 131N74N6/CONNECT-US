@@ -2,11 +2,6 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
 import useAuth from "./useAuth";
 
-interface ApiResponse<T> {
-    data: T[];
-    message?: string;
-}
-
 export default function DataModifier() {
     const { user } = useAuth();
     const token = user ? user.token : null;
@@ -24,7 +19,7 @@ export default function DataModifier() {
     }
 
     const getData = <TSX>(api_url: string, key: string[]) => {
-        const { data, error, isLoading } = useQuery<ApiResponse<TSX>, Error>({
+        const { data, error, isLoading } = useQuery<TSX, Error>({
             queryFn: async () => {
                 const request = await fetch(api_url, {
                     headers: {

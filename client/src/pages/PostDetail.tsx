@@ -32,7 +32,7 @@ export default function PostDetail() {
         }
     }, [error.isError]);
 
-    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail>(
+    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>(
         `http://localhost:1234/posts/selected/${_id}`, [`selected-post-${_id}`]
     );
 
@@ -54,8 +54,6 @@ export default function PostDetail() {
         limit: 12,
         stale_time: 1000,
     });
-
-    console.log(selectedPost)
 
     const userLiked = useMemo(() => {
         if (!_id || !likesData || !user || likesData.length === 0) return false;
@@ -88,7 +86,7 @@ export default function PostDetail() {
                         post_id: _id,
                         user_id: user.info.id,
                         username: user.info.username,
-                        post_owner_id: selectedPost?.data?.[0]?.user_id
+                        post_owner_id: selectedPost[0]?.user_id
                     }
                 });
             } else {
@@ -118,7 +116,7 @@ export default function PostDetail() {
                     post_id: _id,
                     user_id: user.info.id,
                     username: user.info.username,
-                    post_owner_id: selectedPost?.data?.[0]?.user_id
+                    post_owner_id: selectedPost?.[0]?.user_id
                 }
             });
         },
@@ -158,12 +156,13 @@ export default function PostDetail() {
 
     if (postLoading) return <Loading/>;
 
-    const isPostOwner = user ? user.info.id === selectedPost?.data?.[0]?.user_id : false;
+    const isPostOwner = user ? user.info.id === selectedPost?.[0]?.user_id : false;
 
     // Separate images and videos
-    const getSelectedMediaFiles = selectedPost ? selectedPost?.data?.[0]?.posts_file : []
+    const getSelectedMediaFiles = selectedPost?.[0]?.posts_file;
     const images = getSelectedMediaFiles ? getSelectedMediaFiles.filter(file => file.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/) !== null) : [];
     const videos = getSelectedMediaFiles ? getSelectedMediaFiles.filter(url => url.file_url.match(/\.(mp4|mov|avi|wmv|flv|webm)$/) !== null) : [];
+    console.log(images);
 
     return (
         <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
@@ -176,14 +175,14 @@ export default function PostDetail() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                            {selectedPost?.data?.[0]?.uploader_name.charAt(0)}
+                            {selectedPost?.[0]?.uploader_name.charAt(0)}
                         </div>
                         <div>
-                            <Link to={`/about/${selectedPost?.data?.[0]?.user_id}`} className="font-semibold">
-                                {selectedPost?.data?.[0]?.uploader_name}
+                            <Link to={`/about/${selectedPost?.[0]?.user_id}`} className="font-semibold">
+                                {selectedPost?.[0]?.uploader_name}
                             </Link>
                             <p className="text-gray-400 text-sm">
-                                {selectedPost && new Date(selectedPost?.data?.[0]?.created_at).toLocaleString()}
+                                {selectedPost && new Date(selectedPost?.[0]?.created_at).toLocaleString()}
                             </p>
                         </div>
                     </div>
@@ -209,7 +208,7 @@ export default function PostDetail() {
                         setOpenComments={setOpenComments}
                         userLiked={userLiked}
                     />
-                    <div className="text-gray-200">{selectedPost?.data?.[0]?.description}</div>
+                    <div className="text-gray-200">{selectedPost?.[0]?.description}</div>
                 </div>
 
                 {openComments ? 
