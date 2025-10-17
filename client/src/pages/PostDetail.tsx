@@ -2,11 +2,10 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
-import type { CommentResponseProps, IComments, ILikes, LikeResponseProps, PostDetail } from "../services/custom-types";
+import type { CommentResponseProps, ILikes, LikeResponseProps, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import ImageSlider from "../components/ImageSlider";
 import { useEffect, useMemo, useState } from "react";
-import LikeField from "../components/LikeField";
 import VideoSlider from "../components/VideoSlider";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,10 +15,9 @@ export default function PostDetail() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const { deleteData, getData, infiniteScroll, insertData } = DataModifier();
+    const { deleteData, getData, insertData } = DataModifier();
 
     const [isLiking, setIsLiking] = useState<boolean>(false);
-    const [comment, setComment] = useState<string>('');
     const [error, setError] = useState({ isError: false, message: '' });
 
     useEffect(() => {
@@ -33,24 +31,15 @@ export default function PostDetail() {
         `http://localhost:1234/posts/selected/${_id}`, [`selected-post-${_id}`]
     );
 
-    const {
-        data: paginatedComment,
-        isReachedEnd: commentsReachedEnd,
-        isLoadingMore: loadMoreComments,
-        fetchNextPage: fetchMoreComments,
-    } =  infiniteScroll<CommentResponseProps>({
-        api_url: _id ? `http://localhost:1234/comments/get-all/${_id}` : ``, 
-        limit: 12,
-        stale_time: 1000,
-        query_key: `comments-${_id}`
-    });
+    const { data: commentsData } =  getData<CommentResponseProps[]>(
+        `http://localhost:1234/comments/get-all/${_id}`, 
+        [`comments-total-${_id}`]
+    );
 
-    const { data: likesData, isLoading: postLoad } = infiniteScroll<LikeResponseProps>({
-        api_url: `http://localhost:1234/likes/get-all/${_id}`,
-        query_key: `likes-${_id}`,
-        limit: 12,
-        stale_time: 1000,
-    });
+    const { data: likesData, isLoading: postLoad } = getData<LikeResponseProps[]>(
+        `http://localhost:1234/likes/get-all/${_id}`,
+        [`likes-total-${_id}`],
+    );
 
     const userLiked = useMemo(() => {
         if (!_id || !likesData || !user || likesData.length === 0) return false;
@@ -58,12 +47,12 @@ export default function PostDetail() {
     }, [_id, likesData, user]);
 
     const commentsTotal = useMemo(() => {
-        if (paginatedComment.length === 0) return 0;
-        return paginatedComment[0].comment_total;
-    }, [_id, paginatedComment]);
+        if (!commentsData) return 0;
+        return commentsData[0].comment_total;
+    }, [_id, commentsData]);
 
     const likesTotal = useMemo(() => {
-        if (likesData.length === 0) return 0;
+        if (!likesData) return 0;
         return likesData[0].likes_total;
     }, [_id, likesData]);
 
@@ -93,36 +82,6 @@ export default function PostDetail() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] }),
         onSettled: () => setIsLiking(false),
         onError: () => setError({ isError: true, message: 'Failed to give like' })
-    });
-
-    const commentMutation = useMutation({
-        onMutate: () => {
-            setIsSendComment(true);
-        },
-        mutationFn: async () => {
-            const getCurrentDate = new Date();
-
-            if (!user || !_id || !selectedPost) return;
-            if (!comment.trim()) return;
-
-            await insertData<IComments>({
-                api_url: `http://localhost:1234/comments/add`,
-                data: {
-                    created_at: getCurrentDate.toISOString(),
-                    opinions: comment.trim(),
-                    post_id: _id,
-                    user_id: user.info.id,
-                    username: user.info.username,
-                    post_owner_id: selectedPost?.[0]?.user_id
-                }
-            });
-        },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`comments-${_id}`] }),
-        onSettled: () => {
-            setComment('');
-            setIsSendComment(false);
-        },
-        onError: () => setError({ isError: true, message: error.message || 'Failed to send comment' })
     });
 
     const deletePostMutation = useMutation({
@@ -194,16 +153,18 @@ export default function PostDetail() {
                     <div className="flex gap-[1rem]">
                         <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                             <i 
-                                className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${props.userLiked ? 'text-red-500' : ''}`} 
+                                className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
                                 onClick={givingLikes}
                             ></i>
                             <span>
-                                {likes_total}
+                                {likesTotal}
                             </span>
                         </div>
                         <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
-                            <i className="fa-regular fa-comment cursor-pointer" onClick={() => props.setOpenComments(true)}></i>
-                            <span>{props.comment_total}</span>
+                            <Link to={`/comments-post/${_id}`}>
+                                <i className="fa-regular fa-comment cursor-pointer"></i>
+                            </Link>
+                            <span>{commentsTotal}</span>
                         </div>
                     </div>
                     <div className="text-gray-200">{selectedPost?.[0]?.description}</div>
