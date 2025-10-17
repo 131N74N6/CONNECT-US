@@ -16,9 +16,10 @@ export default function Followed() {
     } = infiniteScroll<FollowedResponseProps>({
         api_url: `http://localhost:1234/followers/who-followed/${user_id}`, 
         limit: 12,
-        query_key: `who-followed/${user_id}`,
+        query_key: `who-followed-${user_id}`,
         stale_time: 1000,
     });
+
     return (
         <section className="flex md:flex-row flex-col h-screen gap-[1rem] p-[1rem] bg-black text-white relative z-10">
             <Navbar1/>

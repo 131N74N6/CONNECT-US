@@ -13,7 +13,7 @@ export default function About() {
     const { user } = useAuth();
     const queryQlient = useQueryClient();
     const { user_id } = useParams();
-    const { infiniteScroll, insertData, deleteData } = DataModifier();
+    const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
     const [error, setError] = useState({ isError: false, message: '' });
     const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
     
@@ -38,33 +38,19 @@ export default function About() {
         stale_time: 1000
     });
 
-    const { data: currentUserFollowers } = infiniteScroll<FollowersResponseProps>({
-        api_url: `http://localhost:1234/followers/get-all/${user_id}`, 
-        limit: 12,
-        query_key: `followers-${user_id}`,
-        stale_time: 1000,
-    });
+    const { data: currentUserFollowers } = getData<FollowersResponseProps[]>(
+        `http://localhost:1234/followers/get-all/${user_id}`, 
+        [`followers-total-${user_id}`]
+    );
 
-    const { data: currentUserFollowed } = infiniteScroll<FollowedResponseProps>({
-        api_url: `http://localhost:1234/followers/who-followed/${user_id}`, 
-        limit: 12,
-        query_key: `who-followed/${user_id}`,
-        stale_time: 1000,
-    });
+    const { data: currentUserFollowed } = getData<FollowedResponseProps[]>(
+        `http://localhost:1234/followers/who-followed/${user_id}`, 
+        [`who-followed-total-${user_id}`]
+    );
 
     const getFollowers = useMemo(() => {
         if (!currentUserFollowers) return [];
         return currentUserFollowers.flatMap(page => page.followers);
-    }, [currentUserFollowers]);
-
-    const getPostOwnerName = useMemo(() => {
-        if (!currentUserFollowers) return [];
-        return currentUserFollowers.flatMap(page => page.followers);
-    }, [currentUserFollowers]);
-
-    const followersTotal = useMemo(() => {
-        if (currentUserFollowers.length === 0) return 0;
-        return currentUserFollowers[0].follower_total;
     }, [currentUserFollowers]);
 
     const currentUserPostTotal = useMemo(() => {
@@ -73,9 +59,14 @@ export default function About() {
     }, [currentUserPosts]);
 
     const followedTotal = useMemo(() => {
-        if (currentUserFollowed.length === 0) return 0;
+        if (!currentUserFollowed) return 0;
         return currentUserFollowed[0].followed_total;
     }, [currentUserFollowed]);
+
+    const followersTotal = useMemo(() => {
+        if (!currentUserFollowers) return 0;
+        return currentUserFollowers[0].follower_total;
+    }, [currentUserFollowers]);
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = getFollowers && user ? getFollowers.some(follow => user.info.id === follow.user_id) : false;
@@ -96,7 +87,7 @@ export default function About() {
                     data: {
                         created_at: getCurrentDate.toISOString(),
                         followed_user_id: user_id,
-                        followed_username: getPostOwnerName[0].username,
+                        followed_username: getFollowers[0].username,
                         user_id: user.info.id,
                         username: user.info.username
                     }
@@ -106,6 +97,8 @@ export default function About() {
             }
         },
         onSuccess: () => {
+            queryQlient.invalidateQueries({ queryKey: [`followers-total-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`who-followed-total-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
         },

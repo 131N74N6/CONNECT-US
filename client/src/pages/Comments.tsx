@@ -8,11 +8,11 @@ import Loading from "../components/Loading";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 
 export default function Comments() {
+    const queryClient = useQueryClient();
     const { _id } = useParams();
     const { user } = useAuth();
-    const queryClient = useQueryClient();
-    
     const { getData, infiniteScroll, insertData } = DataModifier();
+    
     const [isSendComment, setIsSendComment] = useState<boolean>(false);
     const [comment, setComment] = useState<string>('');
     const [error, setError] = useState({ isError: false, message: '' });

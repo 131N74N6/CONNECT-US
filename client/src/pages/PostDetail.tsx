@@ -6,7 +6,6 @@ import type { CommentResponseProps, IComments, ILikes, LikeResponseProps, PostDe
 import Loading from "../components/Loading";
 import ImageSlider from "../components/ImageSlider";
 import { useEffect, useMemo, useState } from "react";
-import CommentField from "../components/CommentField";
 import LikeField from "../components/LikeField";
 import VideoSlider from "../components/VideoSlider";
 import Notification from "../components/Notification";
@@ -20,9 +19,7 @@ export default function PostDetail() {
     const { deleteData, getData, infiniteScroll, insertData } = DataModifier();
 
     const [isLiking, setIsLiking] = useState<boolean>(false);
-    const [isSendComment, setIsSendComment] = useState<boolean>(false);
     const [comment, setComment] = useState<string>('');
-    const [openComments, setOpenComments] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
 
     useEffect(() => {
@@ -136,12 +133,6 @@ export default function PostDetail() {
         },
         onError: () => setError({ isError: true, message: 'Failed to delete post.' })
     });
-
-    function sendComment(event: React.FormEvent): void {
-        event.preventDefault();
-        if (isSendComment) return;
-        commentMutation.mutate();
-    }
     
     function givingLikes(): void {
         if (isLiking) return;
@@ -200,29 +191,23 @@ export default function PostDetail() {
                     {images.length > 0 ? <ImageSlider images={images} /> : null}
                     {videos.length > 0 ? <VideoSlider videos={videos}/> : null}
             
-                    <LikeField
-                        comment_total={commentsTotal}
-                        givingLikes={givingLikes}
-                        likes_total={likesTotal}
-                        setOpenComments={setOpenComments}
-                        userLiked={userLiked}
-                    />
+                    <div className="flex gap-[1rem]">
+                        <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
+                            <i 
+                                className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${props.userLiked ? 'text-red-500' : ''}`} 
+                                onClick={givingLikes}
+                            ></i>
+                            <span>
+                                {likes_total}
+                            </span>
+                        </div>
+                        <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
+                            <i className="fa-regular fa-comment cursor-pointer" onClick={() => props.setOpenComments(true)}></i>
+                            <span>{props.comment_total}</span>
+                        </div>
+                    </div>
                     <div className="text-gray-200">{selectedPost?.[0]?.description}</div>
                 </div>
-
-                {openComments ? 
-                    <CommentField 
-                        onClose={setOpenComments} 
-                        comments_data={paginatedComment[0].comments}
-                        comment={comment}
-                        isReachedEnd={commentsReachedEnd}
-                        loadMore={loadMoreComments || false}
-                        setComment={setComment}
-                        sendComment={sendComment}
-                        setSize={fetchMoreComments}
-                        isSendComment={isSendComment}
-                    /> 
-                : null}
             </div>
         </section>
     );

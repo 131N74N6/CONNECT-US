@@ -11,6 +11,8 @@ import Setting from "./pages/Setting";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LikeList from "./pages/LikeList";
 import Followers from "./pages/Followers";
+import Followed from "./pages/Followed";
+import Comments from "./pages/Comments";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +30,9 @@ export default function App() {
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
                     <Route path="/post/:_id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
                     <Route path="/like-post/:_id" element={<ProtectedRoute><LikeList/></ProtectedRoute>}/>
+                    <Route path="/comments-post/:_id" element={<ProtectedRoute><Comments/></ProtectedRoute>}/>
                     <Route path="/followers/:user_id" element={<ProtectedRoute><Followers/></ProtectedRoute>}/>
+                    <Route path="/followed/:user_id" element={<ProtectedRoute><Followed/></ProtectedRoute>}/>
                     <Route path="/" element={<Navigate to="/home" replace/>}/>
                     <Route path="*" element={<Navigate to="/signin" replace/>}/>
                 </Routes>
