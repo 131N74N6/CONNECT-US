@@ -164,7 +164,7 @@ export default function PostDetail() {
     const videos = getSelectedMediaFiles ? getSelectedMediaFiles.filter(url => url.file_url.match(/\.(mp4|mov|avi|wmv|flv|webm)$/) !== null) : [];
 
     return (
-        <div className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
+        <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
             <Navbar1 />
             <Navbar2 />
             {error.isError ? <Notification class_name="" message={error.message}/> : null}
@@ -224,6 +224,6 @@ export default function PostDetail() {
                     /> 
                 : null}
             </div>
-        </div>
+        </section>
     );
 }
