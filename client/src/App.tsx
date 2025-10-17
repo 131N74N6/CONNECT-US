@@ -10,6 +10,7 @@ import About from "./pages/About";
 import Setting from "./pages/Setting";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LikeList from "./pages/LikeList";
+import Followers from "./pages/Followers";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,7 @@ export default function App() {
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
                     <Route path="/post/:_id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
                     <Route path="/like-post/:_id" element={<ProtectedRoute><LikeList/></ProtectedRoute>}/>
-                    <Route path="/connection/:user_id" element={<ProtectedRoute><LikeList/></ProtectedRoute>}/>
+                    <Route path="/followers/:user_id" element={<ProtectedRoute><Followers/></ProtectedRoute>}/>
                     <Route path="/" element={<Navigate to="/home" replace/>}/>
                     <Route path="*" element={<Navigate to="/signin" replace/>}/>
                 </Routes>

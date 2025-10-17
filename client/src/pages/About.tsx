@@ -7,7 +7,6 @@ import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
 import { useEffect, useMemo, useState } from "react";
 import Notification from "../components/Notification";
-import { FollowerList, FollowingList } from "../components/FollowList";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function About() {
@@ -16,8 +15,6 @@ export default function About() {
     const { user_id } = useParams();
     const { infiniteScroll, insertData, deleteData } = DataModifier();
     const [error, setError] = useState({ isError: false, message: '' });
-    const [showFollowers, setShowFollowers] = useState<boolean>(false);
-    const [showFollowing, setShowFollowing] = useState<boolean>(false);
     const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
     
     useEffect(() => {
@@ -41,24 +38,14 @@ export default function About() {
         stale_time: 1000
     });
 
-    const { 
-        data: currentUserFollowers,
-        isReachedEnd: currentUserFollowerReachEnd, 
-        isLoadingMore: loadCurrentUserFollower, 
-        fetchNextPage: setCurrentUserFollower, 
-    } = infiniteScroll<FollowersResponseProps>({
+    const { data: currentUserFollowers } = infiniteScroll<FollowersResponseProps>({
         api_url: `http://localhost:1234/followers/get-all/${user_id}`, 
         limit: 12,
         query_key: `followers-${user_id}`,
         stale_time: 1000,
     });
 
-    const { 
-        data: currentUserFollowed,
-        isReachedEnd: currentUserFollowingReachEnd, 
-        isLoadingMore: loadCurrentUserFollowing, 
-        fetchNextPage: setCurrentUserFollowing, 
-    } = infiniteScroll<FollowedResponseProps>({
+    const { data: currentUserFollowed } = infiniteScroll<FollowedResponseProps>({
         api_url: `http://localhost:1234/followers/who-followed/${user_id}`, 
         limit: 12,
         query_key: `who-followed/${user_id}`,
@@ -140,24 +127,6 @@ export default function About() {
                     message={error.message}
                 /> 
             : null}
-            {showFollowers ? 
-                <FollowerList
-                    followers={currentUserFollowers[0].followers}
-                    isReachedEnd={currentUserFollowerReachEnd}
-                    loadMore={loadCurrentUserFollower || false}
-                    onClose={setShowFollowers}
-                    setSize={setCurrentUserFollower}
-                /> 
-            : null}
-            {showFollowing ? 
-                <FollowingList
-                    followed={currentUserFollowed[0].followed}
-                    isReachedEnd={currentUserFollowingReachEnd}
-                    loadMore={loadCurrentUserFollowing || false}
-                    onClose={setShowFollowing}
-                    setSize={setCurrentUserFollowing}
-                /> 
-            : null}
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
                 <div>
                     {notOwner ? (
@@ -182,13 +151,13 @@ export default function About() {
                 </div>
                 <ul className="flex justify-evenly border-b border-purple-400 pb-[0.45rem]">
                     <li className="flex flex-col gap-[0.2rem] text-center">
-                        <span className="text-purple-400 font-[500] text-[1rem] cursor-pointer" onClick={() => setShowFollowers(true)}>Followers</span>
+                        <Link to={`/followers/${user_id}`} className="text-purple-400 font-[500] text-[1rem] cursor-pointer">Followers</Link>
                         <span className="text-purple-400 font-[500] text-[1rem]">
                             {followersTotal}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
-                        <span className="text-purple-400 font-[500] text-[1rem] cursor-pointer" onClick={() => setShowFollowing(true)}>Following</span>
+                        <Link to={`/followed/${user_id}`} className="text-purple-400 font-[500] text-[1rem] cursor-pointer">Following</Link>
                         <span className="text-purple-400 font-[500] text-[1rem]">
                             {followedTotal}
                         </span>
