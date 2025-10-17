@@ -27,6 +27,7 @@ export default function App() {
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
                     <Route path="/post/:_id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
                     <Route path="/like-post/:_id" element={<ProtectedRoute><LikeList/></ProtectedRoute>}/>
+                    <Route path="/connection/:user_id" element={<ProtectedRoute><LikeList/></ProtectedRoute>}/>
                     <Route path="/" element={<Navigate to="/home" replace/>}/>
                     <Route path="*" element={<Navigate to="/signin" replace/>}/>
                 </Routes>
