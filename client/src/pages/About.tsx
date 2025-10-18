@@ -30,7 +30,7 @@ export default function About() {
     );
 
     const { data: userConnectionStats } = getData<UserConnectionStatsProps>(
-        `http://localhost:1234/user-connection-stats/get-all/${user_id}`, 
+        `http://localhost:1234/followers/user-connection-stats/${user_id}`, 
         [`user-connection-stats-${user_id}`]
     );
 
@@ -70,6 +70,7 @@ export default function About() {
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = hasFollowed;
+    console.log(currentUserPosts);
 
     const startFollowMutation = useMutation({
         onMutate: () => setIsFollowLoading(true),
