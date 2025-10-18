@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
-import type { CommentResponseProps, ILikes, LikeResponseProps, PostDetail } from "../services/custom-types";
+import type { ILikes, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import ImageSlider from "../components/ImageSlider";
 import { useEffect, useMemo, useState } from "react";
@@ -31,30 +31,32 @@ export default function PostDetail() {
         `http://localhost:1234/posts/selected/${_id}`, [`selected-post-${_id}`]
     );
 
-    const { data: commentsData } =  getData<CommentResponseProps[]>(
-        `http://localhost:1234/comments/get-all/${_id}`, 
+    const { data: commentsTotal } = getData<number>(
+        `http://localhost:1234/comments/comment-total/${_id}`, 
         [`comments-total-${_id}`]
     );
 
-    const { data: likesData, isLoading: postLoad } = getData<LikeResponseProps[]>(
-        `http://localhost:1234/likes/get-all/${_id}`,
+    const { data: likesTotal } = getData<number>(
+        `http://localhost:1234/likes/likes-total/${_id}`,
         [`likes-total-${_id}`],
     );
 
-    const userLiked = useMemo(() => {
-        if (!_id || !likesData || !user || likesData.length === 0) return false;
-        return likesData[0].likes.some(like => like.user_id === user.info.id && like.post_id === _id);
-    }, [_id, likesData, user]);
+    const { data: hasUserLiked } = getData<boolean>(
+        `http://localhost:1234/likes/has-liked/${user?.info.id}`,
+        [`has-liked-${user?.info.id}`],
+    );
 
-    const commentsTotal = useMemo(() => {
-        if (!commentsData) return 0;
-        return commentsData[0].comment_total;
-    }, [_id, commentsData]);
+    const userLiked = hasUserLiked;
 
-    const likesTotal = useMemo(() => {
-        if (!likesData) return 0;
-        return likesData[0].likes_total;
-    }, [_id, likesData]);
+    const countCommentTotal = useMemo(() => {
+        if (!commentsTotal) return 0;
+        return commentsTotal;
+    }, [_id, commentsTotal]);
+
+    const countLikesTotal = useMemo(() => {
+        if (!likesTotal) return 0;
+        return likesTotal;
+    }, [_id, likesTotal]);
 
     const likeMutation = useMutation({
         onMutate: () => {
@@ -120,7 +122,7 @@ export default function PostDetail() {
             {error.isError ? <Notification class_name="" message={error.message}/> : null}
             <div className="md:w-3/4 w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
                 {errorPost ? <span>{errorPost.message}</span> : null}
-                {postLoad ? <div className="flex justify-center items-center h-full"><Loading/></div> : null}
+                {postLoading ? <div className="flex justify-center items-center h-full"><Loading/></div> : null}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
@@ -157,14 +159,14 @@ export default function PostDetail() {
                                 onClick={givingLikes}
                             ></i>
                             <span>
-                                {likesTotal}
+                                {countLikesTotal}
                             </span>
                         </div>
                         <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                             <Link to={`/comments-post/${_id}`}>
                                 <i className="fa-regular fa-comment cursor-pointer"></i>
                             </Link>
-                            <span>{commentsTotal}</span>
+                            <span>{countCommentTotal}</span>
                         </div>
                     </div>
                     <div className="text-gray-200">{selectedPost?.[0]?.description}</div>
