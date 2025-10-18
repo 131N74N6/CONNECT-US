@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Follower } from '../models/follower.model';
+import { User } from '../models/user.model';
 
 async function getCurrentUserFollowers(req: Request, res: Response): Promise<void> {
     try {
@@ -13,12 +14,7 @@ async function getCurrentUserFollowers(req: Request, res: Response): Promise<voi
             { user_id: 1, username: 1, created_at: 1 }
         ).limit(limit).skip(skip);
 
-        const followerTotal = await Follower.find({ followed_user_id: currentUserId }).countDocuments();
-
-        res.json({
-            follower_total: followerTotal,
-            followers: showFollowers
-        });
+        res.json(showFollowers);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -36,11 +32,32 @@ async function getCurrentUserFollowing(req: Request, res: Response): Promise<voi
             { followed_user_id: 1, followed_username: 1, created_at: 1 }
         ).limit(limit).skip(skip);
 
-        const followedTotal = await Follower.find({ user_id: currentUserId }).countDocuments();
+        res.json(showFollowed);
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
 
+async function hasUserFollowed(req: Request, res: Response): Promise<void> {
+    try {
+        const currentUserId = req.params.id;
+        const getCurrentUserId = await User.find({ _id: currentUserId });
+        const getFollowersData = await Follower.find({});
+        const isFollowed = getFollowersData.some(follower => follower.user_id === getCurrentUserId[0]._id);
+        res.json(isFollowed);
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
+async function userConnectionStats(req: Request, res: Response): Promise<void> {
+    try {
+        const currentUserId = req.params.id;
+        const followerTotal = await Follower.find({ followed_user_id: currentUserId }).countDocuments();
+        const followedTotal = await Follower.find({ user_id: currentUserId }).countDocuments();
         res.json({
             followed_total: followedTotal,
-            followed: showFollowed
+            follower_total: followerTotal,
         });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -68,8 +85,10 @@ async function unfollowOtherUser(req: Request, res: Response): Promise<void> {
 }
 
 export { 
+    followOtherUser, 
     getCurrentUserFollowers, 
     getCurrentUserFollowing, 
-    followOtherUser, 
-    unfollowOtherUser 
+    hasUserFollowed,
+    unfollowOtherUser, 
+    userConnectionStats
 }
