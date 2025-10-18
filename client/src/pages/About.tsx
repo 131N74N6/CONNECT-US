@@ -1,4 +1,4 @@
-import type { AddFollowerProps, UserConnectionStatsProps, PostResponseProps } from "../services/custom-types";
+import type { AddFollowerProps, UserConnectionStatsProps, PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -24,19 +24,10 @@ export default function About() {
         }
     }, [error.isError]);
 
-    const { 
-        error: currentUserPostsError,
-        data: currentUserPosts, 
-        isLoading: loadPosts, 
-        isReachedEnd: postReachEnd, 
-        isLoadingMore: loadPostOwner, 
-        fetchNextPage: setCurrentUserPosts, 
-    } = infiniteScroll<PostResponseProps>({
-        api_url: `http://localhost:1234/posts/signed-user/${user_id}`, 
-        limit: 12,
-        query_key: `signed-user-posts_${user_id}`,
-        stale_time: 1000
-    });
+    const { data: userPostTotal } = getData<number>(
+        `http://localhost:1234/posts/post-total/${user_id}`, 
+        [`user-post-total-${user_id}`],
+    );
 
     const { data: userConnectionStats } = getData<UserConnectionStatsProps>(
         `http://localhost:1234/user-connection-stats/get-all/${user_id}`, 
@@ -48,61 +39,84 @@ export default function About() {
         [`has-followed`]
     );
 
+    const { 
+        error: currentUserPostsError,
+        data: currentUserPosts, 
+        isLoading: loadPosts, 
+        isReachedEnd: postReachEnd, 
+        isLoadingMore: loadPostOwner, 
+        fetchNextPage: setCurrentUserPosts, 
+    } = infiniteScroll<PostItemProps>({
+        api_url: `http://localhost:1234/posts/signed-user/${user_id}`, 
+        limit: 12,
+        query_key: `signed-user-posts-${user_id}`,
+        stale_time: 1000
+    });
+
     const currentUserPostTotal = useMemo(() => {
-        if (currentUserPosts.length === 0) return 0;
-        return currentUserPosts[0].total_post;
-    }, [currentUserPosts]);
+        if (!userPostTotal) return 0;
+        return userPostTotal;
+    }, [userPostTotal, user_id]);
 
     const followedTotal = useMemo(() => {
         if (!userConnectionStats) return 0;
         return userConnectionStats.followed_total;
-    }, [userConnectionStats?.followed_total]);
+    }, [userConnectionStats?.followed_total, user_id]);
 
     const followersTotal = useMemo(() => {
         if (!userConnectionStats) return 0;
         return userConnectionStats.follower_total;
-    }, [userConnectionStats?.follower_total]);
+    }, [userConnectionStats?.follower_total, user_id]);
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = hasFollowed;
 
-    const insertMutation = useMutation({
-        onMutate: () => {
-            if (isFollowLoading) return;
-            setIsFollowLoading(true);
-        },
+    const startFollowMutation = useMutation({
+        onMutate: () => setIsFollowLoading(true),
         mutationFn: async () => {
             if (!user_id || !user) return;
-            
-            const getCurrentDate = new Date();
 
-            if (!isFollowed) {
-                await insertData<AddFollowerProps>({
-                    api_url: `http://localhost:1234/followers/add`,
-                    data: {
-                        created_at: getCurrentDate.toISOString(),
-                        followed_user_id: user_id,
-                        followed_username: getFollowers[0].username,
-                        user_id: user.info.id,
-                        username: user.info.username
-                    }
-                });
-            } else {
-                await deleteData(`http://localhost:1234/followers/erase/${user.info.id}`);
-            }
+            const getCurrentDate = new Date();
+            
+            await insertData<AddFollowerProps>({
+                api_url: `http://localhost:1234/followers/add`,
+                data: {
+                    created_at: getCurrentDate.toISOString(),
+                    followed_user_id: user_id,
+                    followed_username: currentUserPosts[0].uploader_name,
+                    user_id: user.info.id,
+                    username: user.info.username
+                }
+            });
         },
         onSuccess: () => {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`who-followed-total-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user?.info.id}`] });
         },
         onError: () => setError({ isError: true, message: 'Failed to follow' }),
         onSettled: () => setIsFollowLoading(false)
     });
 
-    const handleFollowBtn = async (): Promise<void> => {
-        insertMutation.mutate();
+    const stopFollowMutation = useMutation({
+        onMutate: () => setIsFollowLoading(true),
+        mutationFn: async () => {
+            if (!user) return;
+            await deleteData(`http://localhost:1234/followers/erase/${user.info.id}`);
+        },
+        onError: () => setError({ isError: true, message: 'Failed to unfollow' }),
+        onSuccess: () => {
+            queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user?.info.id}`] });
+        },
+        onSettled: () => setIsFollowLoading(false)
+    });
+
+    const handleFollowBtn = (): void => {
+        if (isFollowLoading) return;
+        if (!isFollowed) startFollowMutation.mutate();
+        else stopFollowMutation.mutate();
     }
 
     return (
@@ -161,7 +175,7 @@ export default function About() {
                     : loadPosts ? <Loading/> 
                     : currentUserPosts ?
                         <PostList 
-                            data={currentUserPosts[0].posts}
+                            data={currentUserPosts}
                             loadMore={loadPostOwner}
                             isReachedEnd={postReachEnd}
                             setSize={setCurrentUserPosts}
