@@ -36,7 +36,7 @@ export default function About() {
 
     const { data: hasFollowed } = getData<boolean>(
         `http://localhost:1234/followers/has-followed/${user_id}`, 
-        [`has-followed`]
+        [`has-followed-`]
     );
 
     const { 

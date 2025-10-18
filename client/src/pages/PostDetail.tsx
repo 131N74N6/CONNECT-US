@@ -32,18 +32,15 @@ export default function PostDetail() {
     );
 
     const { data: commentsTotal } = getData<number>(
-        `http://localhost:1234/comments/comment-total/${_id}`, 
-        [`comments-total-${_id}`]
+        `http://localhost:1234/comments/comment-total/${_id}`, [`comments-total-${_id}`]
     );
 
     const { data: likesTotal } = getData<number>(
-        `http://localhost:1234/likes/likes-total/${_id}`,
-        [`likes-total-${_id}`],
+        `http://localhost:1234/likes/likes-total/${_id}`, [`likes-total-${_id}`],
     );
 
     const { data: hasUserLiked } = getData<boolean>(
-        `http://localhost:1234/likes/has-liked/${user?.info.id}`,
-        [`has-liked-${user?.info.id}`],
+        `http://localhost:1234/likes/has-liked/${user?.info.id}`, [`has-liked-${user?.info.id}`],
     );
 
     const userLiked = hasUserLiked;
@@ -58,46 +55,62 @@ export default function PostDetail() {
         return likesTotal;
     }, [_id, likesTotal]);
 
-    const likeMutation = useMutation({
-        onMutate: () => {
-            setIsLiking(true);
-        },
+    const giveLikeMutation = useMutation({
+        onMutate: () => setIsLiking(true),
         mutationFn: async () => {
             const getCurrentDate = new Date();
             if (!user || !_id || !selectedPost) return;
 
-            if (!userLiked) {
-                await insertData<ILikes>({
-                    api_url: `http://localhost:1234/likes/add`,
-                    data: {
-                        created_at: getCurrentDate.toISOString(),
-                        post_id: _id,
-                        user_id: user.info.id,
-                        username: user.info.username,
-                        post_owner_id: selectedPost[0]?.user_id
-                    }
-                });
-            } else {
-                await deleteData(`http://localhost:1234/likes/erase/${user.info.id}`);
-            } 
+            await insertData<ILikes>({
+                api_url: `http://localhost:1234/likes/add`,
+                data: {
+                    created_at: getCurrentDate.toISOString(),
+                    post_id: _id,
+                    user_id: user.info.id,
+                    username: user.info.username,
+                    post_owner_id: selectedPost[0].user_id
+                }
+            });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`has-liked-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`likes-total-${_id}`] });
+        },
         onSettled: () => setIsLiking(false),
         onError: () => setError({ isError: true, message: 'Failed to give like' })
     });
 
+    const startDislikeMutation = useMutation({
+        onMutate: () => setIsLiking(true),
+        mutationFn: async () => {
+            if (!user) return;
+            await deleteData(`http://localhost:1234/likes/erase/${user.info.id}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`has-liked-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`likes-total-${_id}`] });
+        },
+        onSettled: () => setIsLiking(false),
+        onError: () => setError({ isError: true, message: 'Failed to dislike' })
+    });
+
     const deletePostMutation = useMutation({
+        onMutate: () => setIsLiking(true),
         mutationFn: async () => await deleteData(`http://localhost:1234/posts/erase/${_id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`selected-post-${_id}`] });
             navigate('/home');
         },
+        onSettled: () => setIsLiking(false),
         onError: () => setError({ isError: true, message: 'Failed to delete post.' })
     });
     
     function givingLikes(): void {
         if (isLiking) return;
-        likeMutation.mutate();
+        if (!userLiked) giveLikeMutation.mutate();
+        else startDislikeMutation.mutate();
     }
 
     function handleDeletePost(): void {

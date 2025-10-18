@@ -1,7 +1,7 @@
 import DataModifier from "../services/data-modifier";
 import Loading from "../components/Loading";
 import { Link, useParams } from "react-router-dom";
-import type { FollowersResponseProps } from "../services/custom-types";
+import type { AddFollowerProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 
 export default function Followers() {
@@ -13,7 +13,7 @@ export default function Followers() {
         isReachedEnd: currentUserFollowerReachEnd, 
         isLoadingMore: loadCurrentUserFollower, 
         fetchNextPage: getMoreCurrentUserFollower, 
-    } = infiniteScroll<FollowersResponseProps>({
+    } = infiniteScroll<Pick<AddFollowerProps, 'created_at' | 'user_id' | 'username'>>({
         api_url: `http://localhost:1234/followers/get-all/${user_id}`, 
         limit: 12,
         query_key: `followers-${user_id}`,
@@ -26,7 +26,7 @@ export default function Followers() {
             <Navbar2/>
             <div className="flex flex-col gap-[1rem] min-h-[450px] border-b border-purple-400 h-[100%] overflow-y-auto">
                 {currentUserFollowers.length > 0 ? (
-                    currentUserFollowers[0].followers.map(follower => (
+                    currentUserFollowers.map(follower => (
                         <div key={`fld_${follower.user_id}`} className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">
                             <div className="text-white text-[1.1rem]">
                                 <i className="fa-regular fa-user"></i>
