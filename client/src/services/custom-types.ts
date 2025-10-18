@@ -144,6 +144,11 @@ export type FollowedDataProps = {
     onClose: (value: React.SetStateAction<boolean>) => void;
 }
 
+export type UserConnectionStatsProps = {
+    followed_total: number;
+    follower_total: number;
+}
+
 export type FollowersResponseProps = {
     followers: AddFollowerProps[];
     follower_total: number; 

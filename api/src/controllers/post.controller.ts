@@ -79,6 +79,16 @@ async function getSelectedPost(req: Request, res: Response): Promise<void> {
     }
 }
 
+async function getUserTotalPost(req: Request, res: Response): Promise<void> {
+    try {
+        const getUserId = req.params.id;
+        const totalPost = await Post.find({ user_id: getUserId }).countDocuments();
+        res.json(totalPost);
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
 async function insertNewPost(req: Request, res: Response): Promise<void> {
     try {
         const newPost = new Post(req.body);
@@ -155,5 +165,6 @@ export {
     getSearchedPost, 
     getSelectedPost, 
     getSignedUserPosts, 
+    getUserTotalPost,
     insertNewPost 
 }

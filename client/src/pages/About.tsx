@@ -1,4 +1,4 @@
-import type { AddFollowerProps, FollowedResponseProps, FollowersResponseProps, PostResponseProps } from "../services/custom-types";
+import type { AddFollowerProps, UserConnectionStatsProps, PostResponseProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -38,20 +38,15 @@ export default function About() {
         stale_time: 1000
     });
 
-    const { data: currentUserFollowers } = getData<FollowersResponseProps[]>(
-        `http://localhost:1234/followers/get-all/${user_id}`, 
-        [`followers-total-${user_id}`]
+    const { data: userConnectionStats } = getData<UserConnectionStatsProps>(
+        `http://localhost:1234/user-connection-stats/get-all/${user_id}`, 
+        [`user-connection-stats-${user_id}`]
     );
 
-    const { data: currentUserFollowed } = getData<FollowedResponseProps[]>(
-        `http://localhost:1234/followers/who-followed/${user_id}`, 
-        [`who-followed-total-${user_id}`]
+    const { data: hasFollowed } = getData<boolean>(
+        `http://localhost:1234/followers/has-followed/${user_id}`, 
+        [`has-followed`]
     );
-
-    const getFollowers = useMemo(() => {
-        if (!currentUserFollowers) return [];
-        return currentUserFollowers.flatMap(page => page.followers);
-    }, [currentUserFollowers]);
 
     const currentUserPostTotal = useMemo(() => {
         if (currentUserPosts.length === 0) return 0;
@@ -59,17 +54,17 @@ export default function About() {
     }, [currentUserPosts]);
 
     const followedTotal = useMemo(() => {
-        if (!currentUserFollowed) return 0;
-        return currentUserFollowed[0].followed_total;
-    }, [currentUserFollowed]);
+        if (!userConnectionStats) return 0;
+        return userConnectionStats.followed_total;
+    }, [userConnectionStats?.followed_total]);
 
     const followersTotal = useMemo(() => {
-        if (!currentUserFollowers) return 0;
-        return currentUserFollowers[0].follower_total;
-    }, [currentUserFollowers]);
+        if (!userConnectionStats) return 0;
+        return userConnectionStats.follower_total;
+    }, [userConnectionStats?.follower_total]);
 
     const notOwner = user_id && user && user.info.id !== user_id;
-    const isFollowed = getFollowers && user ? getFollowers.some(follow => user.info.id === follow.user_id) : false;
+    const isFollowed = hasFollowed;
 
     const insertMutation = useMutation({
         onMutate: () => {
@@ -97,7 +92,7 @@ export default function About() {
             }
         },
         onSuccess: () => {
-            queryQlient.invalidateQueries({ queryKey: [`followers-total-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-total-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
