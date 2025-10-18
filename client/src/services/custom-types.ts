@@ -109,11 +109,6 @@ export type CommentProps = {
     isSendComment: boolean;
 }
 
-export type CommentResponseProps = {
-    comment_total: number;
-    comments: Pick<IComments, 'created_at' | 'username' | 'opinions'>[];
-}
-
 export type AddFollowerProps = {
     _id: string;
     created_at: string;
@@ -142,14 +137,4 @@ export type FollowedDataProps = {
 export type UserConnectionStatsProps = {
     followed_total: number;
     follower_total: number;
-}
-
-export type FollowersResponseProps = {
-    followers: AddFollowerProps[];
-    follower_total: number; 
-}
-
-export type FollowedResponseProps = {
-    followed: AddFollowerProps[];
-    followed_total: number; 
 }

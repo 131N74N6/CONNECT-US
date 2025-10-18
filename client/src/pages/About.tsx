@@ -93,7 +93,7 @@ export default function About() {
         onSuccess: () => {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user?.info.id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
         },
         onError: () => setError({ isError: true, message: 'Failed to follow' }),
         onSettled: () => setIsFollowLoading(false)
@@ -109,7 +109,7 @@ export default function About() {
         onSuccess: () => {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user?.info.id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
         },
         onSettled: () => setIsFollowLoading(false)
     });

@@ -1,9 +1,9 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/useAuth";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import DataModifier from "../services/data-modifier";
-import type { CommentResponseProps, IComments, PostDetail } from "../services/custom-types";
+import type { IComments, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 
@@ -26,7 +26,7 @@ export default function Comments() {
         isReachedEnd: commentsReachedEnd,
         isLoadingMore: loadMoreComments,
         fetchNextPage: fetchMoreComments,
-    } =  infiniteScroll<CommentResponseProps>({
+    } =  infiniteScroll<Pick<IComments, 'created_at' | 'username' | 'opinions'>>({
         api_url: _id ? `http://localhost:1234/comments/get-all/${_id}` : ``, 
         limit: 12,
         stale_time: 1000,
@@ -34,9 +34,7 @@ export default function Comments() {
     });
 
     const commentMutation = useMutation({
-        onMutate: () => {
-            setIsSendComment(true);
-        },
+        onMutate: () => setIsSendComment(true),
         mutationFn: async () => {
             const getCurrentDate = new Date();
 
@@ -55,7 +53,10 @@ export default function Comments() {
                 }
             });
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: [`comments-${_id}`] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`comments-${_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`comments-total-${_id}`] });
+        },
         onSettled: () => {
             setComment('');
             setIsSendComment(false);
@@ -76,8 +77,8 @@ export default function Comments() {
             <div className="md:w-3/4 w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
                 <div className="flex flex-col gap-[1rem] pb-[1rem] border-b border-purple-400 h-[88%] overflow-y-auto">
                     {commentsData.length > 0 ?
-                        commentsData[0].comments.map((comment, index) => (
-                            <div className="bg-black p-[0.6rem] rounded-[0.6rem]" key={`cmt: ${index}`}>
+                        commentsData.map((comment, index) => (
+                            <div className="bg-black flex flex-col gap-[0.6rem] p-[1rem] rounded-[0.6rem]" key={`cmt: ${index}`}>
                                 <div className="flex justify-between">
                                     <p>{comment.username}</p>
                                     <p className="text-[0.9rem]">{new Date(comment.created_at).toLocaleString()}</p>
@@ -124,6 +125,12 @@ export default function Comments() {
                         >
                             <span className="text-[1rem] font-[550] text-black">Send</span>
                         </button>
+                        <Link 
+                            to={`/post/${_id}`}
+                            className="cursor-pointer bg-purple-400 p-[0.45rem] rounded-[0.45rem] text-center"
+                        >
+                            <span className="text-[1rem] font-[550] text-black">Back</span>
+                        </Link>
                     </div>
                 </form>
             </div>
