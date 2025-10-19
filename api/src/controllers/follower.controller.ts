@@ -41,7 +41,7 @@ async function hasUserFollowed(req: Request, res: Response): Promise<void> {
     try {
         const currentUserId = req.params.id;
         const isFollowed = await Follower.findOne({ user_id: currentUserId });
-        res.json(isFollowed);
+        res.json(!!isFollowed);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
