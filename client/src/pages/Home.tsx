@@ -30,7 +30,7 @@ export default function Home() {
                         <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
                     </div>
                 ) : isLoading ? (
-                    <div className="flex justify-center items-center h-full">
+                    <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
                         <Loading/>
                     </div> 
                 ) : data ? (
