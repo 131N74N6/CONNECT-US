@@ -39,8 +39,8 @@ async function getCurrentUserFollowing(req: Request, res: Response): Promise<voi
 
 async function hasUserFollowed(req: Request, res: Response): Promise<void> {
     try {
-        const currentUserId = req.params.id;
-        const isFollowed = await Follower.findOne({ user_id: currentUserId });
+        const { user_id, followed_user_id } = req.query;
+        const isFollowed = await Follower.findOne({ user_id, followed_user_id });
         res.json(!!isFollowed);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

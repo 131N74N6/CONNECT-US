@@ -11,7 +11,7 @@ followerRoutes.delete('/erase/:id', unfollowOtherUser);
 
 followerRoutes.get('/get-all/:id', getCurrentUserFollowers);
 
-followerRoutes.get('/has-followed/:id', hasUserFollowed);
+followerRoutes.get('/has-followed', hasUserFollowed);
 
 followerRoutes.get('/user-connection-stats/:id', userConnectionStats);
 

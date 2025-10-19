@@ -24,7 +24,7 @@ export default function Followed() {
         <section className="flex md:flex-row flex-col h-screen gap-[1rem] p-[1rem] bg-black text-white relative z-10">
             <Navbar1/>
             <Navbar2/>
-            <div className="flex flex-col gap-[1rem] min-h-[450px] border-b border-purple-400 h-[100%] overflow-y-auto">
+            <div className="flex flex-col gap-[1rem] p-[1rem] min-h-[450px] bg-[#1a1a1a] md:w-3/4 w-full h-[100%] overflow-y-auto">
                 {currentUserFollowed.length > 0 ? (
                     currentUserFollowed.map(followed => (
                         <div key={`fld_${followed.followed_user_id}`} className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">

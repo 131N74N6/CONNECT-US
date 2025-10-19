@@ -35,7 +35,7 @@ export default function About() {
     );
 
     const { data: hasFollowed } = getData<boolean>(
-        `http://localhost:1234/followers/has-followed/${user?.info.id}`, 
+        `http://localhost:1234/followers/has-followed/?user_id=${user?.info.id}&followed_user_id=${user_id}`, 
         [`has-followed-${user?.info.id}`]
     );
 
@@ -175,7 +175,7 @@ export default function About() {
                     </li>
                 </ul>
                 {currentUserPostsError ? <span className="text-[2rem] font-[600] text-purple-700">{currentUserPostsError.message}</span>
-                    : loadPosts ? <Loading/> 
+                    : loadPosts ? <div className="flex justify-center items-center h-full"><Loading/></div> 
                     : currentUserPosts ?
                         <PostList 
                             data={currentUserPosts}
