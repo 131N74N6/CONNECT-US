@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { Follower } from '../models/follower.model';
-import { User } from '../models/user.model';
 
 async function getCurrentUserFollowers(req: Request, res: Response): Promise<void> {
     try {
@@ -41,9 +40,7 @@ async function getCurrentUserFollowing(req: Request, res: Response): Promise<voi
 async function hasUserFollowed(req: Request, res: Response): Promise<void> {
     try {
         const currentUserId = req.params.id;
-        const getCurrentUserId = await User.find({ _id: currentUserId });
-        const getFollowersData = await Follower.find({});
-        const isFollowed = getFollowersData.some(follower => follower.user_id === getCurrentUserId[0]._id);
+        const isFollowed = await Follower.findOne({ user_id: currentUserId });
         res.json(isFollowed);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });

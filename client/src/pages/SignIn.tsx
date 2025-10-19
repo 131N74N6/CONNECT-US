@@ -79,11 +79,11 @@ export default function SignIn() {
                     <span className="text-white">Don't have an account?</span> <Link className="text-blue-700 hover:underline" to={'/signup'}>Sign Up</Link>
                 </div>
                 
-                {showMessage && (
+                {showMessage ? (
                     <div className="text-amber-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
                         {message}
                     </div>
-                )}
+                ) : null}
                 
                 <button 
                     type="submit" 

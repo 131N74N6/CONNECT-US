@@ -13,9 +13,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 export default function PostDetail() {
     const { _id } = useParams();
     const { user } = useAuth();
+    const { deleteData, getData, insertData } = DataModifier();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const { deleteData, getData, insertData } = DataModifier();
 
     const [isLiking, setIsLiking] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
@@ -40,7 +40,8 @@ export default function PostDetail() {
     );
 
     const { data: hasUserLiked } = getData<boolean>(
-        `http://localhost:1234/likes/has-liked/${user?.info.id}`, [`has-liked-${user?.info.id}`],
+        `http://localhost:1234/likes/has-liked?post_id=${_id}&user_id=${user?.info.id}`, 
+        [`has-liked-${user?.info.id}`],
     );
 
     const userLiked = hasUserLiked;

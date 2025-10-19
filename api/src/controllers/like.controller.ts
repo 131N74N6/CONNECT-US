@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { Like } from "../models/like.model";
-import { User } from "../models/user.model";
 
 async function dislikeByUser(req: Request, res:Response) {
     try {
@@ -52,11 +51,9 @@ async function giveLike(req: Request, res: Response): Promise<void> {
 
 async function hasUserLiked(req: Request, res: Response): Promise<void> {
     try {
-        const getUserId = req.params.id;
-        const getCurrentUserId = await User.find({ _id: getUserId });
-        const getLikesData = await Like.find({});
-        const hasLiked = getLikesData.some(like => like.user_id === getCurrentUserId[0]._id);
-        res.json(hasLiked);
+        const { post_id, user_id } = req.query;
+        const hasLiked = await Like.findOne({ post_id, user_id });
+        res.json(!!hasLiked);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
