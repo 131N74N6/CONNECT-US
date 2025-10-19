@@ -3,7 +3,7 @@ import { dislikeByUser, getAllLikes, getTotalLikes, giveLike, hasUserLiked } fro
 
 const likeRoutes = Router();
 
-likeRoutes.get('/has-liked/:id', hasUserLiked);
+likeRoutes.get('/has-liked', hasUserLiked);
 
 likeRoutes.get('/likes-total/:id', getTotalLikes);
 
