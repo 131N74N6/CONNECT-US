@@ -25,17 +25,26 @@ export default function Home() {
             <Navbar1/>
             <Navbar2/>
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[200px] w-full bg-[#1a1a1a]">
-                {error ? <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
-                    : isLoading ? <div className="flex justify-center items-center h-full"><Loading/></div>
-                    : data ?
-                        <PostList 
-                            data={data}
-                            isReachedEnd={isReachedEnd}
-                            loadMore={isLoadingMore}
-                            setSize={fetchNextPage}
-                        />
-                    : <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>
-                }
+                {error ? (
+                    <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+                        <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
+                    </div>
+                ) : isLoading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading/>
+                    </div> 
+                ) : data ? (
+                    <PostList 
+                        data={data}
+                        isReachedEnd={isReachedEnd}
+                        loadMore={isLoadingMore}
+                        setSize={fetchNextPage}
+                    />
+                ) : (
+                    <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+                        <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>
+                    </div>
+                )}
             </div>
         </section>
     );

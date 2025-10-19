@@ -24,17 +24,25 @@ export default function SearchPost() {
             <Navbar1/>
             <Navbar2/>
             <div className="bg-black flex flex-col gap-[1rem] md:w-3/4 w-full">
-                <form onSubmit={searchPosts} className="bg-[#1a1a1a] p-[1rem]">
+                <form className="bg-[#1a1a1a] p-[1rem]">
                     <input 
                         ref={searchRef}
                         placeholder="search here..."
+                        onChange={searchPosts}
                         type="text" 
                         className="p-[0.45rem] font-[550] text-purple-400 outline-0 border w-full border-purple-400"
                     />
-                    <button>Search</button>
                 </form>
-                <div className="bg-[#1a1a1a] text-purple-400 p-[1rem] h-screen overflow-y-auto">
-                    
+                <div className="bg-[#1a1a1a] text-purple-400 p-[1rem] h-full overflow-y-auto">
+                    {searchedPost.length === 0 ? (                        
+                        <div className="h-full flex justify-center items-center">
+                            <span className="text-purple-400 font-[500] text-[1.3rem]">No Post Found</span>
+                        </div>
+                    ) : (                        
+                        <div className="h-full flex justify-center items-center">
+                            <span className="text-purple-400 font-[500] text-[1.3rem]">No Post Found</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

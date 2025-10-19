@@ -44,7 +44,7 @@ export default function Setting() {
                             type="button"
                             disabled={isDeleteing}
                             onClick={deleteAllSignedUserPosts}
-                            className="bg-purple-400 w-[90px] cursor-pointer font-[500] text-gray-800 text-[0.9rem] p-[0.4rem]"
+                            className="bg-purple-400 w-[150px] cursor-pointer font-[500] text-gray-800 text-[0.9rem] p-[0.4rem]"
                         >
                             Delete All Posts
                         </button>

@@ -58,11 +58,6 @@ export type LikesData = {
     onClose: (value: React.SetStateAction<boolean>) => void
 }
 
-export type LikeResponseProps = {
-    likes_total: number;
-    likes: Pick<ILikes, 'created_at' | 'user_id' | 'username' | 'post_id'>[];
-}
-
 export type IComments = {
     _id: string;
     created_at: string;
@@ -97,18 +92,6 @@ export type PostListProps = {
     setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
-export type CommentProps = {
-    comments_data: Pick<IComments, "created_at" | "username" | "opinions">[];
-    comment: string;
-    sendComment: (event: React.FormEvent) => void;
-    setComment: (value: React.SetStateAction<string>) => void
-    onClose: (value: React.SetStateAction<boolean>) => void
-    isReachedEnd: boolean;
-    loadMore: boolean;
-    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
-    isSendComment: boolean;
-}
-
 export type AddFollowerProps = {
     _id: string;
     created_at: string;
@@ -116,22 +99,6 @@ export type AddFollowerProps = {
     followed_username: string;
     user_id: string;
     username: string;
-}
-
-export type FollowersDataProps = {
-    followers: Pick<AddFollowerProps, 'created_at' | 'user_id' | 'username'>[];
-    isReachedEnd: boolean;
-    loadMore: boolean;
-    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
-    onClose: (value: React.SetStateAction<boolean>) => void;
-}
-
-export type FollowedDataProps = {
-    followed: Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>[];
-    isReachedEnd: boolean;
-    loadMore: boolean;
-    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
-    onClose: (value: React.SetStateAction<boolean>) => void;
 }
 
 export type UserConnectionStatsProps = {

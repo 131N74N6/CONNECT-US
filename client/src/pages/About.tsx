@@ -174,20 +174,26 @@ export default function About() {
                         </span>
                     </li>
                 </ul>
-                {currentUserPostsError ? <span className="text-[2rem] font-[600] text-purple-700">{currentUserPostsError.message}</span>
-                    : loadPosts ? <div className="flex justify-center items-center h-full"><Loading/></div> 
-                    : currentUserPosts ?
-                        <PostList 
-                            data={currentUserPosts}
-                            loadMore={loadPostOwner}
-                            isReachedEnd={postReachEnd}
-                            setSize={setCurrentUserPosts}
-                        />
-                    :
+                {currentUserPostsError ? (
+                    <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+                        <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
+                    </div>
+                ) : loadPosts ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading/>
+                    </div> 
+                ) : currentUserPosts ? (
+                    <PostList 
+                        data={currentUserPosts}
+                        loadMore={loadPostOwner}
+                        isReachedEnd={postReachEnd}
+                        setSize={setCurrentUserPosts}
+                    />
+                ) : (
                     <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
                         <span className="text-[2rem] font-[600] text-purple-700">Failed to get posts</span>
                     </div>
-                }
+                )}
             </div>
         </section>
     );
