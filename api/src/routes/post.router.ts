@@ -22,5 +22,4 @@ postRoutes.post('/add', insertNewPost);
 
 postRoutes.post('/searched', getSearchedPost);
 
-
 export default postRoutes;
