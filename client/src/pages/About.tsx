@@ -35,8 +35,8 @@ export default function About() {
     );
 
     const { data: hasFollowed } = getData<boolean>(
-        `http://localhost:1234/followers/has-followed/${user_id}`, 
-        [`has-followed-`]
+        `http://localhost:1234/followers/has-followed/${user?.info.id}`, 
+        [`has-followed-${user?.info.id}`]
     );
 
     const { 
@@ -94,6 +94,7 @@ export default function About() {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user?.info.id}`] });
         },
         onError: () => setError({ isError: true, message: 'Failed to follow' }),
         onSettled: () => setIsFollowLoading(false)
@@ -110,6 +111,7 @@ export default function About() {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user?.info.id}`] });
         },
         onSettled: () => setIsFollowLoading(false)
     });
