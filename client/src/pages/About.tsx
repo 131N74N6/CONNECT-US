@@ -70,7 +70,6 @@ export default function About() {
 
     const notOwner = user_id && user && user.info.id !== user_id;
     const isFollowed = hasFollowed;
-    console.log(currentUserPosts);
 
     const startFollowMutation = useMutation({
         onMutate: () => setIsFollowLoading(true),
