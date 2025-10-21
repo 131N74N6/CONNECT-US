@@ -47,7 +47,7 @@ export default function Followers() {
                     <div className="text-center">
                         <span>No Followers to Load</span>
                     </div>
-                    ) : (
+                ) : (
                     <div className="flex justify-center">
                         <button 
                             type="button"
