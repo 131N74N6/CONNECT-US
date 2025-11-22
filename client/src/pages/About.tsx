@@ -24,20 +24,23 @@ export default function About() {
         }
     }, [error.isError]);
 
-    const { data: userPostTotal } = getData<number>(
-        `http://localhost:1234/posts/post-total/${user_id}`, 
-        [`user-post-total-${user_id}`],
-    );
+    const { data: userPostTotal } = getData<number>({
+        api_url: `http://localhost:1234/posts/post-total/${user_id}`,
+        query_key: [`user-post-total-${user_id}`],
+        stale_time: 600000
+    });
 
-    const { data: userConnectionStats } = getData<UserConnectionStatsProps>(
-        `http://localhost:1234/followers/user-connection-stats/${user_id}`, 
-        [`user-connection-stats-${user_id}`]
-    );
+    const { data: userConnectionStats } = getData<UserConnectionStatsProps>({
+        api_url: `http://localhost:1234/followers/user-connection-stats/${user_id}`, 
+        query_key: [`user-connection-stats-${user_id}`],
+        stale_time: 600000
+    });
 
-    const { data: hasFollowed } = getData<boolean>(
-        `http://localhost:1234/followers/has-followed/?user_id=${user?.info.id}&followed_user_id=${user_id}`, 
-        [`has-followed-${user?.info.id}`]
-    );
+    const { data: hasFollowed } = getData<boolean>({
+        api_url: `http://localhost:1234/followers/has-followed/?user_id=${user?.info.id}&followed_user_id=${user_id}`, 
+        query_key: [`has-followed-${user?.info.id}`],
+        stale_time: 600000
+    });
 
     const { 
         error: currentUserPostsError,
@@ -50,7 +53,7 @@ export default function About() {
         api_url: `http://localhost:1234/posts/signed-user/${user_id}`, 
         limit: 12,
         query_key: `signed-user-posts-${user_id}`,
-        stale_time: 1000
+        stale_time: 600000
     });
 
     const currentUserPostTotal = useMemo(() => {

@@ -17,7 +17,7 @@ export default function Home() {
         api_url: `http://localhost:1234/posts/get-all`, 
         limit: 12,
         query_key: 'all-posts',
-        stale_time: 1000
+        stale_time: 600000
     });
 
     return (

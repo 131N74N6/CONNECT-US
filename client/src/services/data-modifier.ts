@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import type { InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
+import type { IGetData, InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
 import useAuth from "./useAuth";
 
 export default function DataModifier() {
@@ -18,10 +18,10 @@ export default function DataModifier() {
         await request.json();
     }
 
-    const getData = <TSX>(api_url: string, key: string[]) => {
+    const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
             queryFn: async () => {
-                const request = await fetch(api_url, {
+                const request = await fetch(props.api_url, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -32,12 +32,12 @@ export default function DataModifier() {
                 const response = await request.json();
                 return response;
             },
-            queryKey: key,
+            queryKey: props.query_key,
             refetchOnMount: true,
             refetchOnReconnect: true,
             refetchOnWindowFocus: false,
             gcTime: 240000,
-            staleTime: 1000,
+            staleTime: props.stale_time,
         });
 
         return { data, error, isLoading }

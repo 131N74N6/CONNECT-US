@@ -27,22 +27,29 @@ export default function PostDetail() {
         }
     }, [error.isError]);
 
-    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>(
-        `http://localhost:1234/posts/selected/${_id}`, [`selected-post-${_id}`]
-    );
+    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>({
+        api_url: `http://localhost:1234/posts/selected/${_id}`, 
+        query_key: [`selected-post-${_id}`],
+        stale_time: 600000
+    });
 
-    const { data: commentsTotal } = getData<number>(
-        `http://localhost:1234/comments/comment-total/${_id}`, [`comments-total-${_id}`]
-    );
+    const { data: commentsTotal } = getData<number>({
+        api_url: `http://localhost:1234/comments/comment-total/${_id}`, 
+        query_key: [`comments-total-${_id}`],
+        stale_time: 600000
+    });
 
-    const { data: likesTotal } = getData<number>(
-        `http://localhost:1234/likes/likes-total/${_id}`, [`likes-total-${_id}`],
-    );
+    const { data: likesTotal } = getData<number>({
+        api_url: `http://localhost:1234/likes/likes-total/${_id}`, 
+        query_key: [`likes-total-${_id}`],
+        stale_time: 600000
+    });
 
-    const { data: hasUserLiked } = getData<boolean>(
-        `http://localhost:1234/likes/has-liked?post_id=${_id}&user_id=${user?.info.id}`, 
-        [`has-liked-${user?.info.id}`],
-    );
+    const { data: hasUserLiked } = getData<boolean>({
+        api_url: `http://localhost:1234/likes/has-liked?post_id=${_id}&user_id=${user?.info.id}`, 
+        query_key: [`has-liked-${user?.info.id}`],
+        stale_time: 600000
+    });
 
     const userLiked = hasUserLiked;
 

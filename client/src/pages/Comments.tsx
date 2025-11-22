@@ -17,9 +17,11 @@ export default function Comments() {
     const [comment, setComment] = useState<string>('');
     const [error, setError] = useState({ isError: false, message: '' });
     
-    const { data: selectedPost } = getData<PostDetail[]>(
-        `http://localhost:1234/posts/selected/${_id}`, [`selected-post-${_id}`]
-    );
+    const { data: selectedPost } = getData<PostDetail[]>({
+        api_url: `http://localhost:1234/posts/selected/${_id}`,
+        query_key: [`selected-post-${_id}`],
+        stale_time: 600000
+    });
     
     const {
         data: commentsData,

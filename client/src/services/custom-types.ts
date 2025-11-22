@@ -12,6 +12,12 @@ export type InfiniteScrollProps = {
     stale_time: number;
 }
 
+export type IGetData = {
+    api_url: string; 
+    query_key: string[];
+    stale_time: number;
+}
+
 export type IPutData<T> = {
     api_url: string;
     data: Partial<Omit<T, '_id'>>;
