@@ -57,9 +57,7 @@ export default function AddPost() {
 
     const removeMediaFile = (index: number) => {
         const fileToRemove = mediaFiles[index];
-        
         URL.revokeObjectURL(fileToRemove.previewUrl);
-        
         setMediaFiles(prev => prev.filter((_, i) => i !== index));
     }
 

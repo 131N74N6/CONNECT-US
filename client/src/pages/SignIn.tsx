@@ -42,7 +42,11 @@ export default function SignIn() {
         }
     }, [showMessage]);
 
-    if (loading) return <Loading/>
+    if (loading) return (
+        <div className="flex justify-center items-center h-screen">
+            <Loading/>
+        </div>
+    )
 
     return (
         <div className="flex justify-center items-center h-screen bg-[#1a1a1a]">

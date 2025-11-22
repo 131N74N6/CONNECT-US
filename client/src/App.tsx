@@ -9,7 +9,7 @@ import SearchPost from "./pages/SearchPost";
 import About from "./pages/About";
 import Setting from "./pages/Setting";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import LikeList from "./pages/LikeList";
+import Likes from "./pages/Likes";
 import Followers from "./pages/Followers";
 import Followed from "./pages/Followed";
 import Comments from "./pages/Comments";
@@ -29,7 +29,7 @@ export default function App() {
                     <Route path="/add-post" element={<ProtectedRoute><AddPost/></ProtectedRoute>}/>
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>
                     <Route path="/post/:_id" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
-                    <Route path="/like-post/:_id" element={<ProtectedRoute><LikeList/></ProtectedRoute>}/>
+                    <Route path="/like-post/:_id" element={<ProtectedRoute><Likes/></ProtectedRoute>}/>
                     <Route path="/comments-post/:_id" element={<ProtectedRoute><Comments/></ProtectedRoute>}/>
                     <Route path="/followers/:user_id" element={<ProtectedRoute><Followers/></ProtectedRoute>}/>
                     <Route path="/followed/:user_id" element={<ProtectedRoute><Followed/></ProtectedRoute>}/>

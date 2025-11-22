@@ -46,7 +46,7 @@ export type IUserInfo = {
     username: string;
 }
 
-export type ILikes = {
+export type LikeDataProps = {
     _id: string;
     created_at: string;
     post_id: string;
@@ -55,13 +55,11 @@ export type ILikes = {
     username: string;
 }
 
-export type LikesData = {
-    likes: Pick<ILikes, 'created_at' | 'user_id' | 'username' | 'post_id'>[];
+export type LikeListProps = {
+    likes: Pick<LikeDataProps, 'created_at' | 'user_id' | 'username' | 'post_id'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
-    size: number;
-    setSize: (size: number | ((_size: number) => number)) => Promise<any[] | undefined>;
-    onClose: (value: React.SetStateAction<boolean>) => void
+    setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
 export type IComments = {

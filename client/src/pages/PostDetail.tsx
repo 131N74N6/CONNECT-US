@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data-modifier";
 import useAuth from "../services/useAuth";
-import type { ILikes, PostDetail } from "../services/custom-types";
+import type { LikeDataProps, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import ImageSlider from "../components/ImageSlider";
 import { useEffect, useMemo, useState } from "react";
@@ -69,7 +69,7 @@ export default function PostDetail() {
             const getCurrentDate = new Date();
             if (!user || !_id || !selectedPost) return;
 
-            await insertData<ILikes>({
+            await insertData<LikeDataProps>({
                 api_url: `http://localhost:1234/likes/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
@@ -179,9 +179,7 @@ export default function PostDetail() {
                                 className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
                                 onClick={givingLikes}
                             ></i>
-                            <span>
-                                {countLikesTotal}
-                            </span>
+                            <Link to={`/like-post/${_id}`}>{countLikesTotal}</Link>
                         </div>
                         <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                             <Link to={`/comments-post/${_id}`}>
