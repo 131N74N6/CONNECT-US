@@ -1,17 +1,16 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import type { PostItemProps } from "../services/custom-types";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useDebounce from "../services/useDebounce";
 
 export default function SearchPost() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [searchedPost, setSearchedPost] = useState<PostItemProps[]>([]);
-    const searchRef = useRef<HTMLInputElement>(null);
     const debouncedSearch = useDebounce(searchQuery, 500);
 
     const searchPosts = async (debouncedSearch: string) => {
         const request = await fetch(`http://localhost:1234/posts/searched`, {
-            body: JSON.stringify({ searched: searchRef.current?.value }),
+            body: JSON.stringify({ searched: debouncedSearch }),
             method: 'POST'
         });
 
@@ -24,10 +23,10 @@ export default function SearchPost() {
         else setSearchedPost([]);
     }, [debouncedSearch, searchPosts]);
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setSearchQuery(value);
-    }
+    }, []);
 
     return (
         <div className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">
@@ -36,7 +35,6 @@ export default function SearchPost() {
             <div className="bg-black flex flex-col gap-[1rem] md:w-3/4 w-full">
                 <form className="bg-[#1a1a1a] p-[1rem]">
                     <input 
-                        ref={searchRef}
                         value={searchQuery}
                         placeholder="search here..."
                         onChange={handleInputChange}

@@ -33,17 +33,30 @@ async function getAllPosts(req: Request, res: Response): Promise<void> {
 async function getSearchedPost(req: Request, res: Response): Promise<void> {
     try {
         const { searched } = req.query;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 12;
+        const skip = (page - 1) * limit;
         
         if (!searched || typeof searched !== 'string') {
             res.status(400).json({ message: 'Search query is required' });
             return;
         }
 
-        const searchedPost = await Post.find({ 
-            description: { 
-                $regex: new RegExp(searched, 'i') 
-            } 
-        });
+        if (isNaN(page) || page < 1) {
+            res.status(400).json({ message: 'Invalid page parameter' });
+            return;
+        }
+
+        if (isNaN(limit) || limit < 1 || limit > 12) {
+            res.status(400).json({ message: 'Invalid limit parameter' });
+            return;
+        }
+
+        const searchedPost = await Post.find(
+            { description: { $regex: new RegExp(searched, 'i') } },
+            { _id: 1, description: 1, posts_file: 1, user_id: 1 }
+        ).limit(limit).skip(skip);
+
         res.json(searchedPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
