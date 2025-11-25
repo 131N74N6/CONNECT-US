@@ -11,11 +11,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function About() {
     const { user } = useAuth();
-    const queryQlient = useQueryClient();
     const { user_id } = useParams();
     const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
     const [error, setError] = useState({ isError: false, message: '' });
     const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
+    const queryQlient = useQueryClient();
     
     useEffect(() => {
         if (error.isError) {

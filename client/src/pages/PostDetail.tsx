@@ -15,10 +15,10 @@ export default function PostDetail() {
     const { user } = useAuth();
     const { deleteData, getData, insertData } = DataModifier();
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
-
+    
     const [isLiking, setIsLiking] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (error.isError) {

@@ -10,14 +10,29 @@ async function signIn(req: Request, res: Response) {
     try {
         const { email, password } = req.body;
         
-        if (!email) return res.status(400).json({ message: 'email is required' });
-        if (!password) return res.status(400).json({ message: 'password is required' });
+        if (!email) {
+            res.status(400).json({ message: 'email is required' });
+            return;
+        }
+
+        if (!password) {
+            res.status(400).json({ message: 'password is required' });
+            return;
+        }
 
         const findUser = await User.findOne({ email });
-        if (!findUser) return res.status(401).json({ message: 'Invalid email. Try again later' });
+
+        if (!findUser) {
+            res.status(401).json({ message: 'Invalid email. Try again later' });
+            return;
+        }
 
         const isPasswordMatch = await bcrypt.compare(password, findUser.password);
-        if (!isPasswordMatch) return res.status(401).json({ message: 'Invalid password. Try again later' })
+
+        if (!isPasswordMatch) {
+            res.status(401).json({ message: 'Invalid password. Try again later' });
+            return;
+        }
 
         const token = jwt.sign(
             {
@@ -47,12 +62,27 @@ async function signUp(req: Request, res: Response) {
     try {
         const { created_at, email, password, username } = req.body;
         
-        if (!email) return res.status(400).send({ message: 'email is required' });
-        if (!password) return res.status(400).send({ message: 'password is required' });
-        if (!username) return res.status(400).send({ message: 'username is required' });
+        if (!email) {
+            res.status(400).send({ message: 'email is required' });
+            return;
+        }
+
+        if (!password) {
+            res.status(400).send({ message: 'password is required' });
+            return;
+        }
+
+        if (!username) {
+            res.status(400).send({ message: 'username is required' });
+            return;
+        }
 
         const findUser = await User.findOne({ email });
-        if (findUser) return res.status(409).send({ message: 'User already exist' });
+        
+        if (findUser) {
+            res.status(409).send({ message: 'User already exist' });
+            return;
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 

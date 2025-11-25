@@ -96,6 +96,14 @@ export type PostListProps = {
     setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
+export type SearchedPost = {
+    api_url: string;
+    limit: number;
+    query_key: string[];
+    searched: string;
+    stale_time: number;
+}
+
 export type AddFollowerProps = {
     _id: string;
     created_at: string;
