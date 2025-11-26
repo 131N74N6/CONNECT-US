@@ -13,6 +13,7 @@ export default function About() {
     const { user } = useAuth();
     const { user_id } = useParams();
     const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
+    const currentUserId = user ? user.info.id : '';
     const [error, setError] = useState({ isError: false, message: '' });
     const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
     const queryQlient = useQueryClient();
@@ -37,8 +38,8 @@ export default function About() {
     });
 
     const { data: hasFollowed } = getData<boolean>({
-        api_url: `http://localhost:1234/followers/has-followed/?user_id=${user?.info.id}&followed_user_id=${user_id}`, 
-        query_key: [`has-followed-${user?.info.id}`],
+        api_url: `http://localhost:1234/followers/has-followed/?user_id=${currentUserId}&followed_user_id=${user_id}`, 
+        query_key: [`has-followed-${user_id}-${currentUserId}`],
         stale_time: 600000
     });
 
@@ -96,7 +97,7 @@ export default function About() {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user?.info.id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`has-followed-${currentUserId}`] });
         },
         onError: () => setError({ isError: true, message: 'Failed to follow' }),
         onSettled: () => setIsFollowLoading(false)
@@ -113,7 +114,7 @@ export default function About() {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user?.info.id}`] });
+            queryQlient.invalidateQueries({ queryKey: [`has-followed-${currentUserId}`] });
         },
         onSettled: () => setIsFollowLoading(false)
     });

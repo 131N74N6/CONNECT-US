@@ -56,7 +56,7 @@ export type LikeDataProps = {
 }
 
 export type LikeListProps = {
-    likes: Pick<LikeDataProps, 'created_at' | 'user_id' | 'username' | 'post_id'>[];
+    likes: Pick<LikeDataProps, 'created_at' | 'user_id' | 'username'>[];
     isReachedEnd: boolean;
     loadMore: boolean;
     setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>

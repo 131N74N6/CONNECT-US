@@ -40,6 +40,12 @@ async function getCurrentUserFollowing(req: Request, res: Response): Promise<voi
 async function hasUserFollowed(req: Request, res: Response): Promise<void> {
     try {
         const { user_id, followed_user_id } = req.query;
+
+        if (!user_id || !followed_user_id) {
+            res.status(400).json({ message: 'user_id and followed_user_id are required' });
+            return;
+        }
+
         const isFollowed = await Follower.findOne({ user_id, followed_user_id });
         res.json(!!isFollowed);
     } catch (error) {

@@ -19,6 +19,7 @@ export default function PostDetail() {
     const [isLiking, setIsLiking] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
     const queryClient = useQueryClient();
+    const currentUserId = user ? user.info.id : '';
 
     useEffect(() => {
         if (error.isError) {
@@ -46,8 +47,8 @@ export default function PostDetail() {
     });
 
     const { data: hasUserLiked } = getData<boolean>({
-        api_url: `http://localhost:1234/likes/has-liked?post_id=${_id}&user_id=${user?.info.id}`, 
-        query_key: [`has-liked-${user?.info.id}`],
+        api_url: `http://localhost:1234/likes/has-liked?post_id=${_id}&user_id=${currentUserId}`, 
+        query_key: [`has-liked-${currentUserId}`],
         stale_time: 600000
     });
 
@@ -82,7 +83,7 @@ export default function PostDetail() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`has-liked-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`has-liked-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`likes-total-${_id}`] });
         },
         onSettled: () => setIsLiking(false),
@@ -97,7 +98,7 @@ export default function PostDetail() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`has-liked-${user?.info.id}`] });
+            queryClient.invalidateQueries({ queryKey: [`has-liked-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`likes-total-${_id}`] });
         },
         onSettled: () => setIsLiking(false),

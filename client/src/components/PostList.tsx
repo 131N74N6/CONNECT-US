@@ -6,7 +6,7 @@ export default function PostList(props: PostListProps) {
     if (!props.data || props.data.length === 0) {
         return (
              <section className="flex h-full items-center justify-center">
-                <span className="text-purple-400 font-[600] text-[1rem]">No post added currently...</span>
+                <span className="text-purple-400 font-[600] text-[1rem]">No post found</span>
             </section>
         );
     }

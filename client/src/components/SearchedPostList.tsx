@@ -5,15 +5,15 @@ import PostItem from "./PostItem";
 export default function SearchedPostList(props: PostListProps) {
     if (!props.data || props.data.length === 0) {
         return (
-             <section className="flex h-full items-center justify-center">
-                <span className="text-purple-400 font-[600] text-[1rem]">Nah</span>
+            <section className="flex h-full items-center justify-center">
+                <span className="text-purple-400 font-[600] text-[1rem]">No Post Found</span>
             </section>
         );
     }
 
     return (
         <section className="bg-[#1a1a1a] gap-[1rem] flex flex-col overflow-y-auto">
-            {!props.data ? <Loading/> : null}
+            {!props.data ? (<Loading/>) : null}
             <div className="gap-[0.5rem] grid md:grid-cols-3 grid-cols-2">
                 {props.data.map((post) => (
                     <PostItem 

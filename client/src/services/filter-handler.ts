@@ -29,6 +29,7 @@ export default function FilterHandler() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
+            enabled: !!props.searched,
             queryKey: props.query_key,
             queryFn: fecthers,
             getNextPageParam: (lastPage, allPages) => {

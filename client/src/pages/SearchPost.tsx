@@ -1,5 +1,5 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import useDebounce from "../services/useDebounce";
 import FilterHandler from "../services/filter-handler";
 import Loading from "../components/Loading";
@@ -9,6 +9,15 @@ export default function SearchPost() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const debouncedSearch = useDebounce(searchQuery, 500);
     const { searchedPost } =  FilterHandler();
+
+    const searchConfig = useMemo(() => ({
+        api_url: `http://localhost:1234/posts/searched`,
+        limit: 12,
+        query_key: [`searched-posts-${debouncedSearch}`],
+        searched: debouncedSearch,
+        stale_time: 600000
+    }), [debouncedSearch]);
+    
     const { 
         data,
         error,
@@ -16,13 +25,7 @@ export default function SearchPost() {
         isLoading,
         isLoadingMore,
         isReachedEnd
-     } = searchedPost({
-        api_url: `http://localhost:1234/posts/searched`,
-        limit: 12,
-        query_key: [`searched-posts-${debouncedSearch}`],
-        searched: debouncedSearch,
-        stale_time: 600000
-    });
+     } = searchedPost(searchConfig);
 
     const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
@@ -32,7 +35,7 @@ export default function SearchPost() {
         <div className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">
             <Navbar1/>
             <Navbar2/>
-            <div className="bg-black flex flex-col gap-[1rem] md:w-3/4 w-full h-[100%]">
+            <div className="bg-black flex flex-col gap-[1rem] md:w-3/4 w-full h-[100%] min-h-[300px]">
                 <form className="bg-[#1a1a1a] p-[1rem]">
                     <input 
                         value={searchQuery}

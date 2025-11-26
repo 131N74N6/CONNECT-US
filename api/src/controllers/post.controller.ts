@@ -33,8 +33,8 @@ async function getAllPosts(req: Request, res: Response): Promise<void> {
 async function getSearchedPost(req: Request, res: Response): Promise<void> {
     try {
         const { searched } = req.query;
-        const page = parseInt(req.query.page as string) | 1;
-        const limit = parseInt(req.query.limit as string) | 12;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 12;
         const skip = (page - 1) * limit;
         
         if (!searched || typeof searched !== 'string') {

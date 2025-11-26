@@ -20,6 +20,6 @@ postRoutes.get('/post-total/:id', getUserTotalPost);
 
 postRoutes.post('/add', insertNewPost);
 
-postRoutes.post('/searched', getSearchedPost);
+postRoutes.get('/searched', getSearchedPost);
 
 export default postRoutes;
