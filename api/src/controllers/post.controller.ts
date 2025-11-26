@@ -42,6 +42,16 @@ async function getSearchedPost(req: Request, res: Response): Promise<void> {
             return;
         }
 
+        if (isNaN(page) || page < 1) {
+            res.status(400).json({ message: 'Invalid page parameter' });
+            return;
+        }
+
+        if (isNaN(limit) || limit < 1 || limit > 12) {
+            res.status(400).json({ message: 'Invalid limit parameter' });
+            return;
+        }
+
         const searchedPost = await Post.find(
             { description: { $regex: new RegExp(searched, 'i') } },
             { _id: 1, description: 1, posts_file: 1, user_id: 1 }
