@@ -128,7 +128,7 @@ export default function AddPost() {
             <Navbar2/>
             {error.isError ? 
                 <Notification
-                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] absolute top-[5%] left-[50%] right-[50%]"
+                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] text-[2rem] font-[600] text-purple-700"
                     message={error.message}
                 /> 
             : null}

@@ -57,7 +57,9 @@ export default function Followed() {
                     </div>
                 )}
                 {loadCurrentUserFollowed ? <div className="flex justify-center"><Loading/></div> : null}
-                {currentUserFollowedReachEnd ? (
+                {currentUserFollowed.length < 12 ? (
+                    <></>
+                ) : currentUserFollowedReachEnd ? (
                     <div className="text-center">
                         <span>No Followers to Load</span>
                     </div>

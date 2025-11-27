@@ -153,7 +153,12 @@ export default function PostDetail() {
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
             <Navbar1 />
             <Navbar2 />
-            {error.isError ? <Notification class_name="" message={error.message}/> : null}
+            {error.isError ? 
+                <Notification 
+                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] text-[2rem] font-[600] text-purple-700" 
+                    message={error.message}
+                /> : 
+            null}
             <div className="md:w-3/4 w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
                 {errorPost ? <span>{errorPost.message}</span> : null}
                 {postLoading ? <div className="flex justify-center items-center h-full"><Loading/></div> : null}

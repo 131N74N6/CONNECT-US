@@ -8,6 +8,7 @@ import useAuth from "../services/useAuth";
 export default function Home() {
     const{ loading, user } =  useAuth();
     const { infiniteScroll } = DataModifier();
+    
     const { 
         error, 
         data, 
