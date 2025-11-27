@@ -10,13 +10,15 @@ import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function About() {
-    const { user } = useAuth();
+    const { loading, user } = useAuth();
     const { user_id } = useParams();
     const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
+
     const currentUserId = user ? user.info.id : '';
+    const queryQlient = useQueryClient();
+
     const [error, setError] = useState({ isError: false, message: '' });
     const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
-    const queryQlient = useQueryClient();
     
     useEffect(() => {
         if (error.isError) {
@@ -123,7 +125,19 @@ export default function About() {
         if (isFollowLoading) return;
         if (!isFollowed) startFollowMutation.mutate();
         else stopFollowMutation.mutate();
-    }
+    }    
+    
+    if (loading) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <Loading/>
+        </div>
+    );
+
+    if (!user) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <span className="text-[2rem] font-[600] text-purple-700">please sign in to see post</span>
+        </div>
+    );
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black relative z-10">

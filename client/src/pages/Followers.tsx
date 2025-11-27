@@ -3,10 +3,12 @@ import Loading from "../components/Loading";
 import { Link, useParams } from "react-router-dom";
 import type { AddFollowerProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
+import useAuth from "../services/useAuth";
 
 export default function Followers() {
     const { user_id } = useParams();
     const { infiniteScroll } = DataModifier();
+    const { loading, user } = useAuth();
 
     const { 
         data: currentUserFollowers,
@@ -19,6 +21,18 @@ export default function Followers() {
         query_key: `followers-${user_id}`,
         stale_time: 1000,
     });
+    
+    if (loading) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <Loading/>
+        </div>
+    );
+
+    if (!user) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <span className="text-[2rem] font-[600] text-purple-700">please sign in to see post</span>
+        </div>
+    );
     
     return (
         <section className="flex md:flex-row flex-col h-screen gap-[1rem] p-[1rem] bg-black text-white relative z-10">
@@ -43,7 +57,9 @@ export default function Followers() {
                     </div>
                 )}
                 {loadCurrentUserFollower ? <div className="flex justify-center"><Loading/></div> : null}
-                {currentUserFollowerReachEnd ? (
+                {currentUserFollowers.length < 12 ? (
+                    <></>
+                ) : currentUserFollowerReachEnd ? (
                     <div className="text-center">
                         <span>No Followers to Load</span>
                     </div>

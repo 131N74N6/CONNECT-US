@@ -9,9 +9,22 @@ export default function useAuth() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const userExist = localStorage.getItem('user');
-        if (userExist) setUser(JSON.parse(userExist));
-        setLoading(false);
+        const initAuth = () => {
+            try {
+                const userExist = localStorage.getItem('user');
+                if (userExist) {
+                    const parsedUser = JSON.parse(userExist);
+                    setUser(parsedUser);
+                }
+            } catch (err) {
+                console.error("Failed to parse user from localStorage", err);
+                localStorage.removeItem('user'); // Hapus data rusak
+            } finally {
+                setLoading(false); 
+            }
+        };
+
+        initAuth();
     }, []);
 
     const signIn = async (email: string, password: string) => {
@@ -29,6 +42,7 @@ export default function useAuth() {
             }
 
             const response: User = await request.json();
+            console.log("API Response:", response);
             const signedInUser = {
                 status: response.status,
                 token: response.token,

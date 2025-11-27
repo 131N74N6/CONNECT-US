@@ -94,7 +94,9 @@ export default function Comments() {
                         )
                     }
                     {loadMoreComments ? <div className="flex justify-center"><Loading/></div> : null}
-                    {commentsReachedEnd ? (
+                    {commentsData.length < 12 ? (
+                        <></>
+                    ) : commentsReachedEnd ? (
                         <div className="text-center">
                             <span>No Comments to Load</span>
                         </div>

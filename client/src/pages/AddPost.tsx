@@ -7,10 +7,11 @@ import type { MediaFile, PostDetail } from "../services/custom-types";
 import { useNavigate } from "react-router-dom";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Loading from "../components/Loading";
 
 export default function AddPost() {
     const postFolder = 'sns_posts';
-    const { user } = useAuth();
+    const { loading, user } = useAuth();
     const navigate = useNavigate();
     const { insertData } = DataModifier();
     const queryQlient = useQueryClient();
@@ -108,6 +109,18 @@ export default function AddPost() {
         event.preventDefault();
         insertMutation.mutate();
     }
+    
+    if (loading) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <Loading/>
+        </div>
+    );
+
+    if (!user) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <span className="text-[2rem] font-[600] text-purple-700">please sign in to see post</span>
+        </div>
+    );
 
     return (
         <section className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">

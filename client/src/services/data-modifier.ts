@@ -3,7 +3,7 @@ import type { IGetData, InfiniteScrollProps, IPostData, IPutData } from "./custo
 import useAuth from "./useAuth";
 
 export default function DataModifier() {
-    const { user } = useAuth();
+    const { loading, user } = useAuth();
     const token = user ? user.token : null;
 
     const deleteData = async (api_url: string) => {
@@ -20,6 +20,8 @@ export default function DataModifier() {
 
     const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
+            gcTime: 240000,
+            enabled: !!token && !loading,
             queryFn: async () => {
                 const request = await fetch(props.api_url, {
                     headers: {
@@ -36,7 +38,6 @@ export default function DataModifier() {
             refetchOnMount: true,
             refetchOnReconnect: true,
             refetchOnWindowFocus: false,
-            gcTime: 240000,
             staleTime: props.stale_time,
         });
 
@@ -92,18 +93,19 @@ export default function DataModifier() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
+            enabled: !!token && !loading,
+            gcTime: 240000,
+            initialPageParam: 1,
             queryKey: [props.query_key],
             queryFn: fetchData,
             getNextPageParam: (lastPage, allPages) => {
                 if (lastPage.length < props.limit) return;
                 return allPages.length + 1;
             },
-            initialPageParam: 1,
-            staleTime: props.stale_time,
-            gcTime: 240000,
             refetchOnMount: true,
             refetchOnReconnect: true,
             refetchOnWindowFocus: false,
+            staleTime: props.stale_time,
         });
 
         const paginatedData: T[] = data ? data.pages.flat() : [];

@@ -4,11 +4,13 @@ import useDebounce from "../services/useDebounce";
 import FilterHandler from "../services/filter-handler";
 import Loading from "../components/Loading";
 import SearchedPostList from "../components/SearchedPostList";
+import useAuth from "../services/useAuth";
 
 export default function SearchPost() {
+    const { loading, user } = useAuth();
+    const { searchedPost } =  FilterHandler();
     const [searchQuery, setSearchQuery] = useState<string>("");
     const debouncedSearch = useDebounce(searchQuery, 500);
-    const { searchedPost } =  FilterHandler();
 
     const searchConfig = useMemo(() => ({
         api_url: `http://localhost:1234/posts/searched`,
@@ -30,6 +32,18 @@ export default function SearchPost() {
     const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
     }, []);
+    
+    if (loading) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <Loading/>
+        </div>
+    );
+
+    if (!user) return (
+        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
+            <span className="text-[2rem] font-[600] text-purple-700">please sign in to see post</span>
+        </div>
+    );
 
     return (
         <div className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">
