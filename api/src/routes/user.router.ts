@@ -4,11 +4,8 @@ import { getSelectedUser, signIn, signUp, updateSelectedUser } from "../controll
 const userRoutes = Router();
 
 userRoutes.get('/selected/:id', getSelectedUser);
-
 userRoutes.post('/sign-up', signUp);
-
 userRoutes.post('/sign-in', signIn);
-
 userRoutes.put('/change/:id', updateSelectedUser);
 
 export default userRoutes;

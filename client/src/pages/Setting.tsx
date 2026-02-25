@@ -1,5 +1,5 @@
-import DataModifier from "../services/data-modifier";
-import useAuth from "../services/useAuth";
+import DataModifier from "../services/data.service";
+import useAuth from "../services/auth.service";
 import type { IUserInfo } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,13 +14,18 @@ export default function Setting() {
 
     const [isDeleteing, setIsDeleting] = useState<boolean>(false);
     const getUserId = user ? user.info.id : '';
-    const { data: userData } =  getData<IUserInfo[]>(`http://localhost:1234/users/selected/${getUserId}`, ['signed-in-user']);
+
+    const { data: userData } =  getData<IUserInfo[]>({
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/selected/${getUserId}`, 
+        query_key: ['signed-in-user'], 
+        stale_time: 660000
+    });
 
     const deleteAllPostMutation = useMutation({
         onMutate: () => setIsDeleting(true),
         mutationFn: async () => {
             if (!user || !window.confirm('Are you sure you want to delete this post?')) return;
-            await deleteData(`http://localhost:1234/posts/erase-all/${getUserId}`);
+            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase-all/${getUserId}`);
         }, onSuccess: () => {
             queryQlient.invalidateQueries({ queryKey: ['all-posts'] });
             queryQlient.invalidateQueries({ queryKey: ['signed-user-posts'] });

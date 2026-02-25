@@ -1,52 +1,29 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/useAuth";
-import Loading from "../components/Loading";
+import useAuth from "../services/auth.service";
 
 export default function SignIn() {
+    const { error, loading, setError, user, signIn } = useAuth();
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [message, setMessage] = useState<string>('');
-    const [showMessage, setShowMessage] = useState<boolean>(false);
 
-    const { error, loading, user, signIn } = useAuth();
-    const navigate = useNavigate();
+    useEffect(() => {
+        if (user) navigate('/home', { replace: true });
+    }, [user, navigate]);
+
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
 
     const handleSignIn = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
-        setMessage('');
-        setShowMessage(false);
-
-        const trimmedEmail = email.trim();
-        const trimmedPassword = password.trim();
-
-        try {
-            if (error) throw new Error(error);
-            await signIn(trimmedEmail, trimmedPassword);
-        } catch (error: any) {
-            setMessage(error.message);
-            setShowMessage(true);
-        }
+        await signIn(email.trim(), password.trim());
     }, [email, password]);
-
-    useEffect(() => {
-        if (user && !loading) {
-            navigate('/home', { replace: true });
-        }
-    }, [user, loading, navigate]);
-
-    useEffect(() => {
-        if (showMessage) {
-            const timer = setTimeout(() => setShowMessage(false), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [showMessage]);
-
-    if (loading) return (
-        <div className="flex justify-center items-center h-screen">
-            <Loading/>
-        </div>
-    )
 
     return (
         <div className="flex justify-center items-center h-screen bg-[#1a1a1a]">
@@ -62,7 +39,6 @@ export default function SignIn() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your@gmail.com"
-                        disabled={loading}
                     />
                 </div>
                 
@@ -75,7 +51,6 @@ export default function SignIn() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
                         className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
                         placeholder="your_password"
-                        disabled={loading}
                     />
                 </div>
                 
@@ -83,15 +58,10 @@ export default function SignIn() {
                     <span className="text-white">Don't have an account?</span> <Link className="text-blue-700 hover:underline" to={'/signup'}>Sign Up</Link>
                 </div>
                 
-                {showMessage ? (
-                    <div className="text-amber-600 text-sm font-medium text-center p-2 bg-red-100 rounded">
-                        {message}
-                    </div>
-                ) : null}
+                {error ? <div className="text-blue-300 font-medium text-center text-[0.9rem]">{error}</div> : null}
                 
                 <button 
                     type="submit" 
-                    disabled={loading}
                     className="p-[0.45rem] text-[0.9rem] outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-purple-800 transition-colors"
                 >
                     {loading ? 'Signing In...' : 'Sign In'}

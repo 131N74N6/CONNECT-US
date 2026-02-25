@@ -15,6 +15,11 @@ async function signIn(req: Request, res: Response) {
             return;
         }
 
+        if (!email || !password) {
+            res.status(400).json({ message: 'email and password is required' });
+            return;
+        }
+
         if (!password) {
             res.status(400).json({ message: 'password is required' });
             return;
@@ -30,7 +35,7 @@ async function signIn(req: Request, res: Response) {
         const isPasswordMatch = await bcrypt.compare(password, findUser.password);
 
         if (!isPasswordMatch) {
-            res.status(401).json({ message: 'Invalid password. Try again later' });
+            res.status(400).json({ message: 'Invalid password. Try again later' });
             return;
         }
 
@@ -41,10 +46,9 @@ async function signIn(req: Request, res: Response) {
                 username: findUser.username 
             },
             process.env.JWT_SECRET_KEY || 'jwt token',
-            { expiresIn: '1h' }
         );
 
-        res.status(201).json({
+        res.status(200).json({
             status: 'sign-in successfully',
             token,
             info: {
@@ -61,6 +65,11 @@ async function signIn(req: Request, res: Response) {
 async function signUp(req: Request, res: Response) {
     try {
         const { created_at, email, password, username } = req.body;
+
+        if (!email || !password || !username) {
+            res.status(400).json({ message: 'email, password, and username is required' });
+            return;
+        }
         
         if (!email) {
             res.status(400).send({ message: 'email is required' });
@@ -77,10 +86,16 @@ async function signUp(req: Request, res: Response) {
             return;
         }
 
-        const findUser = await User.findOne({ email });
+        const findEmail = await User.findOne({ email });
+        const findUsername = await User.findOne({ username });
         
-        if (findUser) {
-            res.status(409).send({ message: 'User already exist' });
+        if (findEmail) {
+            res.status(400).send({ message: 'email already exist' });
+            return;
+        }
+        
+        if (findUsername) {
+            res.status(400).send({ message: 'username already exist' });
             return;
         }
 

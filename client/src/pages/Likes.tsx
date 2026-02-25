@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
-import DataModifier from "../services/data-modifier";
+import DataModifier from "../services/data.service";
 import type { LikeDataProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import LikeList from "../components/LikeList";
 import Loading from "../components/Loading";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth.service";
 
 export default function Likes() {
     const { _id } = useParams();
@@ -19,9 +19,9 @@ export default function Likes() {
         isLoadingMore,
         isReachedEnd,
     } = infiniteScroll<LikeDataProps>({
-        api_url: `http://localhost:1234/likes/get-all/${_id}`,
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/get-all/${_id}`,
         limit: 12,
-        query_key: `likes_${_id}`,
+        query_key: [`likes_${_id}`],
         stale_time: 600000
     });
         

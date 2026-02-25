@@ -1,26 +1,40 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { IGetData, InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
-import useAuth from "./useAuth";
+import useAuth from "./auth.service";
+import { useState } from "react";
 
 export default function DataModifier() {
     const { loading, user } = useAuth();
     const token = user ? user.token : null;
+    const [error, setError] = useState<string | null>(null);
 
-    const deleteData = async (api_url: string) => {
-        const request = await fetch(api_url, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            method: 'DELETE'
-        });
+    async function deleteData(api_url: string) {
+        try {
+            const request = await fetch(api_url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method: 'DELETE'
+            });
 
-        await request.json();
+            const response = await request.json();
+
+            if (!request.ok) {
+                setError(response.message);
+                throw new Error(response.message);
+            } else {
+                setError(null);
+                return response;
+            }
+        } catch (error: any) {
+            setError(error.message || 'Network Error');
+            throw error;
+        }
     }
 
     const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
-            gcTime: 240000,
             enabled: !!token && !loading,
             queryFn: async () => {
                 const request = await fetch(props.api_url, {
@@ -44,30 +58,56 @@ export default function DataModifier() {
         return { data, error, isLoading }
     }
 
-    const insertData = async <TSX>(props: IPostData<TSX>) => {
-        const request = await fetch(props.api_url, {
-            body: JSON.stringify(props.data),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            method: 'POST',
-        });
+    async function insertData<T>(props: IPostData<T>) {
+        try {
+            const request = await fetch(props.api_url, {
+                body: JSON.stringify(props.data),
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+            });
 
-        await request.json();
+            const response = await request.json();
+            
+            if (!request.ok) {
+                setError(response.message);
+                throw new Error(response.message);
+            } else {
+                setError(null);
+                return response;
+            }
+        } catch (error: any) {
+            setError(error.message || 'Check Your Network');
+            throw error;
+        }
     }
 
-    const updateData = async <TSX>(props: IPutData<TSX>) => {
-        const request = await fetch(props.api_url, {
-            body: JSON.stringify(props.data),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            method: 'PUT',
-        });
+    async function updateData<T>(props: IPutData<T>) {
+        try {
+            const request = await fetch(props.api_url, {
+                body: JSON.stringify(props.data),
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method: 'PUT',
+            });
 
-        await request.json();
+            const response = await request.json();
+
+            if (!request.ok) {
+                setError(response.message);
+                throw new Error(response.message);
+            } else {
+                setError(null);
+                return response;
+            }
+        } catch (error: any) {
+            setError(error.message || 'Network Error');
+            throw error;
+        }
     }
 
     const infiniteScroll = <T>(props: InfiniteScrollProps) => {
@@ -94,9 +134,8 @@ export default function DataModifier() {
             refetch,
         } = useInfiniteQuery({
             enabled: !!token && !loading,
-            gcTime: 240000,
             initialPageParam: 1,
-            queryKey: [props.query_key],
+            queryKey: props.query_key,
             queryFn: fetchData,
             getNextPageParam: (lastPage, allPages) => {
                 if (lastPage.length < props.limit) return;
@@ -123,5 +162,5 @@ export default function DataModifier() {
         }
     }
 
-    return { deleteData, getData, infiniteScroll, insertData, updateData }
+    return { deleteData, error, getData, infiniteScroll, insertData, setError, updateData }
 }

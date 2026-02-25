@@ -1,54 +1,30 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/useAuth";
-import Loading from "../components/Loading";
+import useAuth from "../services/auth.service";
 
 export default function SignUp() {
-    const { error, loading, signUp, user } = useAuth();
+    const { error, loading, setError, signUp, user } = useAuth();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
-    const [message, setMessage] = useState<string>('');
-    const [showMessage, setShowMessage] = useState<boolean>(false);
 
     useEffect(() => {
         if (user) navigate('/home', { replace: true });
     }, [user, navigate]);
 
     useEffect(() => {
-        if (error && showMessage) {
-            const timer = setTimeout(() => setShowMessage(false), 3000);
-            return clearTimeout(timer);
+        if (error) {
+            const timer = setTimeout(() => setError(null), 3000);
+            return () => clearTimeout(timer);
         }
-    }, [error, showMessage]);
+    }, [error]);
 
     const hansleSignUp = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
-        const getCurrentDate = new Date();
-        const trimmedEmail = email.trim();
-        const trimmedPassword = password.trim();
-        const trimmedUserName = username.trim();
-
-        try {
-            if (error) throw new Error(error);
-            await signUp(getCurrentDate.toISOString(), trimmedEmail, trimmedUserName, trimmedPassword);
-        } catch (error: any) {
-            setMessage(error.message);
-            setShowMessage(true);
-        } finally {
-            setUsername('');
-            setEmail('');
-            setPassword('');
-        }
+        await signUp(new Date().toISOString(), email.trim(), username.trim(), password.trim());
     }, [email, password, username]);
-    
-    if (loading) return (
-        <div className="flex justify-center items-center h-screen">
-            <Loading/>
-        </div>
-    )
 
     return (
         <div className="flex justify-center items-center h-screen bg-[#1a1a1a]">
@@ -88,11 +64,7 @@ export default function SignUp() {
                     />
                 </div>
                 <div className="text-center text-white">Already have account? <Link className="text-blue-700" to={'/signin'}>SignIn</Link></div>                    
-                {showMessage ? 
-                    <div className="text-red-400 text-sm font-medium text-center p-2 bg-red-100 rounded">
-                        {message}
-                    </div>
-                : null}
+                {error ? <div className="text-blue-300 font-medium text-[0.9rem] text-center">{error}</div> : null}
                 <button 
                     type="submit" 
                     disabled={loading}

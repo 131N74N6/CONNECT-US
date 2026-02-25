@@ -2,8 +2,8 @@ import type { PostItemProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
-import DataModifier from '../services/data-modifier';
-import useAuth from "../services/useAuth";
+import DataModifier from '../services/data.service';
+import useAuth from "../services/auth.service";
 
 export default function Home() {
     const{ loading, user } =  useAuth();
@@ -17,9 +17,9 @@ export default function Home() {
         isLoadingMore, 
         fetchNextPage
     } = infiniteScroll<PostItemProps>({
-        api_url: `http://localhost:1234/posts/get-all`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/get-all`, 
         limit: 12,
-        query_key: 'all-posts',
+        query_key: ['all-posts'],
         stale_time: 600000
     });
 

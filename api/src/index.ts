@@ -11,11 +11,11 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use('/comments', commentRoutes);
-app.use('/followers', followerRoutes);
-app.use('/likes', likeRoutes);
-app.use('/posts', postRoutes);
-app.use('/users', userRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/followers', followerRoutes);
+app.use('/api/likes', likeRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/users', userRoutes);
 
 db.then(() => {
     app.listen(1234, () => console.log(`server running at http://localhost:1234`));

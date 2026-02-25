@@ -8,7 +8,7 @@ export type IPostData<T> = {
 export type InfiniteScrollProps = {
     api_url: string; 
     limit: number; 
-    query_key: string;
+    query_key: string[];
     stale_time: number;
 }
 

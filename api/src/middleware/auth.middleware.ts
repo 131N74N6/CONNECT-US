@@ -69,27 +69,21 @@ const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction):
     }
 };
 
-const checkOwnership = (req: AuthRequest, res: Response, next: NextFunction): void => {
+const checkOwnership = (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         // Pastikan verifyToken telah berjalan dan req.user telah diset
         if (!req.user) {
-            res.status(401).json({ message: 'Authentication required before checking ownership' });
-            return;
+            return res.status(401).json({ message: 'Authentication required before checking ownership' });
         }
 
-        // Ambil user_id dari parameter URL (harus sesuai dengan nama parameter di route)
-        // Kita asumsikan route param disebut 'id' sesuai dengan controller Anda (getSelectedUser, updateSelectedUser)
-        const requestedId = req.params.id;
+        const requestedId = req.params.user_id;
 
         if (!requestedId) {
-            res.status(400).json({ message: 'Resource ID parameter required' });
-            return;
+            return res.status(400).json({ message: 'Resource ID parameter required' });
         }
 
-        // Bandingkan id user yang login dengan id yang diminta
         if (req.user.id !== requestedId) {
-            res.status(403).json({ message: 'Access denied: You can only access your own resources' });
-            return;
+            return res.status(403).json({ message: 'Access denied: You can only access your own resources' });
         }
 
         next();

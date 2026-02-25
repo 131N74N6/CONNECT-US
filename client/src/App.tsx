@@ -13,6 +13,7 @@ import Likes from "./pages/Likes";
 import Followers from "./pages/Followers";
 import Followed from "./pages/Followed";
 import Comments from "./pages/Comments";
+import EditPost from "./pages/EditPost";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ export default function App() {
                     <Route path="/signup" element={<SignUp/>}/>
                     <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
                     <Route path="/about/:user_id" element={<ProtectedRoute><About/></ProtectedRoute>}/>
+                    <Route path="/edit-post/:_id" element={<ProtectedRoute><EditPost/></ProtectedRoute>}/>
                     <Route path="/setting/:user_id" element={<ProtectedRoute><Setting/></ProtectedRoute>}/>
                     <Route path="/add-post" element={<ProtectedRoute><AddPost/></ProtectedRoute>}/>
                     <Route path="/search-post" element={<ProtectedRoute><SearchPost/></ProtectedRoute>}/>

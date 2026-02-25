@@ -1,11 +1,10 @@
 import { Link, useParams } from "react-router-dom";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth.service";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import DataModifier from "../services/data-modifier";
+import DataModifier from "../services/data.service";
 import type { IComments, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
-import { Navbar1, Navbar2 } from "../components/Navbar";
 
 export default function Comments() {
     const queryClient = useQueryClient();
@@ -18,7 +17,7 @@ export default function Comments() {
     const [error, setError] = useState({ isError: false, message: '' });
     
     const { data: selectedPost } = getData<PostDetail[]>({
-        api_url: `http://localhost:1234/posts/selected/${_id}`,
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`,
         query_key: [`selected-post-${_id}`],
         stale_time: 600000
     });
@@ -29,10 +28,10 @@ export default function Comments() {
         isLoadingMore: loadMoreComments,
         fetchNextPage: fetchMoreComments,
     } =  infiniteScroll<Pick<IComments, 'created_at' | 'username' | 'opinions'>>({
-        api_url: _id ? `http://localhost:1234/comments/get-all/${_id}` : ``, 
+        api_url: _id ? `${import.meta.env.VITE_API_BASE_URL}/comments/get-all/${_id}` : ``, 
         limit: 12,
         stale_time: 1000,
-        query_key: `comments-${_id}`
+        query_key: [`comments-${_id}`]
     });
 
     const commentMutation = useMutation({
@@ -44,7 +43,7 @@ export default function Comments() {
             if (!comment.trim()) return;
 
             await insertData<IComments>({
-                api_url: `http://localhost:1234/comments/add`,
+                api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
                     opinions: comment.trim(),
@@ -74,9 +73,7 @@ export default function Comments() {
     
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
-            <Navbar1/>
-            <Navbar2/>
-            <div className="md:w-3/4 w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
+            <div className="w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
                 <div className="flex flex-col gap-[1rem] pb-[1rem] border-b border-purple-400 h-[88%] overflow-y-auto">
                     {commentsData.length > 0 ?
                         commentsData.map((comment, index) => (

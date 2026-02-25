@@ -2,9 +2,9 @@ import type { AddFollowerProps, UserConnectionStatsProps, PostItemProps } from "
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
-import DataModifier from "../services/data-modifier";
+import DataModifier from "../services/data.service";
 import { Link, useParams } from "react-router-dom";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth.service";
 import { useEffect, useMemo, useState } from "react";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,19 +28,19 @@ export default function About() {
     }, [error.isError]);
 
     const { data: userPostTotal } = getData<number>({
-        api_url: `http://localhost:1234/posts/post-total/${user_id}`,
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/post-total/${user_id}`,
         query_key: [`user-post-total-${user_id}`],
         stale_time: 600000
     });
 
     const { data: userConnectionStats } = getData<UserConnectionStatsProps>({
-        api_url: `http://localhost:1234/followers/user-connection-stats/${user_id}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/user-connection-stats/${user_id}`, 
         query_key: [`user-connection-stats-${user_id}`],
         stale_time: 600000
     });
 
     const { data: hasFollowed } = getData<boolean>({
-        api_url: `http://localhost:1234/followers/has-followed/?user_id=${currentUserId}&followed_user_id=${user_id}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/has-followed/?user_id=${currentUserId}&followed_user_id=${user_id}`, 
         query_key: [`has-followed-${user_id}-${currentUserId}`],
         stale_time: 600000
     });
@@ -53,9 +53,9 @@ export default function About() {
         isLoadingMore: loadPostOwner, 
         fetchNextPage: setCurrentUserPosts, 
     } = infiniteScroll<PostItemProps>({
-        api_url: `http://localhost:1234/posts/signed-user/${user_id}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/signed-user/${user_id}`, 
         limit: 12,
-        query_key: `signed-user-posts-${user_id}`,
+        query_key: [`signed-user-posts-${user_id}`],
         stale_time: 600000
     });
 
@@ -85,7 +85,7 @@ export default function About() {
             const getCurrentDate = new Date();
             
             await insertData<AddFollowerProps>({
-                api_url: `http://localhost:1234/followers/add`,
+                api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
                     followed_user_id: user_id,
@@ -109,7 +109,7 @@ export default function About() {
         onMutate: () => setIsFollowLoading(true),
         mutationFn: async () => {
             if (!user) return;
-            await deleteData(`http://localhost:1234/followers/erase/${user.info.id}`);
+            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/followers/erase/${user.info.id}`);
         },
         onError: () => setError({ isError: true, message: 'Failed to unfollow' }),
         onSuccess: () => {

@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifier from "../services/data-modifier";
-import useAuth from "../services/useAuth";
+import DataModifier from "../services/data.service";
+import useAuth from "../services/auth.service";
 import type { LikeDataProps, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import ImageSlider from "../components/ImageSlider";
@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import VideoSlider from "../components/VideoSlider";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Heart, MessageCircle } from "lucide-react";
 
 export default function PostDetail() {
     const { _id } = useParams();
@@ -29,25 +30,25 @@ export default function PostDetail() {
     }, [error.isError]);
 
     const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>({
-        api_url: `http://localhost:1234/posts/selected/${_id}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`, 
         query_key: [`selected-post-${_id}`],
         stale_time: 600000
     });
 
     const { data: commentsTotal } = getData<number>({
-        api_url: `http://localhost:1234/comments/comment-total/${_id}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/comment-total/${_id}`, 
         query_key: [`comments-total-${_id}`],
         stale_time: 600000
     });
 
     const { data: likesTotal } = getData<number>({
-        api_url: `http://localhost:1234/likes/likes-total/${_id}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/likes-total/${_id}`, 
         query_key: [`likes-total-${_id}`],
         stale_time: 600000
     });
 
     const { data: hasUserLiked } = getData<boolean>({
-        api_url: `http://localhost:1234/likes/has-liked?post_id=${_id}&user_id=${currentUserId}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/has-liked?post_id=${_id}&user_id=${currentUserId}`, 
         query_key: [`has-liked-${currentUserId}`],
         stale_time: 600000
     });
@@ -71,7 +72,7 @@ export default function PostDetail() {
             if (!user || !_id || !selectedPost) return;
 
             await insertData<LikeDataProps>({
-                api_url: `http://localhost:1234/likes/add`,
+                api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
                     post_id: _id,
@@ -94,7 +95,7 @@ export default function PostDetail() {
         onMutate: () => setIsLiking(true),
         mutationFn: async () => {
             if (!user) return;
-            await deleteData(`http://localhost:1234/likes/erase/${user.info.id}`);
+            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/likes/erase/${user.info.id}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] });
@@ -107,7 +108,7 @@ export default function PostDetail() {
 
     const deletePostMutation = useMutation({
         onMutate: () => setIsLiking(true),
-        mutationFn: async () => await deleteData(`http://localhost:1234/posts/erase/${_id}`),
+        mutationFn: async () => await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase/${_id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`selected-post-${_id}`] });
             navigate('/home');
@@ -176,32 +177,40 @@ export default function PostDetail() {
                             </p>
                         </div>
                     </div>
-                    
                     {isPostOwner ? (
-                        <button
-                            onClick={handleDeletePost}
-                            className="bg-red-600 cursor-pointer hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-medium"
-                        >
-                            Delete This Post
-                        </button>
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={() => navigate(`/edit-post/${_id}`)}
+                                className="bg-amber-500 cursor-pointer text-gray-800 font-medium hover:bg-amber-600 p-3 rounded-lg text-[0.9rem]"
+                            >
+                                Edit This Post
+                            </button>
+                            <button
+                                onClick={handleDeletePost}
+                                className="bg-amber-500 cursor-pointer text-gray-800 font-medium hover:bg-amber-600 p-3 rounded-lg text-[0.9rem]"
+                            >
+                                Delete This Post
+                            </button>
+                        </div>
                     ) : null}
                 </div>
-                
                 <div className="flex flex-col gap-[1rem]">
                     {images.length > 0 ? <ImageSlider images={images} /> : null}
                     {videos.length > 0 ? <VideoSlider videos={videos}/> : null}
-            
                     <div className="flex gap-[1rem]">
                         <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
-                            <i 
+                            <button
+                                type="button" 
                                 className={`fa-${userLiked ? 'solid' : 'regular'} fa-heart cursor-pointer ${userLiked ? 'text-red-500' : ''}`} 
                                 onClick={givingLikes}
-                            ></i>
+                            >
+                                <Heart></Heart>
+                            </button>
                             <Link to={`/like-post/${_id}`}>{countLikesTotal}</Link>
                         </div>
                         <div className="flex gap-[0.5rem] items-center text-[1.2rem]">
                             <Link to={`/comments-post/${_id}`}>
-                                <i className="fa-regular fa-comment cursor-pointer"></i>
+                                <MessageCircle></MessageCircle>
                             </Link>
                             <span>{countCommentTotal}</span>
                         </div>

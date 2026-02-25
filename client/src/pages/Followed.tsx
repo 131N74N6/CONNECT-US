@@ -1,9 +1,9 @@
-import DataModifier from '../services/data-modifier';
+import DataModifier from '../services/data.service';
 import Loading from '../components/Loading';
 import { Link, useParams } from 'react-router-dom';
 import type { AddFollowerProps } from '../services/custom-types';
 import { Navbar1, Navbar2 } from '../components/Navbar';
-import useAuth from '../services/useAuth';
+import useAuth from '../services/auth.service';
 
 export default function Followed() {
     const { user_id } = useParams();
@@ -16,9 +16,9 @@ export default function Followed() {
         isLoadingMore: loadCurrentUserFollowed, 
         fetchNextPage: getMoreCurrentUserFollowed, 
     } = infiniteScroll<Pick<AddFollowerProps, 'created_at' | 'followed_user_id' | 'followed_username'>>({
-        api_url: `http://localhost:1234/followers/who-followed/${user_id}`, 
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/who-followed/${user_id}`, 
         limit: 12,
-        query_key: `who-followed-${user_id}`,
+        query_key: [`who-followed-${user_id}`],
         stale_time: 1000,
     });
     

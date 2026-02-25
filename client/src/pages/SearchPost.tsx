@@ -4,7 +4,7 @@ import useDebounce from "../services/useDebounce";
 import FilterHandler from "../services/filter-handler";
 import Loading from "../components/Loading";
 import SearchedPostList from "../components/SearchedPostList";
-import useAuth from "../services/useAuth";
+import useAuth from "../services/auth.service";
 
 export default function SearchPost() {
     const { loading, user } = useAuth();
@@ -13,7 +13,7 @@ export default function SearchPost() {
     const debouncedSearch = useDebounce(searchQuery, 500);
 
     const searchConfig = useMemo(() => ({
-        api_url: `http://localhost:1234/posts/searched`,
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/searched`,
         limit: 12,
         query_key: [`searched-posts-${debouncedSearch}`],
         searched: debouncedSearch,

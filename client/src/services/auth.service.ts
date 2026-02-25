@@ -16,9 +16,9 @@ export default function useAuth() {
                     const parsedUser = JSON.parse(userExist);
                     setUser(parsedUser);
                 }
-            } catch (err) {
-                console.error("Failed to parse user from localStorage", err);
-                localStorage.removeItem('user'); // Hapus data rusak
+            } catch (error: any) {
+                setError(error.message);
+                localStorage.removeItem('user'); 
             } finally {
                 setLoading(false); 
             }
@@ -27,34 +27,34 @@ export default function useAuth() {
         initAuth();
     }, []);
 
-    const signIn = async (email: string, password: string) => {
+    async function signIn (email: string, password: string) {
         setLoading(true);
         try {
-            const request = await fetch(`http://localhost:1234/users/sign-in`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-in`, {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
                 method: 'POST',
             });
 
+            const response = await request.json();
+
             if (!request.ok) {
-                const errorMsg = await request.json()
-                throw new Error(errorMsg.message);
-            }
-
-            const response: User = await request.json();
-            console.log("API Response:", response);
-            const signedInUser = {
-                status: response.status,
-                token: response.token,
-                info: {
-                    id: response.info.id,
-                    email: response.info.email,
-                    username: response.info.username
+                const errorMessage = response.error || response.message || 'Gagal sign-in! Coba lagi nanti';
+                setError(errorMessage);
+            } else {
+                const signedInUser = {
+                    status: response.status,
+                    token: response.token,
+                    info: {
+                        id: response.info.id,
+                        email: response.info.email,
+                        username: response.info.username
+                    }
                 }
+    
+                setUser(signedInUser);
+                localStorage.setItem('user', JSON.stringify(signedInUser));
             }
-
-            setUser(signedInUser);
-            localStorage.setItem('user', JSON.stringify(signedInUser));
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -62,21 +62,23 @@ export default function useAuth() {
         }
     }
 
-    const signUp = async (created_at: string, email: string, username: string, password: string) => {
+    async function signUp (created_at: string, email: string, username: string, password: string) {
         setLoading(true);
         try {
-            const request = await fetch(`http://localhost:1234/users/sign-up`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-up`, {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ created_at, email, password, username }),
                 method: 'POST',
             });
 
-            if (!request.ok) {
-                const errorMsg = await request.json()
-                throw new Error(errorMsg.message);
-            }
+            const response = await request.json();
 
-            if (request.ok) navigate('/signin');
+            if (request.ok) {
+                navigate('/sign-in');
+            } else {
+                const errorMessage = response.error || response.message || 'Gagal sign-up! Coba lagi nanti';
+                setError(errorMessage);
+            }
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -84,11 +86,12 @@ export default function useAuth() {
         }
     }
 
-    const signOut = async () => {
+    async function signOut() {
         setLoading(true);
         try {
             localStorage.removeItem('user');
             navigate('/signin');
+            setError(null);
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -96,5 +99,5 @@ export default function useAuth() {
         }
     }
 
-    return { user, loading, error, signUp, signIn, signOut };
+    return { user, loading, error, setError, signUp, signIn, signOut };
 }
