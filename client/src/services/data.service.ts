@@ -33,6 +33,32 @@ export default function DataModifier() {
         }
     }
 
+    async function deleteChosenData(api_url: string, data: string[]) {
+        try {
+            const request = await fetch(api_url, {
+                body: JSON.stringify({ publicIds: data }),
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method: 'DELETE'
+            });
+
+            const response = await request.json();
+
+            if (!request.ok) {
+                setError(response.message);
+                throw new Error(response.message);
+            } else {
+                setError(null);
+                return response;
+            }
+        } catch (error: any) {
+            setError(error.message || 'Network Error');
+            throw error;
+        }
+    }
+
     const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
             enabled: !!token && !loading,
@@ -162,5 +188,5 @@ export default function DataModifier() {
         }
     }
 
-    return { deleteData, error, getData, infiniteScroll, insertData, setError, updateData }
+    return { deleteData, deleteChosenData, error, getData, infiniteScroll, insertData, setError, updateData }
 }

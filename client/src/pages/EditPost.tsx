@@ -4,6 +4,7 @@ import useAuth from "../services/auth.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import type { MediaFile, PostDetail } from "../services/custom-types";
+import Notification from "../components/Notification";
 import { uploadToCloudinary } from "../services/cloud.service";
 import Loading from "../components/Loading";
 import { X } from "lucide-react";
@@ -13,7 +14,7 @@ export default function EditPost() {
     const { _id } = useParams();
     const { loading, user } = useAuth();
     const navigate = useNavigate();
-    const { deleteData, getData, updateData } = DataModifier();
+    const { deleteChosenData, error, getData, setError, updateData } = DataModifier();
     const queryQlient = useQueryClient();
     const currentUserId = user ? user.info.id : '';
 
@@ -22,15 +23,14 @@ export default function EditPost() {
     const [existingFiles, setExistingFiles] = useState<{ file_url: string; public_id: string }[]>([]);
     const [description, setDescription] = useState<string>('');
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [error, setError] = useState({ isError: false, message: '' });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (error.isError) {
-            const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
+        if (error) {
+            const timeout = setTimeout(() => setError(null), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error.isError]);
+    }, [error]);
 
     const { data: selectedPost } = getData<PostDetail[]>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`, 
@@ -91,7 +91,7 @@ export default function EditPost() {
             }
         
             if (selectedFiles.length > 0) {
-                await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase-chosen`)
+                await deleteChosenData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase-chosen`, selectedFiles);
             }
 
             await updateData<PostDetail>({
@@ -133,8 +133,11 @@ export default function EditPost() {
 
     return (
         <section className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">
-            {error.isError ? 
-                <></>
+            {error ? 
+                <Notification
+                    class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] text-[2rem] font-[600] text-purple-700"
+                    message={error}
+                /> 
             : null}
             <form 
                 onSubmit={handleUpdatePost}
@@ -149,7 +152,6 @@ export default function EditPost() {
                     accept="image/*,video/*"
                     id="media-upload"
                 />
-
                 <section 
                     className="border-dashed h-screen p-[1rem] cursor-pointer border-2 border-purple-400 rounded-lg flex flex-col"
                     onClick={() => fileInputRef.current?.click()}
