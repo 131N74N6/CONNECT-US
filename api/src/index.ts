@@ -29,7 +29,7 @@ v2.config({
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    origin: ["http://localhost:5173", "http://localhost:1234"]
+    origin: ["http://localhost:5173", "http://localhost:1234", "https://connect-us-be-five.vercel.app/"]
 }));
 app.use('/api/comments', commentRoutes);
 app.use('/api/followers', followerRoutes);
