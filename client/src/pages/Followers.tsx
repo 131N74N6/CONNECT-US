@@ -19,7 +19,7 @@ export default function Followers() {
         api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/get-all/${user_id}`, 
         limit: 12,
         query_key: [`followers-${user_id}`],
-        stale_time: 1000,
+        stale_time: 1800000,
     });
     
     if (loading) return (
@@ -37,7 +37,6 @@ export default function Followers() {
     return (
         <section className="flex md:flex-row flex-col h-screen gap-[1rem] p-[1rem] bg-black text-white relative z-10">
             <Navbar1/>
-            <Navbar2/>
             <div className="flex flex-col gap-[1rem] p-[1rem] min-h-[450px] bg-[#1a1a1a] md:w-3/4 w-full h-[100%] overflow-y-auto">
                 {currentUserFollowers.length > 0 ? (
                     currentUserFollowers.map(follower => (
@@ -76,6 +75,7 @@ export default function Followers() {
                     </div>
                 )}
             </div>
+            <Navbar2/>
         </section>
     );
 }

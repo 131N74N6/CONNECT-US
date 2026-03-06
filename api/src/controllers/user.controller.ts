@@ -2,9 +2,6 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 async function signIn(req: Request, res: Response) {
     try {
@@ -45,7 +42,7 @@ async function signIn(req: Request, res: Response) {
                 email: findUser.email, 
                 username: findUser.username 
             },
-            process.env.JWT_SECRET_KEY || 'jwt token',
+            process.env.JWT_SECRET_KEY || 'your_secret_key',
         );
 
         res.status(200).json({

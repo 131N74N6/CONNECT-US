@@ -22,7 +22,7 @@ export default function Likes() {
         api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/get-all/${_id}`,
         limit: 12,
         query_key: [`likes_${_id}`],
-        stale_time: 600000
+        stale_time: 1800000
     });
         
     if (loading) return (
@@ -40,7 +40,6 @@ export default function Likes() {
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
             <Navbar1/>
-            <Navbar2/>
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[200px] w-full bg-[#1a1a1a]">
             {likesLoading ? (
                 <div className="flex justify-center items-center h-full">
@@ -63,6 +62,7 @@ export default function Likes() {
                 </div>
             )}
             </div>
+            <Navbar2/>
         </section>
     );
 }

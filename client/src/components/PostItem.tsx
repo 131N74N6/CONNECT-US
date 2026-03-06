@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { PostItemProps } from "../services/custom-types";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 export default function PostItem(props: PostItemProps) {
     const [imageError, setImageError] = useState<boolean>(false);
@@ -8,21 +8,7 @@ export default function PostItem(props: PostItemProps) {
     
     const getPostFiles = props.posts_file ? props.posts_file : [];
     
-    const mediaType = useMemo(() => {
-        if (getPostFiles.length === 0) return 'text';
-        
-        const getFirstUrl = getPostFiles[0].file_url;
-        if (!getFirstUrl) return 'text';
-        
-        if (getFirstUrl.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/i.test(getFirstUrl)) {
-            return 'image';
-        } else if (getFirstUrl.includes('video') || /\.(mp4|mov|avi|wmv|flv|webm)$/i.test(getFirstUrl)) {
-            return 'video';
-        }
-        return 'text';
-    }, [getPostFiles]);
-    
-    if (getPostFiles.length === 0 || mediaType === 'text') {
+    if (getPostFiles.length === 0) {
         return (
             <Link to={`/post/${props._id}`} className="block">
                 <div className="rounded-lg border border-purple-400 bg-[#1a1a1a] aspect-square flex items-center justify-center p-4">
@@ -37,13 +23,13 @@ export default function PostItem(props: PostItemProps) {
     return (
         <Link to={`/post/${props._id}`} className="block h-full">
             <div className="rounded-lg relative aspect-square bg-gray-800">                
-                {mediaType === 'image' && !imageError ? (
+                {getPostFiles[0].file_url.includes('image') && !imageError ? (
                     <img 
                         className="w-full h-full object-cover"
                         src={getPostFiles[0].file_url}
                         onError={() => setImageError(true)}
                     />
-                ) : mediaType === 'video' && !videoError ? (
+                ) : getPostFiles[0].file_url.includes('video') && !videoError ? (
                     <video
                         muted
                         autoPlay

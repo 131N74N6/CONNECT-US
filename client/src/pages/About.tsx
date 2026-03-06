@@ -5,12 +5,12 @@ import PostList from "../components/PostList";
 import DataModifier from "../services/data.service";
 import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/auth.service";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function About() {
-    const { loading, user } = useAuth();
+    const { user } = useAuth();
     const { user_id } = useParams();
     const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
 
@@ -30,19 +30,19 @@ export default function About() {
     const { data: userPostTotal } = getData<number>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/post-total/${user_id}`,
         query_key: [`user-post-total-${user_id}`],
-        stale_time: 600000
+        stale_time: 1800000
     });
 
     const { data: userConnectionStats } = getData<UserConnectionStatsProps>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/user-connection-stats/${user_id}`, 
         query_key: [`user-connection-stats-${user_id}`],
-        stale_time: 600000
+        stale_time: 1800000
     });
 
     const { data: hasFollowed } = getData<boolean>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/has-followed/?user_id=${currentUserId}&followed_user_id=${user_id}`, 
         query_key: [`has-followed-${user_id}-${currentUserId}`],
-        stale_time: 600000
+        stale_time: 1800000
     });
 
     const { 
@@ -56,26 +56,11 @@ export default function About() {
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/signed-user/${user_id}`, 
         limit: 12,
         query_key: [`signed-user-posts-${user_id}`],
-        stale_time: 600000
+        stale_time: 1800000
     });
 
-    const currentUserPostTotal = useMemo(() => {
-        if (!userPostTotal) return 0;
-        return userPostTotal;
-    }, [userPostTotal, user_id]);
-
-    const followedTotal = useMemo(() => {
-        if (!userConnectionStats) return 0;
-        return userConnectionStats.followed_total;
-    }, [userConnectionStats?.followed_total, user_id]);
-
-    const followersTotal = useMemo(() => {
-        if (!userConnectionStats) return 0;
-        return userConnectionStats.follower_total;
-    }, [userConnectionStats?.follower_total, user_id]);
-
     const notOwner = user_id && user && user.info.id !== user_id;
-    const isFollowed = hasFollowed;
+    const isFollowed = hasFollowed ? hasFollowed : false;
 
     const startFollowMutation = useMutation({
         onMutate: () => setIsFollowLoading(true),
@@ -99,7 +84,7 @@ export default function About() {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`has-followed-${currentUserId}`] });
+            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user_id}-${currentUserId}`] });
         },
         onError: () => setError({ isError: true, message: 'Failed to follow' }),
         onSettled: () => setIsFollowLoading(false)
@@ -116,33 +101,20 @@ export default function About() {
             queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
             queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`has-followed-${currentUserId}`] });
+            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user_id}-${currentUserId}`] });
         },
         onSettled: () => setIsFollowLoading(false)
     });
 
-    const handleFollowBtn = (): void => {
+    function handleFollowBtn() {
         if (isFollowLoading) return;
         if (!isFollowed) startFollowMutation.mutate();
         else stopFollowMutation.mutate();
-    }    
-    
-    if (loading) return (
-        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-            <Loading/>
-        </div>
-    );
-
-    if (!user) return (
-        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-            <span className="text-[2rem] font-[600] text-purple-700">please sign in to see post</span>
-        </div>
-    );
+    }
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black relative z-10">
             <Navbar1/>
-            <Navbar2/>
             {error.isError ? 
                 <Notification
                     class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] absolute top-[5%] left-[50%] right-[50%]"
@@ -175,19 +147,19 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <Link to={`/followers/${user_id}`} className="text-purple-400 font-[500] text-[1rem] cursor-pointer">Followers</Link>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {followersTotal}
+                            {userConnectionStats ? userConnectionStats.follower_total : 0}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <Link to={`/followed/${user_id}`} className="text-purple-400 font-[500] text-[1rem] cursor-pointer">Following</Link>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {followedTotal}
+                            {userConnectionStats ? userConnectionStats.followed_total : 0}
                         </span>
                     </li>
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {currentUserPostTotal}
+                            {userPostTotal ? userPostTotal : 0}
                         </span>
                     </li>
                 </ul>
@@ -212,6 +184,7 @@ export default function About() {
                     </div>
                 )}
             </div>
+            <Navbar2/>
         </section>
     );
 }

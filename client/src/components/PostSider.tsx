@@ -1,31 +1,38 @@
 import { useState } from "react";
 
 interface PostSliderProps {
-    videos: { file_url: string; }[];
+    post_files: { file_url: string; }[];
 }
 
-export default function VideoSlider(props: PostSliderProps) {
-    const [currentIndex, setCurrentIndex] = useState(0);
+export default function PostSider(props: PostSliderProps) {
+    const [currentIndex, setCurrentIndex] = useState<number>(0);
 
     const goToPrevious = () => {
-        setCurrentIndex(prevIndex => prevIndex === 0 ? props.videos.length - 1 : prevIndex - 1);
+        setCurrentIndex(prevIndex => prevIndex === 0 ? props.post_files.length - 1 : prevIndex - 1);
     }
 
     const goToNext = () => {
-        setCurrentIndex(prevIndex => prevIndex === props.videos.length - 1 ? 0 : prevIndex + 1);
+        setCurrentIndex(prevIndex => prevIndex === props.post_files.length - 1 ? 0 : prevIndex + 1);
     }
 
-    if (props.videos.length === 0) return null;
+    if (props.post_files.length === 0) return null;
 
     return (
-        <div className="relative w-full bg-gray-900 rounded-lg overflow-hidden">
-            <video 
-                src={props.videos[currentIndex].file_url} 
-                controls 
-                className="w-full h-auto max-h-96 object-contain"
-            />
-            
-            {props.videos.length > 1 ? (
+        <div className="relative w-full h-96 bg-gray-900 rounded-lg overflow-hidden">
+            {props.post_files[currentIndex].file_url.includes('image') ? (
+                <img 
+                    src={props.post_files[currentIndex].file_url} 
+                    alt={`Slide ${currentIndex + 1}`}
+                    className="w-full h-full object-contain"
+                />
+            ) : props.post_files[currentIndex].file_url.includes('video') ? (
+                <video 
+                    src={props.post_files[currentIndex].file_url} 
+                    controls 
+                    className="w-full h-auto max-h-96 object-contain"
+                />
+            ) : null}
+            {props.post_files.length > 1 ? (
                 <>
                     <button
                         type="button"
@@ -43,7 +50,7 @@ export default function VideoSlider(props: PostSliderProps) {
                     </button>
                     
                     <div className="absolute bottom-2 left-0 right-0 flex justify-center space-x-1">
-                        {props.videos.map((_, index) => (
+                        {props.post_files.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
@@ -53,7 +60,7 @@ export default function VideoSlider(props: PostSliderProps) {
                     </div>
                     
                     <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-                        {currentIndex + 1} / {props.videos.length}
+                        {currentIndex + 1} / {props.post_files.length}
                     </div>
                 </>
             ) : null}

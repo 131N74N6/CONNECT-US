@@ -37,7 +37,7 @@ export default function SignIn() {
                         id="email" 
                         value={email}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-                        className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
+                        className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-purple-400 font-[600] rounded" 
                         placeholder="your@gmail.com"
                     />
                 </div>
@@ -49,7 +49,7 @@ export default function SignIn() {
                         id="password" 
                         value={password}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-                        className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-gray-800 font-[600] rounded" 
+                        className="p-[0.45rem] text-[0.9rem] text-purple-400 outline-0 border border-purple-400 font-[600] rounded" 
                         placeholder="your_password"
                     />
                 </div>

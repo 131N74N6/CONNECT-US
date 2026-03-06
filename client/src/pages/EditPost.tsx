@@ -7,7 +7,6 @@ import type { MediaFile, PostDetail } from "../services/custom-types";
 import Notification from "../components/Notification";
 import { uploadToCloudinary } from "../services/cloud.service";
 import Loading from "../components/Loading";
-import { X } from "lucide-react";
 
 export default function EditPost() {
     const postFolder = 'sns_posts';
@@ -35,7 +34,7 @@ export default function EditPost() {
     const { data: selectedPost } = getData<PostDetail[]>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`, 
         query_key: [`edit-selected-post-${_id}`],
-        stale_time: 660000
+        stale_time: 1800000
     });
 
     useEffect(() => {
@@ -170,8 +169,7 @@ export default function EditPost() {
                                             key={`Preview-img-${index + 1}`}
                                             className="w-full h-32 object-cover rounded-lg"
                                         />
-                                    ) : null}
-                                    {media.file_url.includes('video') ? (
+                                    ) : media.file_url.includes('video') ? (
                                         <video 
                                             src={media.file_url}
                                             key={`Preview-vid-${index + 1}`}
@@ -185,9 +183,9 @@ export default function EditPost() {
                                             e.stopPropagation();
                                             removeExistingFile(media.public_id);
                                         }}
-                                        className="absolute top-1 right-1 bg-[rgba(0,0,0,0.5)] rounded-full w-6 h-6 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                        className="absolute top-1 right-1 cursor-pointer bg-[rgba(0,0,0,0.5)] text-white rounded-full p-[1rem] w-6 h-6 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
-                                        <X size={22} color="white"></X>
+                                        <i className="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
                             ))}
@@ -200,8 +198,7 @@ export default function EditPost() {
                                             key={`Exist-img-${index + 1}`}
                                             className="w-full h-32 object-cover rounded-lg"
                                         />
-                                    ) : null}
-                                    {media.type === 'video' ? (
+                                    ) : media.type === 'video' ? (
                                         <video 
                                             src={media.previewUrl}
                                             key={`Exist-vid-${index + 1}`}
@@ -215,9 +212,9 @@ export default function EditPost() {
                                             e.stopPropagation();
                                             removeMediaFile(index);
                                         }}
-                                        className="absolute top-1 right-1 bg-[rgba(0,0,0,0.5)] rounded-full p-[1rem] w-6 h-6 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                        className="absolute top-1 right-1 cursor-pointer bg-[rgba(0,0,0,0.5)] text-white rounded-full p-[1rem] w-6 h-6 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
-                                        <X size={22} color="white"></X>
+                                        <i className="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
                             ))}

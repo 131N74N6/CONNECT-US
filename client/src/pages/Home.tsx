@@ -20,7 +20,7 @@ export default function Home() {
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/get-all`, 
         limit: 12,
         query_key: ['all-posts'],
-        stale_time: 600000
+        stale_time: 1800000
     });
 
     if (loading) return (
@@ -38,7 +38,6 @@ export default function Home() {
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">
             <Navbar1/>
-            <Navbar2/>
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[200px] w-full bg-[#1a1a1a]">
                 {error ? (
                     <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
@@ -61,6 +60,7 @@ export default function Home() {
                     </div>
                 )}
             </div>
+            <Navbar2/>
         </section>
     );
 }

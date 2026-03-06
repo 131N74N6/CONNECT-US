@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload as JwtPayloadType } from "jsonwebtoken";
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 interface AuthRequest extends Request {
     user?: {
@@ -33,7 +30,7 @@ const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction):
         // Verifikasi token
         let decoded: string | JwtPayloadType;
         try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || 'jwt token');
+            decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || 'your_secret_key');
         } catch (verifyError) {
             if (verifyError instanceof jwt.TokenExpiredError) {
                 res.status(401).json({ message: 'Token expired' });

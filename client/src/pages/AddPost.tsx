@@ -149,21 +149,20 @@ export default function AddPost() {
                                             alt={`Preview ${index + 1}`}
                                             className="w-full h-32 object-cover rounded-lg"
                                         />
-                                    ) : (
+                                    ) : media.type === 'video' ? (
                                         <video 
                                             src={media.previewUrl}
                                             className="w-full h-32 object-cover rounded-lg"
                                             controls
                                         />
-                                    )}
-                                    
+                                    ) : null}
                                     <button
                                         type="button"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                             e.stopPropagation();
                                             removeMediaFile(index);
                                         }}
-                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-[1rem] w-6 h-6 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute top-1 right-1 cursor-pointer bg-[rgba(0,0,0,0.5)] text-white rounded-full p-[1rem] w-6 h-6 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
                                         <i className="fa-solid fa-xmark"></i>
                                     </button>

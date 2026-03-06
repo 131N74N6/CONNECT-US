@@ -30,7 +30,7 @@ export default function Comments() {
     } =  infiniteScroll<Pick<IComments, 'created_at' | 'username' | 'opinions'>>({
         api_url: _id ? `${import.meta.env.VITE_API_BASE_URL}/comments/get-all/${_id}` : ``, 
         limit: 12,
-        stale_time: 1000,
+        stale_time: 1800000,
         query_key: [`comments-${_id}`]
     });
 
