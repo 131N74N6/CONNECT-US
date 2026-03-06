@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import useAuth from "../services/auth.service";
 import DataModifier from "../services/data.service";
-import { uploadToCloudinary } from "../services/cloud.service";
+import { uploadToCloudinary } from "../services/cloudiary.service";
 import type { MediaFile, PostDetail } from "../services/custom-types";
 import { useNavigate } from "react-router-dom";
 import Notification from "../components/Notification";

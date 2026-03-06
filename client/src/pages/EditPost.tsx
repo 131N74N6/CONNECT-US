@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import type { MediaFile, PostDetail } from "../services/custom-types";
 import Notification from "../components/Notification";
-import { uploadToCloudinary } from "../services/cloud.service";
+import { uploadToCloudinary } from "../services/cloudiary.service";
 import Loading from "../components/Loading";
 
 export default function EditPost() {

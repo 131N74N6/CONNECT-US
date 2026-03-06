@@ -60,8 +60,6 @@ const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction):
 
         next();
     } catch (error) {
-        // Ini seharusnya tidak terjadi jika semua error di atas ditangani
-        console.error('VerifyToken middleware error:', error);
         res.status(500).json({ message: 'Internal server error during token verification' });
     }
 };

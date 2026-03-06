@@ -114,8 +114,7 @@ async function signUp(req: Request, res: Response) {
 
 async function getSelectedUser(req: Request, res: Response) {
     try {
-        const getUserId = req.params.id;
-        const signedInUser = await User.find({ _id: getUserId });
+        const signedInUser = await User.find({ _id: req.params.user_id });
         res.json(signedInUser);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -124,8 +123,7 @@ async function getSelectedUser(req: Request, res: Response) {
 
 async function updateSelectedUser(req: Request, res: Response) {
     try {
-        const getUserId = req.params.id;
-        await User.updateOne({ _id: getUserId }, {
+        await User.updateOne({ _id: req.params.user_id }, {
             $set: {
                 username: req.body.username
             }
