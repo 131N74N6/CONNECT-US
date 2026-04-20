@@ -6,7 +6,7 @@ export default function LikeList(props: LikeListProps) {
     if (props.likes.length === 0) {
         return (
             <section className="flex h-full items-center justify-center">
-                <span className="text-purple-400 font-[600] text-[1rem]">No post added currently...</span>
+                <span className="text-purple-400 font-[600] text-[1rem]">No likes currently...</span>
             </section>
         );
     }
