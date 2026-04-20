@@ -49,7 +49,7 @@ export default function SignIn() {
                 <div className="flex flex-col gap-[0.5rem] relative">
                     <label htmlFor="password" className="font-medium text-purple-400">Password</label>
                     <input 
-                        type="password" 
+                        type={showPassword ? "text" : "password"} 
                         id="password" 
                         value={password}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
