@@ -1,4 +1,4 @@
-import type { AddFollowerProps, UserConnectionStatsProps, PostItemProps } from "../services/custom-types";
+import type { AddFollowerProps, UserConnectionStatsProps, PostItemProps, IUserInfo } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
@@ -10,13 +10,17 @@ import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function About() {
-    const { user } = useAuth();
+    const queryQlient = useQueryClient();
+    const { currentUserId } = useAuth();
     const { user_id } = useParams();
     const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
 
-    const currentUserId = user ? user.info.id : '';
-    const queryQlient = useQueryClient();
-
+    const { data: userData } =  getData<IUserInfo>({
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
+        query_key: ['signed-in-user'], 
+        stale_time: 660000
+    });
+    
     const [error, setError] = useState({ isError: false, message: '' });
     const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
     
@@ -59,13 +63,13 @@ export default function About() {
         stale_time: 1800000
     });
 
-    const notOwner = user_id && user && user.info.id !== user_id;
+    const notOwner = user_id && currentUserId && currentUserId !== user_id;
     const isFollowed = hasFollowed ? hasFollowed : false;
 
     const startFollowMutation = useMutation({
         onMutate: () => setIsFollowLoading(true),
         mutationFn: async () => {
-            if (!user_id || !user) return;
+            if (!user_id || !userData || !currentUserId) return;
 
             const getCurrentDate = new Date();
             
@@ -75,8 +79,8 @@ export default function About() {
                     created_at: getCurrentDate.toISOString(),
                     followed_user_id: user_id,
                     followed_username: currentUserPosts[0].uploader_name,
-                    user_id: user.info.id,
-                    username: user.info.username
+                    user_id: currentUserId,
+                    username: userData.username
                 }
             });
         },
@@ -93,8 +97,7 @@ export default function About() {
     const stopFollowMutation = useMutation({
         onMutate: () => setIsFollowLoading(true),
         mutationFn: async () => {
-            if (!user) return;
-            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/followers/erase/${user.info.id}`);
+            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/followers/erase/${currentUserId}`);
         },
         onError: () => setError({ isError: true, message: 'Failed to unfollow' }),
         onSuccess: () => {
@@ -136,7 +139,7 @@ export default function About() {
                             {isFollowLoading ? 'loading...' : isFollowed ? 'Following' : 'Follow'}
                         </button> 
                     ) : (
-                        <Link to={user ? `/setting/${user.info.id}` : '/home'}>
+                        <Link to={currentUserId ? `/setting/${currentUserId}` : '/home'}>
                             <div className="bg-purple-400 cursor-pointer w-[88px] text-[0.9rem] p-[0.3rem] text-center text-[#1a1a1a] font-[500]">
                                 Setting
                             </div>

@@ -3,13 +3,13 @@ import useAuth from "../services/auth.service";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import DataModifier from "../services/data.service";
-import type { IComments, PostDetail } from "../services/custom-types";
+import type { IComments, IUserInfo, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 
 export default function Comments() {
     const queryClient = useQueryClient();
     const { _id } = useParams();
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const { getData, infiniteScroll, insertData } = DataModifier();
     
     const [isSendComment, setIsSendComment] = useState<boolean>(false);
@@ -20,6 +20,12 @@ export default function Comments() {
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`,
         query_key: [`selected-post-${_id}`],
         stale_time: 600000
+    });
+
+    const { data: userData } =  getData<IUserInfo>({
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
+        query_key: ['signed-in-user'], 
+        stale_time: 660000
     });
     
     const {
@@ -39,8 +45,7 @@ export default function Comments() {
         mutationFn: async () => {
             const getCurrentDate = new Date();
 
-            if (!user || !_id || !selectedPost) return;
-            if (!comment.trim()) return;
+            if (!currentUserId || !comment.trim() || !userData || !_id || !selectedPost) return;
 
             await insertData<IComments>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
@@ -48,8 +53,8 @@ export default function Comments() {
                     created_at: getCurrentDate.toISOString(),
                     opinions: comment.trim(),
                     post_id: _id,
-                    user_id: user.info.id,
-                    username: user.info.username,
+                    user_id: currentUserId,
+                    username: userData.username,
                     post_owner_id: selectedPost?.[0]?.user_id
                 }
             });
@@ -73,7 +78,7 @@ export default function Comments() {
     
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
-            <div className="w-full min-h-[300px] flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg overflow-y-auto p-[0.8rem]">
+            <div className="w-full h-full flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg p-[0.8rem]">
                 <div className="flex flex-col gap-[1rem] pb-[1rem] border-b border-purple-400 h-[88%] overflow-y-auto">
                     {commentsData.length > 0 ?
                         commentsData.map((comment, index) => (

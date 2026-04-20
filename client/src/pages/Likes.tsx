@@ -4,12 +4,10 @@ import type { LikeDataProps } from "../services/custom-types";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import LikeList from "../components/LikeList";
 import Loading from "../components/Loading";
-import useAuth from "../services/auth.service";
 
 export default function Likes() {
     const { _id } = useParams();
     const { infiniteScroll } = DataModifier();
-    const { loading, user } = useAuth();
     
     const {
         data: likes,
@@ -24,18 +22,6 @@ export default function Likes() {
         query_key: [`likes_${_id}`],
         stale_time: 1800000
     });
-        
-    if (loading) return (
-        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-            <Loading/>
-        </div>
-    );
-
-    if (!user) return (
-        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-            <span className="text-[2rem] font-[600] text-purple-700">please sign in to see post</span>
-        </div>
-    );
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">

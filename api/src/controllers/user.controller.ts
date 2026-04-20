@@ -52,11 +52,7 @@ export async function signIn(req: Request, res: Response) {
         res.status(200).json({
             status: "sign-in successfully",
             token,
-            info: {
-                id: findUser._id, 
-                email: findUser.email, 
-                username: findUser.username 
-            }
+            user_id: findUser._id
         });
     } catch (error) {
         res.status(500).json({ message: "internal server error" });
@@ -110,7 +106,7 @@ export async function signUp(req: Request, res: Response) {
         });
 
         await newUser.save();
-        res.status(201).json({ message: "new user added" });
+        res.status(200).json({ message: "new user added" });
     } catch (error) {
         res.status(500).json({ message: "internal server error" });
     }

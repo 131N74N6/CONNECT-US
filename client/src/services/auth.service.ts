@@ -4,8 +4,11 @@ import { useNavigate } from 'react-router-dom';
 
 export default function useAuth() {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [userLoading, setUserLoading] = useState<boolean>(true);
+    const [userError, setUserError] = useState<string | null>(null);
+
+    const currentUserId = user ? user.user_id : null;
+    const token = user ? user.token : null;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,10 +20,10 @@ export default function useAuth() {
                     setUser(parsedUser);
                 }
             } catch (error: any) {
-                setError(error.message);
+                setUserError(error.message);
                 localStorage.removeItem('user'); 
             } finally {
-                setLoading(false); 
+                setUserLoading(false); 
             }
         };
 
@@ -28,7 +31,7 @@ export default function useAuth() {
     }, []);
 
     async function signIn (email: string, password: string) {
-        setLoading(true);
+        setUserLoading(true);
         try {
             const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-in`, {
                 headers: { 'Content-Type': 'application/json' },
@@ -40,30 +43,26 @@ export default function useAuth() {
 
             if (!request.ok) {
                 const errorMessage = response.error || response.message || 'Gagal sign-in! Coba lagi nanti';
-                setError(errorMessage);
+                setUserError(errorMessage);
             } else {
                 const signedInUser = {
                     status: response.status,
                     token: response.token,
-                    info: {
-                        id: response.info.id,
-                        email: response.info.email,
-                        username: response.info.username
-                    }
+                    user_id: response.user_id
                 }
     
                 setUser(signedInUser);
                 localStorage.setItem('user', JSON.stringify(signedInUser));
             }
         } catch (error: any) {
-            setError(error.message);
+            setUserError(error.message);
         } finally {
-            setLoading(false);
+            setUserLoading(false);
         }
     }
 
     async function signUp (created_at: string, email: string, username: string, password: string) {
-        setLoading(true);
+        setUserLoading(true);
         try {
             const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-up`, {
                 headers: { 'Content-Type': 'application/json' },
@@ -77,27 +76,27 @@ export default function useAuth() {
                 navigate('/sign-in');
             } else {
                 const errorMessage = response.error || response.message || 'Gagal sign-up! Coba lagi nanti';
-                setError(errorMessage);
+                setUserError(errorMessage);
             }
         } catch (error: any) {
-            setError(error.message);
+            setUserError(error.message);
         } finally {
-            setLoading(false);
+            setUserLoading(false);
         }
     }
 
     async function signOut() {
-        setLoading(true);
+        setUserLoading(true);
         try {
             localStorage.removeItem('user');
             navigate('/signin');
-            setError(null);
+            setUserError(null);
         } catch (error: any) {
-            setError(error.message);
+            setUserError(error.message);
         } finally {
-            setLoading(false);
+            setUserLoading(false);
         }
     }
 
-    return { user, loading, error, setError, signUp, signIn, signOut };
+    return { currentUserId, token, userLoading, userError, setUserError, signUp, signIn, signOut };
 }

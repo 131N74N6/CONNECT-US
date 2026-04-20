@@ -4,8 +4,7 @@ import useAuth from "./auth.service";
 import { useState } from "react";
 
 export default function DataModifier() {
-    const { loading, user } = useAuth();
-    const token = user ? user.token : null;
+    const { userLoading, token } = useAuth();
     const [error, setError] = useState<string | null>(null);
 
     async function deleteData(api_url: string) {
@@ -61,7 +60,7 @@ export default function DataModifier() {
 
     const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
-            enabled: !!token && !loading,
+            enabled: !!token && !userLoading,
             queryFn: async () => {
                 const request = await fetch(props.api_url, {
                     headers: {
@@ -159,7 +158,7 @@ export default function DataModifier() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
-            enabled: !!token && !loading,
+            enabled: !!token && !userLoading,
             initialPageParam: 1,
             queryKey: props.query_key,
             queryFn: fetchData,

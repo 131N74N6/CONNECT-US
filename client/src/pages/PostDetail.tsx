@@ -11,14 +11,13 @@ import PostSider from "../components/PostSider";
 
 export default function PostDetail() {
     const { _id } = useParams();
-    const { user } = useAuth();
+    const { currentUserId } = useAuth();
     const { deleteData, getData, insertData } = DataModifier();
     const navigate = useNavigate();
     
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [error, setError] = useState({ isError: false, message: '' });
     const queryClient = useQueryClient();
-    const currentUserId = user ? user.info.id : '';
 
     useEffect(() => {
         if (error.isError) {
@@ -51,21 +50,21 @@ export default function PostDetail() {
         stale_time: 1800000
     });
     
-    const isPostOwner = user ? user.info.id === selectedPost?.[0]?.user_id : false;
+    const isPostOwner = currentUserId ? currentUserId === selectedPost?.[0]?.user_id : false;
     const isLiked = hasUserLiked ? hasUserLiked : false;
 
     const giveLikeMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
             const getCurrentDate = new Date();
-            if (!user || !_id || !selectedPost) return;
+            if (!currentUserId || !_id || !selectedPost) return;
 
             await insertData<LikeDataProps>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),
                     post_id: _id,
-                    user_id: user.info.id,
+                    user_id: currentUserId,
                     username: user.info.username,
                     post_owner_id: selectedPost[0].user_id
                 }
@@ -83,8 +82,7 @@ export default function PostDetail() {
     const startDislikeMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
-            if (!user) return;
-            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/likes/erase/${user.info.id}`);
+            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/likes/erase/${currentUserId}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`likes-${_id}`] });

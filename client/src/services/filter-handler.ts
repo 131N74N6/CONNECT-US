@@ -3,8 +3,7 @@ import useAuth from "./auth.service";
 import type { PostItemProps, SearchedPost } from "./custom-types";
 
 export default function FilterHandler() {
-    const { user } = useAuth();
-    const token = user ? user.token : null;
+    const { token } = useAuth();
     
     function searchedPost(props: SearchedPost) {
         const fecthers = async ({ pageParam = 1 }: { pageParam?: number }) => {

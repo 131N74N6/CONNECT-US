@@ -2,24 +2,30 @@ import { useState, useRef, useEffect } from "react";
 import useAuth from "../services/auth.service";
 import DataModifier from "../services/data.service";
 import { uploadToCloudinary } from "../services/cloudiary.service";
-import type { MediaFile, PostDetail } from "../services/custom-types";
+import type { IUserInfo, MediaFile, PostDetail } from "../services/custom-types";
 import { useNavigate } from "react-router-dom";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Loading from "../components/Loading";
 
 export default function AddPost() {
     const postFolder = 'sns_posts';
-    const { loading, user } = useAuth();
+    const { currentUserId } = useAuth();
     const navigate = useNavigate();
     const { error, insertData, setError } = DataModifier();
     const queryQlient = useQueryClient();
-    const currentUserId = user ? user.info.id : '';
 
     const [description, setDescription] = useState<string>('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const { getData } = DataModifier();
+
+    const { data: userData } =  getData<IUserInfo>({
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
+        query_key: ['signed-in-user'], 
+        stale_time: 660000
+    });
 
     useEffect(() => {
         if (error) {
@@ -61,7 +67,7 @@ export default function AddPost() {
     const insertMutation = useMutation({
         onMutate: () => setIsUploading(true),
         mutationFn: async () => {
-            if (!user) return;
+            if (!currentUserId || !userData) return;
 
             const getCurrentDate = new Date();
             const postsFiles: { file_url: string; public_id: string; }[] = [];
@@ -77,8 +83,8 @@ export default function AddPost() {
                     created_at: getCurrentDate.toISOString(),
                     description: description.trim(),
                     posts_file: postsFiles,
-                    uploader_name: user.info.username,
-                    user_id: user.info.id,
+                    uploader_name: userData.username,
+                    user_id: currentUserId,
                 }
             });
         },
@@ -97,18 +103,6 @@ export default function AddPost() {
         event.preventDefault();
         insertMutation.mutate();
     }
-    
-    if (loading) return (
-        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-            <Loading/>
-        </div>
-    );
-
-    if (!user) return (
-        <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-            <span className="text-[2rem] font-[600] text-purple-700">please sign in to see post</span>
-        </div>
-    );
 
     return (
         <section className="bg-black flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem]">

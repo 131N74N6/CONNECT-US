@@ -33,16 +33,13 @@ export type MediaFile = {
 export type User = {
     status: string;
     token: string;
-    info: {
-        id: string;
-        email: string;
-        username: string;
-    }
+    user_id: string;
 }
 
 export type IUserInfo = {
-    _id: string;
+    created_at: string;
     email: string;
+    user_id: string;
     username: string;
 }
 
