@@ -1,38 +1,42 @@
 import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import jwt from "jsonwebtoken";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
+import { Post } from "../models/post.model";
+import { Like } from "../models/like.model";
+import { Comment } from "../models/comment.model";
+import { v2 } from "cloudinary";
 
-async function signIn(req: Request, res: Response) {
+export async function signIn(req: Request, res: Response) {
     try {
         const { email, password } = req.body;
         
         if (!email) {
-            res.status(400).json({ message: 'email is required' });
+            res.status(400).json({ message: "email is required" });
             return;
         }
 
         if (!email || !password) {
-            res.status(400).json({ message: 'email and password is required' });
+            res.status(400).json({ message: "email and password is required" });
             return;
         }
 
         if (!password) {
-            res.status(400).json({ message: 'password is required' });
+            res.status(400).json({ message: "password is required" });
             return;
         }
 
         const findUser = await User.findOne({ email });
 
         if (!findUser) {
-            res.status(401).json({ message: 'Invalid email. Try again later' });
+            res.status(401).json({ message: "Invalid email. Try again later" });
             return;
         }
 
         const isPasswordMatch = await bcrypt.compare(password, findUser.password);
 
         if (!isPasswordMatch) {
-            res.status(400).json({ message: 'Invalid password. Try again later' });
+            res.status(400).json({ message: "Invalid password. Try again later" });
             return;
         }
 
@@ -42,11 +46,11 @@ async function signIn(req: Request, res: Response) {
                 email: findUser.email, 
                 username: findUser.username 
             },
-            process.env.JWT_SECRET_KEY || 'your_secret_key',
+            process.env.JWT_SECRET_KEY || "your_secret_key",
         );
 
         res.status(200).json({
-            status: 'sign-in successfully',
+            status: "sign-in successfully",
             token,
             info: {
                 id: findUser._id, 
@@ -55,31 +59,31 @@ async function signIn(req: Request, res: Response) {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
+        res.status(500).json({ message: "internal server error" });
     }
 }
 
-async function signUp(req: Request, res: Response) {
+export async function signUp(req: Request, res: Response) {
     try {
         const { created_at, email, password, username } = req.body;
 
         if (!email || !password || !username) {
-            res.status(400).json({ message: 'email, password, and username is required' });
+            res.status(400).json({ message: "email, password, and username is required" });
             return;
         }
         
         if (!email) {
-            res.status(400).send({ message: 'email is required' });
+            res.status(400).send({ message: "email is required" });
             return;
         }
 
         if (!password) {
-            res.status(400).send({ message: 'password is required' });
+            res.status(400).send({ message: "password is required" });
             return;
         }
 
         if (!username) {
-            res.status(400).send({ message: 'username is required' });
+            res.status(400).send({ message: "username is required" });
             return;
         }
 
@@ -87,12 +91,12 @@ async function signUp(req: Request, res: Response) {
         const findUsername = await User.findOne({ username });
         
         if (findEmail) {
-            res.status(400).send({ message: 'email already exist' });
+            res.status(400).send({ message: "email already exist" });
             return;
         }
         
         if (findUsername) {
-            res.status(400).send({ message: 'username already exist' });
+            res.status(400).send({ message: "username already exist" });
             return;
         }
 
@@ -106,22 +110,61 @@ async function signUp(req: Request, res: Response) {
         });
 
         await newUser.save();
-        res.status(201).json({ message: 'new user added' });
+        res.status(201).json({ message: "new user added" });
     } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
+        res.status(500).json({ message: "internal server error" });
     }
 }
 
-async function getSelectedUser(req: Request, res: Response) {
+export async function deleteCurrentUser(req: Request, res: Response) {
     try {
-        const signedInUser = await User.find({ _id: req.params.user_id });
-        res.json(signedInUser);
+        const currentUserPublicIds: string[] = [];
+        const currentUserPosts = await Post.find({ user_id: req.params.user_id });
+
+        if (!currentUserPosts) return res.status(404).json({ message: 'Post not found.' });
+
+        currentUserPosts.forEach(currentPost => {
+            currentPost.posts_file.forEach(post_file => {
+                currentUserPublicIds.push(post_file.public_id);
+            });
+        });
+
+        const deleteFromCloudinary = currentUserPublicIds.map(currentPublicId => {
+            return v2.uploader.destroy(currentPublicId);
+        })
+
+        await Promise.all([
+            deleteFromCloudinary,
+            User.deleteOne({ _id: req.params.user_id }),
+            Post.deleteMany({ user_id: req.params.user_id }),
+            Like.deleteMany({ post_owner_id: req.params.user_id }),
+            Comment.deleteMany({ post_owner_id: req.params.user_id })
+        ]);
+
+        res.status(200).json({ message: "user deleted" });
     } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
+        res.status(500).json({ message: "internal server error" })
     }
 }
 
-async function updateSelectedUser(req: Request, res: Response) {
+export async function getCurrentUserData(req: Request, res: Response) {
+    try {
+        const findUser = await User.find({ _id: req.params.user_id });
+
+        if (!findUser) return res.status(404).json({ message: 'User not found' });
+
+        res.status(200).json({
+            created_at: findUser[0].created_at,
+            email: findUser[0].email,
+            user_id: findUser[0]._id,
+            username: findUser[0].username
+        });
+    } catch (error) {
+        res.status(500).json({ message: "internal server error" });
+    }
+}
+
+export async function updateSelectedUser(req: Request, res: Response) {
     try {
         await User.updateOne({ _id: req.params.user_id }, {
             $set: {
@@ -129,8 +172,6 @@ async function updateSelectedUser(req: Request, res: Response) {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'internal server error' });
+        res.status(500).json({ message: "internal server error" });
     }
 }
-
-export { getSelectedUser, signIn, signUp, updateSelectedUser }

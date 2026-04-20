@@ -74,6 +74,7 @@ export default function SignIn() {
                 
                 <button 
                     type="submit" 
+                    disabled={loading}
                     className="p-[0.45rem] text-base md:text-md outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-purple-800 transition-colors"
                 >
                     {loading ? 'Signing In...' : 'Sign In'}
