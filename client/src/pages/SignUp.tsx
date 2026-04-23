@@ -4,7 +4,7 @@ import useAuth from "../services/auth.service";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SignUp() {
-    const { error, loading, setError, signUp, user } = useAuth();
+    const { userError, userLoading, setUserError, signUp, currentUserId } = useAuth();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
@@ -13,15 +13,15 @@ export default function SignUp() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     useEffect(() => {
-        if (user) navigate('/home', { replace: true });
-    }, [user, navigate]);
+        if (currentUserId) navigate('/home', { replace: true });
+    }, [currentUserId, navigate]);
 
     useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(null), 3000);
+        if (userError) {
+            const timer = setTimeout(() => setUserError(null), 3000);
             return () => clearTimeout(timer);
         }
-    }, [error]);
+    }, [userError]);
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -76,10 +76,10 @@ export default function SignUp() {
                     </button>
                 </div>
                 <div className="text-center text-white">Already have account? <Link className="text-blue-400" to={'/signin'}>SignIn</Link></div>                    
-                {error ? <div className="text-blue-300 font-medium text-base md:text-md text-center">{error}</div> : null}
+                {userError ? <div className="text-blue-300 font-medium text-base md:text-md text-center">{userError}</div> : null}
                 <button 
                     type="submit" 
-                    disabled={loading}
+                    disabled={userLoading}
                     className="p-[0.45rem] text-base md:text-md outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Sign Up

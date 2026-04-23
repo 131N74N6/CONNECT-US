@@ -4,7 +4,7 @@ import useAuth from "../services/auth.service";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
-    const { error, loading, setError, user, signIn } = useAuth();
+    const { userError, userLoading, setUserError, currentUserId, signIn } = useAuth();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
@@ -12,15 +12,15 @@ export default function SignIn() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     useEffect(() => {
-        if (user) navigate('/home', { replace: true });
-    }, [user, navigate]);
+        if (currentUserId) navigate('/home', { replace: true });
+    }, [currentUserId, navigate]);
 
     useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(null), 3000);
+        if (userError) {
+            const timer = setTimeout(() => setUserError(null), 3000);
             return () => clearTimeout(timer);
         }
-    }, [error]);
+    }, [userError]);
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -70,14 +70,14 @@ export default function SignIn() {
                     <span className="text-white">Don't have an account?</span> <Link className="text-blue-400 hover:underline" to={'/signup'}>Sign Up</Link>
                 </div>
                 
-                {error ? <div className="text-blue-300 font-medium text-center text-base md:text-md">{error}</div> : null}
+                {userError ? <div className="text-blue-300 font-medium text-center text-base md:text-md">{userError}</div> : null}
                 
                 <button 
                     type="submit" 
-                    disabled={loading}
+                    disabled={userLoading}
                     className="p-[0.45rem] text-base md:text-md outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-purple-800 transition-colors"
                 >
-                    {loading ? 'Signing In...' : 'Sign In'}
+                    {userLoading ? 'Signing In...' : 'Sign In'}
                 </button>
             </form>
         </div>
