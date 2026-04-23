@@ -30,7 +30,7 @@ export async function verifyToken(req: AuthRequest, res: Response, next: NextFun
 }
 
 export async function checkOwnership(req: AuthRequest, res: Response, next: NextFunction) {
-    try {        
+    try {
         const requestedUserId = req.params.user_id;
 
         if (!req.user) return res.status(401).json({ message: 'Authentication required' });

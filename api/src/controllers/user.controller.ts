@@ -16,20 +16,20 @@ export async function signIn(req: Request, res: Response) {
         if (!email) return res.status(400).json({ message: 'email is required' });
         if (!password) return res.status(400).json({ message: 'password is required' });
 
-        if (!findEmail) return res.status(400).json({ message: 'email not found' });
+        if (!findEmail) return res.status(404).json({ message: 'email not found' });
         
         const isPasswordMatch = await bcrypt.compare(password, findEmail.password);
         if (!isPasswordMatch) return res.status(400).json({ message: 'incorrect password' });
 
         const generatedToken = jwt.sign(
             { user_id: findEmail._id.toString() },
-            process.env.JWT_TOKEN || 'your_jwt_key_myfriend',
+            process.env.JWT_TOKEN || 'your_secret_key',
         );
 
         res.status(200).json({
             status: 'ok',
             token: generatedToken,
-            user_id: findEmail._id
+            user_id: findEmail._id.toString()
         });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
@@ -100,7 +100,7 @@ export async function getCurrentUserData(req: Request, res: Response) {
         res.status(200).json({
             created_at: findUser[0].created_at,
             email: findUser[0].email,
-            user_id: findUser[0]._id,
+            user_id: findUser[0]._id.toString(),
             username: findUser[0].username
         });
     } catch (error) {
