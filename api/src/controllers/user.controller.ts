@@ -11,43 +11,24 @@ export async function signIn(req: Request, res: Response) {
     try {
         const { email, password } = req.body;
         
-        if (!email) {
-            res.status(400).json({ message: "email is required" });
-            return;
-        }
-
-        if (!email || !password) {
-            res.status(400).json({ message: "email and password is required" });
-            return;
-        }
-
-        if (!password) {
-            res.status(400).json({ message: "password is required" });
-            return;
-        }
+        if (!email || !password) return res.status(400).json({ message: "email and password is required" });
+        if (!email) return res.status(400).json({ message: "email is required" });
+        if (!password) return res.status(400).json({ message: "password is required" });
 
         const findUser = await User.findOne({ email });
-
-        if (!findUser) {
-            res.status(401).json({ message: "Invalid email. Try again later" });
-            return;
-        }
+        if (!findUser) return res.status(400).json({ message: "Invalid email. Try again later" });
 
         const isPasswordMatch = await bcrypt.compare(password, findUser.password);
+        if (!isPasswordMatch) return res.status(400).json({ message: "Invalid password. Try again later" });
 
-        if (!isPasswordMatch) {
-            res.status(400).json({ message: "Invalid password. Try again later" });
-            return;
-        }
-
-        const token = jwt.sign(
+        const generatedToken = jwt.sign(
             { user_id: findUser._id.toString() },
             process.env.JWT_SECRET_KEY || "your_secret_key",
         );
 
         res.status(200).json({
             status: "sign-in successfully",
-            token,
+            token: generatedToken,
             user_id: findUser._id
         });
     } catch (error) {
@@ -59,38 +40,16 @@ export async function signUp(req: Request, res: Response) {
     try {
         const { created_at, email, password, username } = req.body;
 
-        if (!email || !password || !username) {
-            res.status(400).json({ message: "email, password, and username is required" });
-            return;
-        }
-        
-        if (!email) {
-            res.status(400).send({ message: "email is required" });
-            return;
-        }
-
-        if (!password) {
-            res.status(400).send({ message: "password is required" });
-            return;
-        }
-
-        if (!username) {
-            res.status(400).send({ message: "username is required" });
-            return;
-        }
+        if (!email || !password || !username) return res.status(400).json({ message: "email, password, and username is required" });
+        if (!email) return res.status(400).send({ message: "email is required" });
+        if (!password) return res.status(400).send({ message: "password is required" });
+        if (!username) return res.status(400).send({ message: "username is required" });
 
         const findEmail = await User.findOne({ email });
         const findUsername = await User.findOne({ username });
         
-        if (findEmail) {
-            res.status(400).send({ message: "email already exist" });
-            return;
-        }
-        
-        if (findUsername) {
-            res.status(400).send({ message: "username already exist" });
-            return;
-        }
+        if (findEmail) return res.status(400).send({ message: "email already exist" });
+        if (findUsername) return res.status(400).send({ message: "username already exist" });
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
