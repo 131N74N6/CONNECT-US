@@ -10,60 +10,53 @@ import { v2 } from "cloudinary";
 export async function signIn(req: Request, res: Response) {
     try {
         const { email, password } = req.body;
+        const findEmail = await User.findOne({ email });
         
-        if (!email || !password) return res.status(400).json({ message: "email and password is required" });
-        if (!email) return res.status(400).json({ message: "email is required" });
-        if (!password) return res.status(400).json({ message: "password is required" });
+        if (!password || !email) return res.status(400).json({ message: "email and password is required" });
+        if (!email) return res.status(400).json({ message: 'email is required' });
+        if (!password) return res.status(400).json({ message: 'password is required' });
 
-        const findUser = await User.findOne({ email });
-        if (!findUser) return res.status(400).json({ message: "Invalid email. Try again later" });
-
-        const isPasswordMatch = await bcrypt.compare(password, findUser.password);
-        if (!isPasswordMatch) return res.status(400).json({ message: "Invalid password. Try again later" });
+        if (!findEmail) return res.status(400).json({ message: 'email not found' });
+        
+        const isPasswordMatch = await bcrypt.compare(password, findEmail.password);
+        if (!isPasswordMatch) return res.status(400).json({ message: 'incorrect password' });
 
         const generatedToken = jwt.sign(
-            { user_id: findUser._id.toString() },
-            process.env.JWT_SECRET_KEY || "your_secret_key",
+            { user_id: findEmail._id.toString() },
+            process.env.JWT_TOKEN || 'your_jwt_key_myfriend',
         );
 
         res.status(200).json({
-            status: "sign-in successfully",
+            status: 'ok',
             token: generatedToken,
-            user_id: findUser._id
+            user_id: findEmail._id
         });
     } catch (error) {
-        res.status(500).json({ message: "internal server error" });
+        res.status(500).json({ message: 'internal server error' });
     }
 }
 
 export async function signUp(req: Request, res: Response) {
     try {
-        const { created_at, email, password, username } = req.body;
-
-        if (!email || !password || !username) return res.status(400).json({ message: "email, password, and username is required" });
-        if (!email) return res.status(400).send({ message: "email is required" });
-        if (!password) return res.status(400).send({ message: "password is required" });
-        if (!username) return res.status(400).send({ message: "username is required" });
-
-        const findEmail = await User.findOne({ email });
-        const findUsername = await User.findOne({ username });
+        const { created_at, email, username, password } = req.body;
         
-        if (findEmail) return res.status(400).send({ message: "email already exist" });
-        if (findUsername) return res.status(400).send({ message: "username already exist" });
+        if (!password || !email || !username) return res.status(400).json({ message: "email, username, and password is required" });
+        if (!email) return res.status(400).send({ message: 'email is required' });
+        if (!password) return res.status(400).send({ message: 'password is required' });
+        if (!username) return res.status(400).send({ message: 'username is required' });
+        
+        const findEmail = await User.findOne({ email: email });
+        if (findEmail) return res.status(400).send({ message: 'this email already exist' });
+
+        const findUser = await User.findOne({ username: username });
+        if (findUser) return res.status(400).send({ message: 'this username already exist' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = new User({
-            created_at,
-            email,
-            password: hashedPassword,
-            username
-        });
-
+        const newUser = new User({ created_at, email, password: hashedPassword, username });
         await newUser.save();
-        res.status(200).json({ message: "new user added" });
+        res.status(201).json({ message: 'user added' });
     } catch (error) {
-        res.status(500).json({ message: "internal server error" });
+        res.status(500).json({ message: 'internal server error' });
     }
 }
 

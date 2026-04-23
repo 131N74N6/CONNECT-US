@@ -20,6 +20,7 @@ export default function useAuth() {
                     setUser(parsedUser);
                 }
             } catch (error: any) {
+                setUserError(null);
                 setUserError(error.message);
                 localStorage.removeItem('user'); 
             } finally {
@@ -85,7 +86,7 @@ export default function useAuth() {
         }
     }
 
-    function signOut() {
+     function signOut() {
         setUserLoading(true);
         try {
             localStorage.removeItem('user');

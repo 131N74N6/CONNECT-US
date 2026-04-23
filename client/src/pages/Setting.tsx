@@ -121,6 +121,8 @@ export default function Setting() {
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="border border-blue-300 text-blue-300 rounded p-2.5 md:text-lg text-base outline-0 bg-transparent"
                             />
+                            <p className="text-purple-400 font-[500] text-[1rem]">User ID: {userData?.user_id}</p>
+                            <p className="text-purple-400 font-[500] text-[1rem]">Username: {userData?.username}</p>
                             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-[0.4rem]">
                                 <button
                                     type="submit"
@@ -145,6 +147,7 @@ export default function Setting() {
                 <div className="flex justify-center p-[1rem] gap-[1rem] bg-[#1a1a1a] w-full md:w-3/4 h-full">
                     <div className="flex flex-col gap-[1rem]">
                         <p className="text-purple-400 font-[500] text-[1rem]">Email: {userData?.email}</p>
+                        <p className="text-purple-400 font-[500] text-[1rem]">User ID: {userData?.user_id}</p>
                         <p className="text-purple-400 font-[500] text-[1rem]">Username: {userData?.username}</p>
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-[0.4rem]">
                             <button 
