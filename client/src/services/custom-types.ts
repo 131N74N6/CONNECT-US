@@ -93,6 +93,20 @@ export type PostListProps = {
     setSize: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
 }
 
+export type SignInProps = {
+    email: string;
+    password: string;
+    callback: (path: string) => void;
+}
+
+export type SignUpProps = {
+    created_at: string;
+    email: string;
+    username: string;
+    password: string;
+    callback: (path: string) => void;
+}
+
 export type SearchedPost = {
     api_url: string;
     limit: number;

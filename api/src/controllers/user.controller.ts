@@ -38,7 +38,7 @@ export async function signIn(req: Request, res: Response) {
 
 export async function signUp(req: Request, res: Response) {
     try {
-        const { created_at, email, username, password } = req.body;
+        const { created_at, email, password, username } = req.body;
         
         if (!password || !email || !username) return res.status(400).json({ message: "email, username, and password is required" });
         if (!email) return res.status(400).send({ message: 'email is required' });

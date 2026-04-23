@@ -1,103 +1,124 @@
-import { useEffect, useState } from 'react';
-import type { User } from './custom-types';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react"
+import type { SignInProps, SignUpProps, User } from "./custom-types";
 
 export default function useAuth() {
     const [user, setUser] = useState<User | null>(null);
     const [userLoading, setUserLoading] = useState<boolean>(true);
     const [userError, setUserError] = useState<string | null>(null);
 
-    const currentUserId = user ? user.user_id : null;
-    const token = user ? user.token : null;
-    const navigate = useNavigate();
+    const currentUserId = user ? user.user_id : '';
+    const token = user ? user.token : '';
 
     useEffect(() => {
-        const initAuth = () => {
+        function initApp() {
             try {
-                const userExist = localStorage.getItem('user');
-                if (userExist) {
-                    const parsedUser = JSON.parse(userExist);
-                    setUser(parsedUser);
+                const existedUser = localStorage.getItem('user');
+                if (existedUser) {
+                    const userData: User = JSON.parse(existedUser);
+                    setUser(userData);
                 }
             } catch (error: any) {
-                setUserError(null);
+                setUser(null);
                 setUserError(error.message);
-                localStorage.removeItem('user'); 
+                localStorage.removeItem('user');
             } finally {
-                setUserLoading(false); 
+                setUserLoading(false);
             }
-        };
+        }
 
-        initAuth();
+        initApp();
     }, []);
 
-    async function signIn (email: string, password: string) {
+    async function signIn(props: SignInProps): Promise<void> {
         setUserLoading(true);
+        setUserError(null);
+
         try {
-            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-in`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`, {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-                method: 'POST',
+                body: JSON.stringify({ email: props.email, password: props.password }),
+                method: 'POST'
             });
 
             const response = await request.json();
 
             if (!request.ok) {
-                const errorMessage = response.error || response.message || 'Gagal sign-in! Coba lagi nanti';
+                const errorMessage = response.error || response.message || 'Failed to sign in. Try again later';
                 setUserError(errorMessage);
             } else {
-                const signedInUser = {
+                const currentUserToken: User = {
                     status: response.status,
                     token: response.token,
                     user_id: response.user_id
-                }
-    
-                setUser(signedInUser);
-                localStorage.setItem('user', JSON.stringify(signedInUser));
+                };
+
+                localStorage.setItem('user', JSON.stringify(currentUserToken));
+                setUser(currentUserToken);
+                props.callback(`/home`);
             }
         } catch (error: any) {
-            setUserError(error.message);
+            setUserError(error.message || 'Failed to sign in');
         } finally {
             setUserLoading(false);
         }
     }
 
-    async function signUp (created_at: string, email: string, username: string, password: string) {
+    async function signUp (props: SignUpProps): Promise<void> {
         setUserLoading(true);
+        setUserError(null);
+        
         try {
-            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-up`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`, {
+                body: JSON.stringify({ 
+                    created_at: props.created_at, 
+                    email: props.email, 
+                    password: props.password, 
+                    username: props.username 
+                }),
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ created_at, email, password, username }),
-                method: 'POST',
+                method: 'POST'
             });
 
             const response = await request.json();
 
-            if (request.ok) {
-                navigate('/sign-in');
-            } else {
-                const errorMessage = response.error || response.message || 'Gagal sign-up! Coba lagi nanti';
+            if (!request.ok) {
+                const errorMessage = response.error || response.message || 'Failed to sign up. Try again later';
                 setUserError(errorMessage);
+            } else {
+                props.callback('/sign-in');
             }
+
         } catch (error: any) {
-            setUserError(error.message);
+            setUserError(error.message || 'Failed to sign up' );
         } finally {
             setUserLoading(false);
         }
     }
 
-     function signOut() {
+    function signOut(callback: (path: string) => void) {
         setUserLoading(true);
+        setUserError(null);
+
         try {
             localStorage.removeItem('user');
-            navigate('/signin');
-            setUserError(null);
+            setUser(null);
+            callback('/sign-in');
         } catch (error: any) {
-            setUserError(error.message);
+            setUserError(error.message || 'Failed to sign out' );
         } finally {
             setUserLoading(false);
         }
     }
 
-    return { currentUserId, token, userLoading, userError, setUserError, signUp, signIn, signOut };
+    return { 
+        currentUserId,
+        signIn, 
+        signOut, 
+        signUp, 
+        setUserError, 
+        setUserLoading, 
+        token,
+        userError, 
+        userLoading 
+    }
 }

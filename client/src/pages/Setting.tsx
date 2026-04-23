@@ -63,7 +63,7 @@ export default function Setting() {
                     return false;
                 }
             });
-            signOut();
+            signOut(navigate);
         },
         onSettled: () => setIsProcessing(false),
     });

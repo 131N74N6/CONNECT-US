@@ -26,7 +26,7 @@ export default function SignIn() {
 
     const handleSignIn = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
-        await signIn(email.trim(), password.trim());
+        await signIn({ email: email.trim(), password: password.trim(), callback: navigate });
     }, [email, password]);
 
     return (

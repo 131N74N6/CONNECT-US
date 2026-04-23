@@ -25,19 +25,21 @@ export default function SignUp() {
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-    const hansleSignUp = useCallback(async (event: React.FormEvent): Promise<void> => {
+    const handleSignUp = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
-        await signUp(new Date().toISOString(), email.trim(), username.trim(), password.trim());
+        await signUp({ 
+            created_at: new Date().toISOString(), email: email.trim(), 
+            username: username.trim(), password: password.trim(), callback: navigate 
+        });
     }, [email, password, username]);
 
     return (
         <div className="flex justify-center items-center h-screen bg-[#1a1a1a] p-3">
-            <form onSubmit={hansleSignUp} className="border border-purple-400 p-[1rem] flex flex-col gap-[1rem] bg-black w-120">
+            <form onSubmit={handleSignUp} className="border border-purple-400 p-[1rem] flex flex-col gap-[1rem] bg-black w-120">
                 <div className="font-[650] text-[1.5rem] text-purple-400 text-center">Welcome</div>
                 <div className="flex flex-col gap-[0.5rem]">
                     <label htmlFor="username" className="text-purple-400">Username</label>
                     <input 
-                        type="text" 
                         id="username" 
                         value={username}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event.target.value)}
