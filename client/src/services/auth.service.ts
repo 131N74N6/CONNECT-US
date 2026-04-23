@@ -85,7 +85,7 @@ export default function useAuth() {
         }
     }
 
-    async function signOut() {
+    function signOut() {
         setUserLoading(true);
         try {
             localStorage.removeItem('user');

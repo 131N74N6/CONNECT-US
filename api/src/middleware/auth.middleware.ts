@@ -19,7 +19,7 @@ export async function verifyToken(req: AuthRequest, res: Response, next: NextFun
         if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ message: 'Access token required' });
 
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.JWT_TOKEN || 'your_jwt_key_myfriend') as JwtPayload;
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN || 'your_secret_key') as JwtPayload;
 
         req.user = { user_id: decoded.user_id, token: token }
         next();

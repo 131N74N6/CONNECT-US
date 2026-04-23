@@ -41,11 +41,7 @@ export async function signIn(req: Request, res: Response) {
         }
 
         const token = jwt.sign(
-            {
-                id: findUser._id, 
-                email: findUser.email, 
-                username: findUser.username 
-            },
+            { user_id: findUser._id.toString() },
             process.env.JWT_SECRET_KEY || "your_secret_key",
         );
 
@@ -131,10 +127,10 @@ export async function deleteCurrentUser(req: Request, res: Response) {
 
         await Promise.all([
             deleteFromCloudinary,
-            User.deleteOne({ _id: req.params.user_id }),
             Post.deleteMany({ user_id: req.params.user_id }),
             Like.deleteMany({ post_owner_id: req.params.user_id }),
-            Comment.deleteMany({ post_owner_id: req.params.user_id })
+            Comment.deleteMany({ post_owner_id: req.params.user_id }),
+            User.deleteOne({ _id: req.params.user_id }),
         ]);
 
         res.status(200).json({ message: "user deleted" });
