@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { PostItemProps } from "../services/custom-types";
+import type { PostItemProps } from "../models/post-model";
 import { useState } from "react";
 
 export default function PostItem(props: PostItemProps) {

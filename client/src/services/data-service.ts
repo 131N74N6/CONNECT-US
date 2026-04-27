@@ -1,7 +1,29 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import type { IGetData, InfiniteScrollProps, IPostData, IPutData } from "./custom-types";
-import useAuth from "./auth.service";
+import useAuth from "./auth-service";
 import { useState } from "react";
+
+type IPostData<T> = {
+    api_url: string;
+    data: Omit<T, '_id'>;
+}
+
+type InfiniteScrollProps = {
+    api_url: string; 
+    limit: number; 
+    query_key: string[];
+    stale_time: number;
+}
+
+type IGetData = {
+    api_url: string; 
+    query_key: string[];
+    stale_time: number;
+}
+
+type IPutData<T> = {
+    api_url: string;
+    data: Partial<Omit<T, '_id'>>;
+}
 
 export default function DataModifier() {
     const { userLoading, token } = useAuth();

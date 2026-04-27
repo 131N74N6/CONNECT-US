@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
-import DataModifier from "../services/data.service";
-import useAuth from "../services/auth.service";
+import DataModifier from "../services/data-service";
+import useAuth from "../services/auth-service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import type { MediaFile, PostDetail } from "../services/custom-types";
+import type { MediaFile, PostDetail } from "../models/post-model";
 import Notification from "../components/Notification";
-import { uploadToCloudinary } from "../services/cloudiary.service";
+import { uploadToCloudinary } from "../services/cloudiary-service";
 
 export default function EditPost() {
     const postFolder = 'sns_posts';

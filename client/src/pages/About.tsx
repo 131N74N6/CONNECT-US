@@ -1,10 +1,13 @@
-import type { AddFollowerProps, UserConnectionStatsProps, PostItemProps, IUserInfo } from "../services/custom-types";
+import type { UserConnectionStatsProps } from "../models/user-model";
+import type { AddFollowerProps } from "../models/follower-model";
+import type { PostItemProps } from "../models/post-model";
+import type { CurrentUserIntrf } from "../models/user-model"
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
-import DataModifier from "../services/data.service";
+import DataModifier from "../services/data-service";
 import { Link, useParams } from "react-router-dom";
-import useAuth from "../services/auth.service";
+import useAuth from "../services/auth-service";
 import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +18,7 @@ export default function About() {
     const { user_id } = useParams();
     const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
 
-    const { data: userData } =  getData<IUserInfo>({
+    const { data: userData } =  getData<CurrentUserIntrf>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
         query_key: ['signed-in-user'], 
         stale_time: 660000

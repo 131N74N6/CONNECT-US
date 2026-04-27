@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
-import type { SignInProps, SignUpProps, User } from "./custom-types";
+import type { SignInProps, SignUpProps, CurrentUserTokenIntrf } from "../models/user-model";
 
 export default function useAuth() {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<CurrentUserTokenIntrf | null>(null);
     const [userLoading, setUserLoading] = useState<boolean>(true);
     const [userError, setUserError] = useState<string | null>(null);
 
@@ -14,7 +14,7 @@ export default function useAuth() {
             try {
                 const existedUser = localStorage.getItem('user');
                 if (existedUser) {
-                    const userData: User = JSON.parse(existedUser);
+                    const userData: CurrentUserTokenIntrf = JSON.parse(existedUser);
                     setUser(userData);
                 }
             } catch (error: any) {
@@ -46,7 +46,7 @@ export default function useAuth() {
                 const errorMessage = response.error || response.message || 'Failed to sign in. Try again later';
                 setUserError(errorMessage);
             } else {
-                const currentUserToken: User = {
+                const currentUserToken: CurrentUserTokenIntrf = {
                     status: response.status,
                     token: response.token,
                     user_id: response.user_id
@@ -54,6 +54,7 @@ export default function useAuth() {
 
                 localStorage.setItem('user', JSON.stringify(currentUserToken));
                 setUser(currentUserToken);
+                props.navigate('/home');
             }
         } catch (error: any) {
             setUserError(error.message || 'Failed to sign in');
@@ -83,6 +84,8 @@ export default function useAuth() {
             if (!request.ok) {
                 const errorMessage = response.error || response.message || 'Failed to sign up. Try again later';
                 setUserError(errorMessage);
+            }else {
+                props.navigate('/sign-in');
             }
 
         } catch (error: any) {
@@ -92,14 +95,14 @@ export default function useAuth() {
         }
     }
 
-    function signOut(callback: (path: string) => void) {
+    function signOut(navigate: (path: string) => void) {
         setUserLoading(true);
         setUserError(null);
 
         try {
             localStorage.removeItem('user');
             setUser(null);
-            callback('/sign-in');
+            navigate('/sign-in');
         } catch (error: any) {
             setUserError(error.message || 'Failed to sign out' );
         } finally {

@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import DataModifier from "../services/data.service";
-import type { LikeDataProps } from "../services/custom-types";
+import DataModifier from "../services/data-service";
+import type { LikeDataProps } from "../models/like-model";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import LikeList from "../components/LikeList";
 import Loading from "../components/Loading";

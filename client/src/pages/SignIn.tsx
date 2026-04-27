@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth.service";
+import useAuth from "../services/auth-service";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
@@ -12,7 +12,7 @@ export default function SignIn() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     useEffect(() => {
-        if (currentUserId) navigate('/home', { replace: true });
+        if (currentUserId) navigate('/home');
     }, [currentUserId, navigate]);
 
     useEffect(() => {
@@ -22,12 +22,12 @@ export default function SignIn() {
         }
     }, [userError]);
 
-    const togglePasswordVisibility = () => setShowPassword(!showPassword);
-
     async function handleSignIn(event: React.FormEvent): Promise<void> {
         event.preventDefault();
-        await signIn({ email: email, password: password });
+        await signIn({ email, navigate, password });
     }
+
+    const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
     return (
         <div className="flex justify-center items-center h-screen bg-[#1a1a1a] p-3">

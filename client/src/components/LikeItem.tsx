@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { LikeDataProps } from "../services/custom-types";
+import type { LikeDataProps } from "../models/like-model";
 
 export default function LikeItem(props: Pick<LikeDataProps, "created_at" | "user_id" | "username">) {
     return (

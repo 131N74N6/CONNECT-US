@@ -1,7 +1,7 @@
-import DataModifier from "../services/data.service";
+import DataModifier from "../services/data-service";
 import Loading from "../components/Loading";
 import { Link, useParams } from "react-router-dom";
-import type { AddFollowerProps } from "../services/custom-types";
+import type { AddFollowerProps } from "../models/follower-model";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 
 export default function Followers() {

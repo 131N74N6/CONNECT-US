@@ -1,9 +1,11 @@
 import { Link, useParams } from "react-router-dom";
-import useAuth from "../services/auth.service";
+import useAuth from "../services/auth-service";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import DataModifier from "../services/data.service";
-import type { IComments, IUserInfo, PostDetail } from "../services/custom-types";
+import DataModifier from "../services/data-service";
+import type { PostDetail } from "../models/post-model";
+import type { CommentIntrf } from "../models/comment-model";
+import type { CurrentUserIntrf } from "../models/user-model";
 import Loading from "../components/Loading";
 
 export default function Comments() {
@@ -22,7 +24,7 @@ export default function Comments() {
         stale_time: 600000
     });
 
-    const { data: userData } =  getData<IUserInfo>({
+    const { data: userData } =  getData<CurrentUserIntrf>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
         query_key: ['signed-in-user'], 
         stale_time: 660000
@@ -33,7 +35,7 @@ export default function Comments() {
         isReachedEnd: commentsReachedEnd,
         isLoadingMore: loadMoreComments,
         fetchNextPage: fetchMoreComments,
-    } =  infiniteScroll<Pick<IComments, 'created_at' | 'username' | 'opinions'>>({
+    } =  infiniteScroll<Pick<CommentIntrf, 'created_at' | 'username' | 'opinions'>>({
         api_url: _id ? `${import.meta.env.VITE_API_BASE_URL}/comments/get-all/${_id}` : ``, 
         limit: 12,
         stale_time: 1800000,
@@ -47,7 +49,7 @@ export default function Comments() {
 
             if (!currentUserId || !comment.trim() || !userData || !_id || !selectedPost) return;
 
-            await insertData<IComments>({
+            await insertData<CommentIntrf>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
                 data: {
                     created_at: getCurrentDate.toISOString(),

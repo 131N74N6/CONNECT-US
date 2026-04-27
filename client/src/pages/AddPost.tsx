@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import useAuth from "../services/auth.service";
-import DataModifier from "../services/data.service";
-import { uploadToCloudinary } from "../services/cloudiary.service";
-import type { IUserInfo, MediaFile, PostDetail } from "../services/custom-types";
+import useAuth from "../services/auth-service";
+import DataModifier from "../services/data-service";
+import { uploadToCloudinary } from "../services/cloudiary-service";
+import type { MediaFile, PostDetail } from "../models/post-model";
+import type { CurrentUserIntrf } from "../models/user-model";
 import { useNavigate } from "react-router-dom";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ export default function AddPost() {
 
     const { getData } = DataModifier();
 
-    const { data: userData } =  getData<IUserInfo>({
+    const { data: userData } =  getData<CurrentUserIntrf>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
         query_key: ['signed-in-user'], 
         stale_time: 660000

@@ -1,6 +1,14 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import useAuth from "./auth.service";
-import type { PostItemProps, SearchedPost } from "./custom-types";
+import useAuth from "./auth-service";
+import type { PostItemProps } from "../models/post-model";
+
+type SearchedPost = {
+    api_url: string;
+    limit: number;
+    query_key: string[];
+    searched: string;
+    stale_time: number;
+}
 
 export default function FilterHandler() {
     const { token } = useAuth();

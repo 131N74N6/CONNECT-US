@@ -1,8 +1,8 @@
-import type { PostItemProps } from "../services/custom-types";
+import type { PostItemProps } from "../models/post-model";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
-import DataModifier from '../services/data.service';
+import DataModifier from '../services/data-service';
 
 export default function Home() {
     const { infiniteScroll } = DataModifier();

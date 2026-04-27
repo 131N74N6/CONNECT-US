@@ -1,6 +1,6 @@
-import DataModifier from "../services/data.service";
-import useAuth from "../services/auth.service";
-import type { IUserInfo } from "../services/custom-types";
+import DataModifier from "../services/data-service";
+import useAuth from "../services/auth-service";
+import type { CurrentUserIntrf } from "../models/user-model";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +18,7 @@ export default function Setting() {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [username, setUsername] = useState<string>('');
 
-    const { data: userData, isLoading, error } =  getData<IUserInfo>({
+    const { data: userData, isLoading, error } =  getData<CurrentUserIntrf>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
         query_key: ['signed-in-user'], 
         stale_time: 660000

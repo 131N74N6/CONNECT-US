@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import DataModifier from "../services/data.service";
-import useAuth from "../services/auth.service";
+import DataModifier from "../services/data-service";
+import useAuth from "../services/auth-service";
 import type { LikeDataProps, PostDetail } from "../services/custom-types";
 import Loading from "../components/Loading";
 import { useEffect, useState } from "react";
