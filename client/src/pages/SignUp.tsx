@@ -28,8 +28,8 @@ export default function SignUp() {
     const handleSignUp = useCallback(async (event: React.FormEvent): Promise<void> => {
         event.preventDefault();
         await signUp({ 
-            created_at: new Date().toISOString(), email: email.trim(), 
-            username: username.trim(), password: password.trim(), callback: navigate 
+            created_at: new Date().toISOString(), email: email, 
+            username: username, password: password, callback: navigate 
         });
     }, [email, password, username]);
 

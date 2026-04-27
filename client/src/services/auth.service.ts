@@ -36,7 +36,7 @@ export default function useAuth() {
         try {
             const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`, {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: props.email, password: props.password }),
+                body: JSON.stringify({ email: props.email.trim(), password: props.password.trim() }),
                 method: 'POST'
             });
 
@@ -71,9 +71,9 @@ export default function useAuth() {
             const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`, {
                 body: JSON.stringify({ 
                     created_at: props.created_at, 
-                    email: props.email, 
-                    password: props.password, 
-                    username: props.username 
+                    email: props.email.trim(), 
+                    password: props.password.trim(), 
+                    username: props.username.trim() 
                 }),
                 headers: { 'Content-Type': 'application/json' },
                 method: 'POST'
