@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../services/auth.service";
 import { Eye, EyeOff } from "lucide-react";
@@ -24,10 +24,10 @@ export default function SignIn() {
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-    const handleSignIn = useCallback(async (event: React.FormEvent): Promise<void> => {
+    async function handleSignIn(event: React.FormEvent): Promise<void> {
         event.preventDefault();
-        await signIn({ email: email, password: password, callback: navigate });
-    }, [email, password]);
+        await signIn({ email: email, password: password });
+    }
 
     return (
         <div className="flex justify-center items-center h-screen bg-[#1a1a1a] p-3">

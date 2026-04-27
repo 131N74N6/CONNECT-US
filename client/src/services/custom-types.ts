@@ -96,7 +96,6 @@ export type PostListProps = {
 export type SignInProps = {
     email: string;
     password: string;
-    callback: (path: string) => void;
 }
 
 export type SignUpProps = {
@@ -104,7 +103,6 @@ export type SignUpProps = {
     email: string;
     username: string;
     password: string;
-    callback: (path: string) => void;
 }
 
 export type SearchedPost = {

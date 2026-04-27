@@ -54,7 +54,6 @@ export default function useAuth() {
 
                 localStorage.setItem('user', JSON.stringify(currentUserToken));
                 setUser(currentUserToken);
-                props.callback(`/home`);
             }
         } catch (error: any) {
             setUserError(error.message || 'Failed to sign in');
@@ -84,8 +83,6 @@ export default function useAuth() {
             if (!request.ok) {
                 const errorMessage = response.error || response.message || 'Failed to sign up. Try again later';
                 setUserError(errorMessage);
-            } else {
-                props.callback('/sign-in');
             }
 
         } catch (error: any) {
