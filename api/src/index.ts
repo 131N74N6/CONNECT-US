@@ -12,11 +12,12 @@ import express from 'express';
 import { db } from './database/mongodb';
 import { v2 } from "cloudinary";
 import cors from 'cors';
-import postRoutes from './routes/post.router';
-import likeRoutes from './routes/like.router';
-import commentRoutes from './routes/comment.router';
-import userRoutes from './routes/user.router';
-import followerRoutes from './routes/follower.router';
+import postRoutes from './routers/post.router';
+import likeRoutes from './routers/like.router';
+import commentRoutes from './routers/comment.router';
+import userRoutes from './routers/user.router';
+import followerRoutes from './routers/follower.router';
+import authRoutes from './routers/auth.router';
 
 const app = express();
 
@@ -36,6 +37,8 @@ app.use(cors({
         "https://connect-us-be-five.vercel.app/"
     ]
 }));
+
+app.use('/api/auth', authRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/followers', followerRoutes);
 app.use('/api/likes', likeRoutes);
