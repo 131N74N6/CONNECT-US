@@ -17,7 +17,6 @@ import likeRoutes from './routers/like.router';
 import commentRoutes from './routers/comment.router';
 import userRoutes from './routers/user.router';
 import followerRoutes from './routers/follower.router';
-import authRoutes from './routers/auth.router';
 
 const app = express();
 
@@ -38,7 +37,6 @@ app.use(cors({
     ]
 }));
 
-app.use('/api/auth', authRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/followers', followerRoutes);
 app.use('/api/likes', likeRoutes);

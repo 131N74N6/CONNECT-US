@@ -34,7 +34,7 @@ export default function useAuth() {
         setUserError(null);
 
         try {
-            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-in`, {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: props.email.trim(), password: props.password.trim() }),
                 method: 'POST'
@@ -68,7 +68,7 @@ export default function useAuth() {
         setUserError(null);
         
         try {
-            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-up`, {
                 body: JSON.stringify({ 
                     created_at: props.created_at, 
                     email: props.email.trim(), 
