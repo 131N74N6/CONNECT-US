@@ -54,7 +54,7 @@ export async function signUp(req: Request, res: Response) {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ created_at, email, password: hashedPassword, username });
         await newUser.save();
-        res.status(201).json({ message: 'user added' });
+        res.status(200).json({ message: 'user added' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

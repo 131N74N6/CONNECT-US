@@ -9,8 +9,6 @@ type ProtectedRouteProps = {
 export default function ProtectedRoute(props: ProtectedRouteProps) {
     const { userLoading, currentUserId } = useAuth();
 
-
-
     if (userLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
