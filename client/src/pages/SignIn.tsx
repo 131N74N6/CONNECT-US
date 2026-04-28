@@ -12,8 +12,8 @@ export default function SignIn() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     useEffect(() => {
-        if (currentUserId) navigate('/home');
-    }, [currentUserId, navigate]);
+        if (currentUserId) navigate('/home', { replace: true });
+    }, [currentUserId, userLoading, navigate]);
 
     useEffect(() => {
         if (userError) {
@@ -24,7 +24,7 @@ export default function SignIn() {
 
     async function handleSignIn(event: React.FormEvent): Promise<void> {
         event.preventDefault();
-        await signIn({ email, navigate, password });
+        await signIn({ email, password });
     }
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);

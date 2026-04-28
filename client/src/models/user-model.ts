@@ -12,7 +12,6 @@ export type CurrentUserIntrf = {
 }
 
 export type SignUpProps = {
-    navigate: (path: string) => void;
     created_at: string;
     email: string;
     password: string;
@@ -22,7 +21,6 @@ export type SignUpProps = {
 export type SignInProps = {
     email: string;
     password: string;
-    navigate: (path: string) => void;
 }
 
 export type UserConnectionStatsProps = {

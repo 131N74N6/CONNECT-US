@@ -12,7 +12,7 @@ export async function signIn(req: Request, res: Response) {
         const { email, password } = req.body;
         const findEmail = await User.findOne({ email });
         
-        if (!password || !email) return res.status(400).json({ message: "email and password is required" });
+        if (!password && !email) return res.status(400).json({ message: "email and password is required" });
         if (!email) return res.status(400).json({ message: 'email is required' });
         if (!password) return res.status(400).json({ message: 'password is required' });
 
@@ -40,7 +40,7 @@ export async function signUp(req: Request, res: Response) {
     try {
         const { created_at, email, password, username } = req.body;
         
-        if (!password || !email || !username) return res.status(400).json({ message: "email, username, and password is required" });
+        if (!password && !email && !username) return res.status(400).json({ message: "email, username, and password is required" });
         if (!email) return res.status(400).send({ message: 'email is required' });
         if (!password) return res.status(400).send({ message: 'password is required' });
         if (!username) return res.status(400).send({ message: 'username is required' });
@@ -115,6 +115,7 @@ export async function updateSelectedUser(req: Request, res: Response) {
                 username: req.body.username
             }
         });
+        res.status(200).json({ message: "User updated successfully" });
     } catch (error) {
         res.status(500).json({ message: "internal server error" });
     }

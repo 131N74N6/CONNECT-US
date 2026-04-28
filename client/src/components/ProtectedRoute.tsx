@@ -7,9 +7,11 @@ type ProtectedRouteProps = {
 }
 
 export default function ProtectedRoute(props: ProtectedRouteProps) {
-    const { loading, user } = useAuth();
+    const { userLoading, currentUserId } = useAuth();
 
-    if (loading) {
+
+
+    if (userLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -17,5 +19,5 @@ export default function ProtectedRoute(props: ProtectedRouteProps) {
         );
     }
 
-    return user ? <>{props.children}</> : <Navigate to={'/signin'} replace/>
+    return currentUserId ? <>{props.children}</> : <Navigate to={'/signin'} replace/>
 }
