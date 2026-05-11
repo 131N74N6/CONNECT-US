@@ -2,12 +2,14 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import DataModifier from "../services/data-service";
 import useAuth from "../services/auth-service";
-import type { LikeDataProps, PostDetail } from "../services/custom-types";
+import type { LikeDataProps } from "../models/like-model";
+import type { PostDetail } from "../models/post-model"
 import Loading from "../components/Loading";
 import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import PostSider from "../components/PostSider";
+import type { CurrentUserIntrf } from "../models/user-model";
 
 export default function PostDetail() {
     const { _id } = useParams();
@@ -25,6 +27,12 @@ export default function PostDetail() {
             return () => clearTimeout(timeout);
         }
     }, [error.isError]);
+
+    const { data: userData } =  getData<CurrentUserIntrf>({
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
+        query_key: ['signed-in-user'], 
+        stale_time: 1800000
+    });
 
     const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`, 
@@ -57,7 +65,7 @@ export default function PostDetail() {
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
             const getCurrentDate = new Date();
-            if (!currentUserId || !_id || !selectedPost) return;
+            if (!currentUserId || !_id || !selectedPost || !userData) return;
 
             await insertData<LikeDataProps>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/add`,
@@ -65,7 +73,7 @@ export default function PostDetail() {
                     created_at: getCurrentDate.toISOString(),
                     post_id: _id,
                     user_id: currentUserId,
-                    username: user.info.username,
+                    username: userData.username,
                     post_owner_id: selectedPost[0].user_id
                 }
             });

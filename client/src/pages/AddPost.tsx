@@ -25,7 +25,7 @@ export default function AddPost() {
     const { data: userData } =  getData<CurrentUserIntrf>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
         query_key: ['signed-in-user'], 
-        stale_time: 660000
+        stale_time: 1800000
     });
 
     useEffect(() => {
