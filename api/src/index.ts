@@ -17,6 +17,7 @@ import likeRoutes from './routers/like.router';
 import commentRoutes from './routers/comment.router';
 import userRoutes from './routers/user.router';
 import followerRoutes from './routers/follower.router';
+import authRoutes from './routers/auth.router';
 
 const app = express();
 
@@ -36,12 +37,12 @@ app.use(cors({
         "https://connect-us-be-five.vercel.app/"
     ]
 }));
-
 app.use('/api/comments', commentRoutes);
 app.use('/api/followers', followerRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
     db.then(() => {

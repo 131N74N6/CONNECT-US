@@ -2,16 +2,15 @@ import { Link, useParams } from "react-router-dom";
 import useAuth from "../services/auth-service";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import DataModifier from "../services/data-service";
+import DataModifier from "../services/data.service";
 import type { PostDetail } from "../models/post-model";
 import type { CommentIntrf } from "../models/comment-model";
-import type { CurrentUserIntrf } from "../models/user-model";
 import Loading from "../components/Loading";
 
 export default function Comments() {
     const queryClient = useQueryClient();
     const { _id } = useParams();
-    const { currentUserId } = useAuth();
+    const { currentUserId, currentUsername } = useAuth();
     const { getData, infiniteScroll, insertData } = DataModifier();
     
     const [isSendComment, setIsSendComment] = useState<boolean>(false);
@@ -22,12 +21,6 @@ export default function Comments() {
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`,
         query_key: [`selected-post-${_id}`],
         stale_time: 600000
-    });
-
-    const { data: userData } =  getData<CurrentUserIntrf>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
-        query_key: ['signed-in-user'], 
-        stale_time: 660000
     });
     
     const {
@@ -47,7 +40,7 @@ export default function Comments() {
         mutationFn: async () => {
             const getCurrentDate = new Date();
 
-            if (!currentUserId || !comment.trim() || !userData || !_id || !selectedPost) return;
+            if (!currentUserId || !comment.trim() || !_id || !selectedPost) return;
 
             await insertData<CommentIntrf>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
@@ -56,7 +49,7 @@ export default function Comments() {
                     opinions: comment.trim(),
                     post_id: _id,
                     user_id: currentUserId,
-                    username: userData.username,
+                    username: currentUsername,
                     post_owner_id: selectedPost?.[0]?.user_id
                 }
             });

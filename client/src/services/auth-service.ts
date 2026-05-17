@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react"
-import type { SignInProps, SignUpProps, CurrentUserTokenIntrf } from "../models/user-model";
+import type { SignInProps, SignUpProps, CurrentUserInfoIntrf } from "../models/user-model";
 
 export default function useAuth() {
-    const [user, setUser] = useState<CurrentUserTokenIntrf | null>(null);
+    const [user, setUser] = useState<CurrentUserInfoIntrf | null>(null);
     const [userLoading, setUserLoading] = useState<boolean>(true);
     const [userError, setUserError] = useState<string | null>(null);
 
     const currentUserId = user ? user.user_id : '';
     const token = user ? user.token : '';
+    const currentUsername = user ? user.username : '';
 
     useEffect(() => {
         function initApp() {
             try {
                 const existedUser = localStorage.getItem('user');
                 if (existedUser) {
-                    const userData: CurrentUserTokenIntrf = JSON.parse(existedUser);
+                    const userData: CurrentUserInfoIntrf = JSON.parse(existedUser);
                     setUser(userData);
                 }
             } catch (error: any) {
@@ -34,7 +35,7 @@ export default function useAuth() {
         setUserError(null);
 
         try {
-            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-in`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`, {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: props.email.trim(), password: props.password.trim() }),
                 method: 'POST'
@@ -46,10 +47,11 @@ export default function useAuth() {
                 const errorMessage = response.error || response.message || 'Failed to sign in. Try again later';
                 setUserError(errorMessage);
             } else {
-                const currentUserToken: CurrentUserTokenIntrf = {
+                const currentUserToken: CurrentUserInfoIntrf = {
                     status: response.status,
                     token: response.token,
-                    user_id: response.user_id
+                    user_id: response.user_id,
+                    username: response.username
                 };
 
                 localStorage.setItem('user', JSON.stringify(currentUserToken));
@@ -67,7 +69,7 @@ export default function useAuth() {
         setUserError(null);
         
         try {
-            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/sign-up`, {
+            const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-up`, {
                 body: JSON.stringify({ 
                     created_at: props.created_at, 
                     email: props.email.trim(), 
@@ -109,6 +111,7 @@ export default function useAuth() {
 
     return { 
         currentUserId,
+        currentUsername,
         signIn, 
         signOut, 
         signUp, 

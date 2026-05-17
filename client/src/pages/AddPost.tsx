@@ -1,32 +1,12 @@
-import { useState, useRef, useEffect } from "react";
-import useAuth from "../services/auth-service";
-import DataModifier from "../services/data-service";
-import { uploadToCloudinary } from "../services/cloudiary-service";
-import type { MediaFile, PostDetail } from "../models/post-model";
-import type { CurrentUserIntrf } from "../models/user-model";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import Notification from "../components/Notification";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import PostServices from "../services/post.service";
 
 export default function AddPost() {
-    const postFolder = 'sns_posts';
-    const { currentUserId } = useAuth();
-    const navigate = useNavigate();
-    const { error, insertData, setError } = DataModifier();
-    const queryQlient = useQueryClient();
-
-    const [description, setDescription] = useState<string>('');
-    const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
-    const [isUploading, setIsUploading] = useState<boolean>(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const { getData } = DataModifier();
-
-    const { data: userData } =  getData<CurrentUserIntrf>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
-        query_key: ['signed-in-user'], 
-        stale_time: 1800000
-    });
+    const { 
+        currentUserId, description, error, fileInputRef, handleFileSelect, insertMutation, 
+        isProcessing, mediaFiles, navigate, removeMediaFile, setDescription, setError 
+    } = PostServices();
 
     useEffect(() => {
         if (error) {
@@ -34,71 +14,6 @@ export default function AddPost() {
             return () => clearTimeout(timeout);
         }
     }, [error]);
-
-    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (!files || files.length === 0) return;
-
-        const newMediaFiles: MediaFile[] = [];
-
-        for (let r = 0; r < files.length; r++) {
-            const file = files[r];
-            const previewUrl = URL.createObjectURL(file);
-            const fileType = file.type.split('/')[0];
-            
-            if (fileType !== 'image' && fileType !== 'video') {
-                URL.revokeObjectURL(previewUrl);
-                continue;
-            }
-            
-            newMediaFiles.push({ file, previewUrl, type: fileType as 'image' | 'video' });
-        }
-
-        setMediaFiles(prev => [...prev, ...newMediaFiles]);
-        
-        if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-
-    const removeMediaFile = (index: number) => {
-        const fileToRemove = mediaFiles[index];
-        URL.revokeObjectURL(fileToRemove.previewUrl);
-        setMediaFiles(prev => prev.filter((_, i) => i !== index));
-    }
-
-    const insertMutation = useMutation({
-        onMutate: () => setIsUploading(true),
-        mutationFn: async () => {
-            if (!currentUserId || !userData) return;
-
-            const getCurrentDate = new Date();
-            const postsFiles: { file_url: string; public_id: string; }[] = [];
-            
-            for (const mediaFile of mediaFiles) {
-                const result = await uploadToCloudinary(mediaFile.file, postFolder);
-                postsFiles.push({ file_url: result.url, public_id: result.publicId });
-            }
-
-            await insertData<PostDetail>({
-                api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/add`,
-                data: {
-                    created_at: getCurrentDate.toISOString(),
-                    description: description.trim(),
-                    posts_file: postsFiles,
-                    uploader_name: userData.username,
-                    user_id: currentUserId,
-                }
-            });
-        },
-        onSuccess: () => {
-            queryQlient.invalidateQueries({ queryKey: ['all-posts'] });
-            queryQlient.invalidateQueries({ queryKey: ['signed-user-posts'] });
-            setDescription('');
-            setMediaFiles([]);
-            navigate('/home');
-        },
-        onSettled: () => setIsUploading(false),
-        onError: () => {}
-    });
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -176,17 +91,17 @@ export default function AddPost() {
                     <button 
                         type="button" 
                         onClick={() => navigate(`/about/${currentUserId}`)}
-                        disabled={isUploading}
+                        disabled={isProcessing}
                         className="text-[0.9rem] p-[0.8rem] rounded-lg font-[550] cursor-pointer bg-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition-colors"
                     >
-                        {isUploading ? 'Uploading...' : 'Back'}
+                        {isProcessing ? 'Uploading...' : 'Back'}
                     </button>
                     <button 
                         type="submit" 
-                        disabled={isUploading}
+                        disabled={isProcessing}
                         className="text-[0.9rem] p-[0.8rem] rounded-lg font-[550] cursor-pointer bg-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition-colors"
                     >
-                        {isUploading ? 'Uploading...' : 'Add Post'}
+                        {isProcessing ? 'Uploading...' : 'Add Post'}
                     </button>
                 </div>
             </form>

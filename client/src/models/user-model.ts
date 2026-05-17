@@ -1,7 +1,8 @@
-export type CurrentUserTokenIntrf = {
+export type CurrentUserInfoIntrf = {
     status: string;
     token: string;
     user_id: string;
+    username: string;
 }
 
 export type CurrentUserIntrf = {

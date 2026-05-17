@@ -1,4 +1,4 @@
-import DataModifier from "../services/data-service";
+import DataModifier from "../services/data.service";
 import useAuth from "../services/auth-service";
 import type { CurrentUserIntrf } from "../models/user-model";
 import { Navbar1, Navbar2 } from "../components/Navbar";

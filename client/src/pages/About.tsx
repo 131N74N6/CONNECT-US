@@ -1,119 +1,28 @@
-import type { UserConnectionStatsProps } from "../models/user-model";
-import type { AddFollowerProps } from "../models/follower-model";
-import type { PostItemProps } from "../models/post-model";
-import type { CurrentUserIntrf } from "../models/user-model"
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
-import DataModifier from "../services/data-service";
 import { Link, useParams } from "react-router-dom";
-import useAuth from "../services/auth-service";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Notification from "../components/Notification";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import PostServices from "../services/post.service";
+import FollowerServices from "../services/follower.service";
 
 export default function About() {
-    const queryQlient = useQueryClient();
-    const { currentUserId } = useAuth();
     const { user_id } = useParams();
-    const { getData, infiniteScroll, insertData, deleteData } = DataModifier();
+    const userId = user_id ? user_id : ''
+    const { currentUserId, error, post_total, setError, user_posts } = PostServices();
+    const { isFollowed, isProcessing, notOwner, startFollowMutation, stopFollowMutation, userConnectionStats } = FollowerServices(userId);
+    const { currentUserPosts, currentUserPostsError, loadPostOwner, loadPosts, postReachEnd, setCurrentUserPosts } = user_posts(userId);
 
-    const { data: userData } =  getData<CurrentUserIntrf>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
-        query_key: ['signed-in-user'], 
-        stale_time: 1800000
-    });
-    
-    const [error, setError] = useState({ isError: false, message: '' });
-    const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
-    
     useEffect(() => {
-        if (error.isError) {
-            const timeout = setTimeout(() => setError({ isError: false, message: '' }), 3000);
+        if (error) {
+            const timeout = setTimeout(() => setError(null), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error.isError]);
-
-    const { data: userPostTotal } = getData<number>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/post-total/${user_id}`,
-        query_key: [`user-post-total-${user_id}`],
-        stale_time: 1800000
-    });
-
-    const { data: userConnectionStats } = getData<UserConnectionStatsProps>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/user-connection-stats/${user_id}`, 
-        query_key: [`user-connection-stats-${user_id}`],
-        stale_time: 1800000
-    });
-
-    const { data: hasFollowed } = getData<boolean>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/has-followed/?user_id=${currentUserId}&followed_user_id=${user_id}`, 
-        query_key: [`has-followed-${user_id}-${currentUserId}`],
-        stale_time: 1800000
-    });
-
-    const { 
-        error: currentUserPostsError,
-        data: currentUserPosts, 
-        isLoading: loadPosts, 
-        isReachedEnd: postReachEnd, 
-        isLoadingMore: loadPostOwner, 
-        fetchNextPage: setCurrentUserPosts, 
-    } = infiniteScroll<PostItemProps>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/signed-user/${user_id}`, 
-        limit: 12,
-        query_key: [`signed-user-posts-${user_id}`],
-        stale_time: 1800000
-    });
-
-    const notOwner = user_id && currentUserId && currentUserId !== user_id;
-    const isFollowed = hasFollowed ? hasFollowed : false;
-
-    const startFollowMutation = useMutation({
-        onMutate: () => setIsFollowLoading(true),
-        mutationFn: async () => {
-            if (!user_id || !userData || !currentUserId) return;
-
-            const getCurrentDate = new Date();
-            
-            await insertData<AddFollowerProps>({
-                api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/add`,
-                data: {
-                    created_at: getCurrentDate.toISOString(),
-                    followed_user_id: user_id,
-                    followed_username: currentUserPosts[0].uploader_name,
-                    user_id: currentUserId,
-                    username: userData.username
-                }
-            });
-        },
-        onSuccess: () => {
-            queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user_id}-${currentUserId}`] });
-        },
-        onError: () => setError({ isError: true, message: 'Failed to follow' }),
-        onSettled: () => setIsFollowLoading(false)
-    });
-
-    const stopFollowMutation = useMutation({
-        onMutate: () => setIsFollowLoading(true),
-        mutationFn: async () => {
-            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/followers/erase/${currentUserId}`);
-        },
-        onError: () => setError({ isError: true, message: 'Failed to unfollow' }),
-        onSuccess: () => {
-            queryQlient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`who-followed-${user_id}`] });
-            queryQlient.invalidateQueries({ queryKey: [`has-followed-${user_id}-${currentUserId}`] });
-        },
-        onSettled: () => setIsFollowLoading(false)
-    });
+    }, [error]);
 
     function handleFollowBtn() {
-        if (isFollowLoading) return;
+        if (isProcessing) return;
         if (!isFollowed) startFollowMutation.mutate();
         else stopFollowMutation.mutate();
     }
@@ -121,10 +30,10 @@ export default function About() {
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black relative z-10">
             <Navbar1/>
-            {error.isError ? 
+            {error ? 
                 <Notification
                     class_name="border-purple-400 border p-[0.5rem] text-center text-white bg-[#1a1a1a] w-[320px] h-[88px] absolute top-[5%] left-[50%] right-[50%]"
-                    message={error.message}
+                    message={error}
                 /> 
             : null}
             <div className="flex flex-col p-[1rem] gap-[1rem] md:w-3/4 h-[100%] min-h-[300px] w-full bg-[#1a1a1a]">
@@ -132,14 +41,14 @@ export default function About() {
                     {notOwner ? (
                         <button 
                             type="button"
-                            disabled={isFollowLoading}
+                            disabled={isProcessing}
                             onClick={handleFollowBtn} 
                             className={
                                 isFollowed ? "bg-purple-400 text-[#1a1a1a] font-[500] w-[120px] cursor-pointer text-[0.9rem] p-[0.45rem] disabled:cursor-not-allowed disabled:opacity-50" : 
                                 "bg-yellow-300 text-gray-800 font-[500] cursor-pointer w-[120px] text-[0.9rem] p-[0.45rem] disabled:cursor-not-allowed disabled:opacity-50"
                             }
                         >
-                            {isFollowLoading ? 'loading...' : isFollowed ? 'Following' : 'Follow'}
+                            {isProcessing ? 'loading...' : isFollowed ? 'Following' : 'Follow'}
                         </button> 
                     ) : (
                         <Link to={currentUserId ? `/setting/${currentUserId}` : '/home'}>
@@ -165,13 +74,13 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {userPostTotal ? userPostTotal : 0}
+                            {post_total(userId) ? post_total(userId) : 0}
                         </span>
                     </li>
                 </ul>
                 {currentUserPostsError ? (
                     <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-                        <span className="text-[2rem] font-[600] text-purple-700">{error.message}</span>
+                        <span className="text-[2rem] font-[600] text-purple-700">{currentUserPostsError.message}</span>
                     </div>
                 ) : loadPosts ? (
                     <div className="flex justify-center items-center h-full">
