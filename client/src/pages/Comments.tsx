@@ -1,82 +1,29 @@
 import { Link, useParams } from "react-router-dom";
-import useAuth from "../services/auth-service";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import DataModifier from "../services/data.service";
-import type { PostDetail } from "../models/post-model";
-import type { CommentIntrf } from "../models/comment-model";
 import Loading from "../components/Loading";
+import CommentServices from "../services/comment.service";
+import PostServices from "../services/post.service";
 
 export default function Comments() {
-    const queryClient = useQueryClient();
     const { _id } = useParams();
-    const { currentUserId, currentUsername } = useAuth();
-    const { getData, infiniteScroll, insertData } = DataModifier();
+    const id = _id ? _id : '';
+
+    const { selectedPostData } = PostServices();
+    const { allCommentsData, commentMutation, isProcessing } = CommentServices(id);
     
-    const [isSendComment, setIsSendComment] = useState<boolean>(false);
     const [comment, setComment] = useState<string>('');
-    const [error, setError] = useState({ isError: false, message: '' });
-    
-    const { data: selectedPost } = getData<PostDetail[]>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${_id}`,
-        query_key: [`selected-post-${_id}`],
-        stale_time: 600000
-    });
-    
-    const {
-        data: commentsData,
-        isReachedEnd: commentsReachedEnd,
-        isLoadingMore: loadMoreComments,
-        fetchNextPage: fetchMoreComments,
-    } =  infiniteScroll<Pick<CommentIntrf, 'created_at' | 'username' | 'opinions'>>({
-        api_url: _id ? `${import.meta.env.VITE_API_BASE_URL}/comments/get-all/${_id}` : ``, 
-        limit: 12,
-        stale_time: 1800000,
-        query_key: [`comments-${_id}`]
-    });
-
-    const commentMutation = useMutation({
-        onMutate: () => setIsSendComment(true),
-        mutationFn: async () => {
-            const getCurrentDate = new Date();
-
-            if (!currentUserId || !comment.trim() || !_id || !selectedPost) return;
-
-            await insertData<CommentIntrf>({
-                api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
-                data: {
-                    created_at: getCurrentDate.toISOString(),
-                    opinions: comment.trim(),
-                    post_id: _id,
-                    user_id: currentUserId,
-                    username: currentUsername,
-                    post_owner_id: selectedPost?.[0]?.user_id
-                }
-            });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`comments-${_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`comments-total-${_id}`] });
-        },
-        onSettled: () => {
-            setComment('');
-            setIsSendComment(false);
-        },
-        onError: () => setError({ isError: true, message: error.message || 'Failed to send comment' })
-    });
 
     function sendComment(event: React.FormEvent): void {
         event.preventDefault();
-        if (isSendComment) return;
-        commentMutation.mutate();
+        commentMutation.mutate(selectedPostData.selectedPost);
     }
     
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
             <div className="w-full h-full flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg p-[0.8rem]">
-                <div className="flex flex-col gap-[1rem] pb-[1rem] border-b border-purple-400 h-[88%] overflow-y-auto">
-                    {commentsData.length > 0 ?
-                        commentsData.map((comment, index) => (
+                <div className="flex flex-col gap-[1rem] pb-[1rem] border-b border-purple-400 h-[80%] overflow-y-auto">
+                    {allCommentsData.commentsData.length > 0 ?
+                        allCommentsData.commentsData.map((comment, index) => (
                             <div className="bg-black flex flex-col gap-[0.6rem] p-[1rem] rounded-[0.6rem]" key={`cmt: ${index}`}>
                                 <div className="flex justify-between">
                                     <p>{comment.username}</p>
@@ -90,10 +37,10 @@ export default function Comments() {
                             </div>
                         )
                     }
-                    {loadMoreComments ? <div className="flex justify-center"><Loading/></div> : null}
-                    {commentsData.length < 12 ? (
+                    {allCommentsData.loadMoreComments ? <div className="flex justify-center"><Loading/></div> : null}
+                    {allCommentsData.commentsData.length < 12 ? (
                         <></>
-                    ) : commentsReachedEnd ? (
+                    ) : allCommentsData.commentsReachedEnd ? (
                         <div className="text-center">
                             <span>No Comments to Load</span>
                         </div>
@@ -101,7 +48,7 @@ export default function Comments() {
                         <div className="flex justify-center">
                             <button 
                                 type="button"
-                                onClick={() => fetchMoreComments()}
+                                onClick={() => allCommentsData.fetchMoreComments()}
                                 className="bg-pink-300 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem]"
                             >
                                 Load More
@@ -109,7 +56,7 @@ export default function Comments() {
                         </div>
                     )}
                 </div>
-                <form className="flex flex-col gap-[1rem] h-[12%]" onSubmit={sendComment}>
+                <form className="flex flex-col gap-[1rem] h-[20%]" onSubmit={sendComment}>
                     <textarea 
                         value={comment}
                         placeholder="Write your comment here"
@@ -121,7 +68,7 @@ export default function Comments() {
                     <div className="grid grid-cols-2 gap-[0.4rem]">
                         <button 
                             type="submit" 
-                            disabled={!comment || isSendComment}
+                            disabled={!comment || isProcessing}
                             className="cursor-pointer bg-purple-400 p-[0.45rem] rounded-[0.45rem] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span className="text-[1rem] font-[550] text-black">Send</span>

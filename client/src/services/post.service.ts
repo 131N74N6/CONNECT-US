@@ -1,15 +1,15 @@
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { MediaFile, PostDetail, PostItemProps } from "../models/post-model";
+import type { MediaFile, PostDetail, PostItemProps, PostServiceIntrf } from "../models/post-model";
 import { uploadToCloudinary } from "./cloudiary.service";
-import useAuth from "./auth-service";
+import AuthServices from "./auth-service";
 import { useNavigate } from "react-router-dom";
 import DataModifier from "./data.service";
 import { useRef, useState } from "react";
 
-export default function PostServices() {
+export default function PostServices(props?: PostServiceIntrf) {
     const postFolder = 'sns_posts';
     const queryClient = useQueryClient();
-    const { currentUserId, currentUsername } = useAuth();
+    const { currentUserId, currentUsername } = AuthServices();
     const navigate = useNavigate();
     const { deleteData, deleteChosenData, error, getData, insertData, infiniteScroll, setError, updateData } = DataModifier();
 
@@ -99,6 +99,8 @@ export default function PostServices() {
         stale_time: 1800000
     });
 
+    const allPosts = { allPostError, allPostsData, allPostsIsLoading, allPostsReachedEnd, allPostsLoadMore, allPostsNextPage }
+
     const deleteAllPostMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
@@ -150,29 +152,25 @@ export default function PostServices() {
         setSelectedFiles(prev => [...prev, public_id]);
     }
 
-    function user_posts(user_id: string) {
-        const { 
-            error: currentUserPostsError,
-            data: currentUserPosts, 
-            isLoading: loadPosts, 
-            isReachedEnd: postReachEnd, 
-            isLoadingMore: loadPostOwner, 
-            fetchNextPage: setCurrentUserPosts, 
-        } = infiniteScroll<PostItemProps>({
-            api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/signed-user/${user_id}`, 
-            limit: 12,
-            query_key: [`signed-user-posts-${user_id}`],
-            stale_time: 1800000
-        });
+    const { 
+        error: currentUserPostsError,
+        data: currentUserPosts, 
+        isLoading: loadPosts, 
+        isReachedEnd: postReachEnd, 
+        isLoadingMore: loadPostOwner, 
+        fetchNextPage: setCurrentUserPosts, 
+    } = infiniteScroll<PostItemProps>({
+        api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/signed-user/${props.user_id}` : '',
+        limit: 12,
+        query_key: [`signed-user-posts-${props?.user_id}`],
+        stale_time: 1800000
+    });
 
-        return { currentUserPostsError, currentUserPosts, loadPosts, postReachEnd, loadPostOwner, setCurrentUserPosts }
-    }
-
-    const allPosts = { allPostError, allPostsData, allPostsIsLoading, allPostsReachedEnd, allPostsLoadMore, allPostsNextPage }
+    const allCurrentUserPosts = { currentUserPostsError, currentUserPosts, loadPosts, postReachEnd, loadPostOwner, setCurrentUserPosts }
 
     const updatePostMutation = useMutation({
         onMutate: () => setIsProcessing(true),
-        mutationFn: async (id: string) => {
+        mutationFn: async () => {
             const newPostsFiles: { file_url: string; public_id: string; }[] = [];
             
             for (const mediaFile of mediaFiles) {
@@ -185,7 +183,7 @@ export default function PostServices() {
             }
 
             await updateData<PostDetail>({
-                api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/edit/${id}`,
+                api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/edit/${props.id}` : '',
                 data: {
                     description: description.trim(),
                     posts_file: [...existingFiles, ...newPostsFiles],
@@ -218,30 +216,24 @@ export default function PostServices() {
         },
     });
 
-    function post_detail(id: string) {
-        const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>({
-            api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${id}`, 
-            query_key: [`selected-post-${id}`],
-            stale_time: 1800000
-        });
+    const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>({
+        api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${props.id}` : '',
+        query_key: [`selected-post-${props?.id}`],
+        stale_time: 1800000
+    });
 
-        return { errorPost, postLoading, selectedPost }
-    }
+    const selectedPostData = { errorPost, postLoading, selectedPost }
 
-    function post_total(user_id: string) {
-        const { data: userPostTotal } = getData<number>({
-            api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/post-total/${user_id}`,
-            query_key: [`user-post-total-${user_id}`],
-            stale_time: 1800000
-        });
-
-        return userPostTotal;
-    }
+    const { data: userPostTotal } = getData<number>({
+        api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/post-total/${props.user_id}` : '',
+        query_key: [`user-post-total-${props?.user_id}`],
+        stale_time: 1800000
+    });
 
     return { 
-        allPosts, currentUserId, currentUsername, description, deleteAllPostMutation, deletePostMutation, 
+        allPosts, allCurrentUserPosts, currentUserId, currentUsername, description, deleteAllPostMutation, deletePostMutation, 
         error, existingFiles, fileInputRef, handleFileSelect, insertMutation, isProcessing, mediaFiles, navigate, 
-        post_detail, post_total, removeExistingFile, removeMediaFile, selectedFiles, setDescription, setError, 
-        updatePostMutation, user_posts
+        selectedPostData, userPostTotal, removeExistingFile, removeMediaFile, selectedFiles, setDescription, setError, 
+        setExistingFiles, setIsProcessing, updatePostMutation
     }
 }

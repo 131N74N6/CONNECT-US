@@ -30,3 +30,8 @@ export type PostDetail = {
     posts_file?: { file_url: string; public_id: string; }[];
     user_id: string;
 }
+
+export type PostServiceIntrf = {
+    id?: string;
+    user_id?: string;
+}

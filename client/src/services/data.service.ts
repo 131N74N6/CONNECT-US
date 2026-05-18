@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import useAuth from "./auth-service";
+import AuthServices from "./auth-service";
 import { useState } from "react";
 
 type IPostData<T> = {
@@ -26,7 +26,7 @@ type IPutData<T> = {
 }
 
 export default function DataModifier() {
-    const { userLoading, token } = useAuth();
+    const { userLoading, token } = AuthServices();
     const [error, setError] = useState<string | null>(null);
 
     async function deleteData(api_url: string) {

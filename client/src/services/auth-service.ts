@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import type { SignInProps, SignUpProps, CurrentUserInfoIntrf } from "../models/user-model";
 
-export default function useAuth() {
+export default function AuthServices() {
     const [user, setUser] = useState<CurrentUserInfoIntrf | null>(null);
     const [userLoading, setUserLoading] = useState<boolean>(true);
     const [userError, setUserError] = useState<string | null>(null);

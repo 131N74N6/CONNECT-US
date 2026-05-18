@@ -1,31 +1,18 @@
-import DataModifier from "../services/data.service";
 import Loading from "../components/Loading";
 import { Link, useParams } from "react-router-dom";
-import type { AddFollowerProps } from "../models/follower-model";
 import { Navbar1, Navbar2 } from "../components/Navbar";
+import FollowerServices from "../services/follower.service";
 
 export default function Followers() {
     const { user_id } = useParams();
-    const { infiniteScroll } = DataModifier();
-
-    const { 
-        data: currentUserFollowers,
-        isReachedEnd: currentUserFollowerReachEnd, 
-        isLoadingMore: loadCurrentUserFollower, 
-        fetchNextPage: getMoreCurrentUserFollower, 
-    } = infiniteScroll<Pick<AddFollowerProps, 'created_at' | 'user_id' | 'username'>>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/followers/get-all/${user_id}`, 
-        limit: 12,
-        query_key: [`followers-${user_id}`],
-        stale_time: 1800000,
-    });
+    const { followersData, isProcessing } = FollowerServices(user_id);
     
     return (
         <section className="flex md:flex-row flex-col h-screen gap-[1rem] p-[1rem] bg-black text-white relative z-10">
             <Navbar1/>
             <div className="flex flex-col gap-[1rem] p-[1rem] min-h-[450px] bg-[#1a1a1a] md:w-3/4 w-full h-[100%] overflow-y-auto">
-                {currentUserFollowers.length > 0 ? (
-                    currentUserFollowers.map(follower => (
+                {followersData.currentUserFollowers.length > 0 ? (
+                    followersData.currentUserFollowers.map(follower => (
                         <div key={`fld_${follower.user_id}`} className="bg-black p-[0.6rem] flex rounded-[0.6rem] items-center gap-[0.8rem] border border-orange-400">
                             <div className="text-white text-[1.1rem]">
                                 <i className="fa-regular fa-user"></i>
@@ -41,10 +28,10 @@ export default function Followers() {
                         <span className="text-center font-[550] text-[1.6rem]">No Followers</span>
                     </div>
                 )}
-                {loadCurrentUserFollower ? <div className="flex justify-center"><Loading/></div> : null}
-                {currentUserFollowers.length < 12 ? (
+                {followersData.loadCurrentUserFollower ? <div className="flex justify-center"><Loading/></div> : null}
+                {followersData.currentUserFollowers.length < 12 ? (
                     <></>
-                ) : currentUserFollowerReachEnd ? (
+                ) : followersData.currentUserFollowerReachEnd ? (
                     <div className="text-center">
                         <span>No Followers to Load</span>
                     </div>
@@ -52,8 +39,8 @@ export default function Followers() {
                     <div className="flex justify-center">
                         <button 
                             type="button"
-                            disabled={loadCurrentUserFollower}
-                            onClick={() => getMoreCurrentUserFollower()}
+                            disabled={isProcessing}
+                            onClick={() => followersData.getMoreCurrentUserFollower()}
                             className="bg-pink-300 text-gray-800 w-[120px] rounded font-[500] cursor-pointer p-[0.4rem] text-[0.9rem] disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             Load More

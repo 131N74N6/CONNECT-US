@@ -5,7 +5,7 @@ async function dislikeByUser(req: Request, res:Response) {
     try {
         const getUserId = req.params.id;
         await Like.deleteOne({ user_id: getUserId });
-        res.status(201).json({ message: 'disliked' });
+        res.status(200).json({ message: 'disliked' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -23,7 +23,7 @@ async function getAllLikes(req: Request, res: Response) {
             { created_at: 1, post_id: 1, user_id: 1, username: 1 }
         ).limit(limit).skip(skip);
 
-        res.json(getPostLike);
+        res.status(200).json(getPostLike);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -33,7 +33,7 @@ async function getTotalLikes(req: Request, res: Response): Promise<void> {
     try {
         const getPostId = req.params.id;
         const likesTotal = await Like.find({ post_id: getPostId }).countDocuments();
-        res.json(likesTotal);
+        res.status(200).json(likesTotal);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -43,7 +43,7 @@ async function giveLike(req: Request, res: Response): Promise<void> {
     try {
         const likePost = new Like(req.body);
         await likePost.save();
-        res.status(201).json({ message: 'like' });
+        res.status(200).json({ message: 'like' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -53,7 +53,7 @@ async function hasUserLiked(req: Request, res: Response): Promise<void> {
     try {
         const { post_id, user_id } = req.query;
         const hasLiked = await Like.findOne({ post_id, user_id });
-        res.json(!!hasLiked);
+        res.status(200).json(!!hasLiked);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

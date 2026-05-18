@@ -13,7 +13,7 @@ async function getAllComments(req: Request, res: Response) {
             { created_at: 1, username: 1, opinions: 1 }
         ).limit(limit).skip(skip);
 
-        res.json(getComments);
+        res.status(200).json(getComments);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -23,7 +23,7 @@ async function getCommentsTotal(req: Request, res: Response): Promise<void> {
     try {
         const getPostId = req.params.id;
         const commentTotal = await Comment.find({ post_id: getPostId }).countDocuments();
-        res.json(commentTotal);
+        res.status(200).json(commentTotal);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -33,7 +33,7 @@ async function insertComment(req: Request, res: Response): Promise<void> {
     try {
         const newComment = new Comment(req.body);
         await newComment.save();
-        res.status(201).send({ message: 'new comment added' });
+        res.status(200).send({ message: 'new comment added' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

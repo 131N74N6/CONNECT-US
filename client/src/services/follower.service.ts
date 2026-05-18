@@ -2,15 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import DataModifier from "./data.service";
 import type { UserConnectionStatsProps } from "../models/user-model";
 import type { AddFollowerProps } from "../models/follower-model";
-import useAuth from "./auth-service";
+import AuthServices from "./auth-service";
 import { useState } from "react";
 import PostServices from "./post.service";
 
-export default function FollowerServices(user_id: string | undefined) {
+export default function FollowerServices(user_id?: string) {
     const queryClient = useQueryClient();
-    const { currentUserId, currentUsername } = useAuth();
+    const { currentUserId, currentUsername } = AuthServices();
     const { deleteData, error, getData, insertData, infiniteScroll, setError } = DataModifier();
-    const { user_posts } = PostServices();
+    const { selectedPostData } = PostServices();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const { data: userConnectionStats } = getData<UserConnectionStatsProps>({
@@ -69,7 +69,7 @@ export default function FollowerServices(user_id: string | undefined) {
     const startFollowMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async () => {
-            if (!user_id || !currentUserId) return;
+            if (!user_id || !currentUserId || !selectedPostData || !selectedPostData.selectedPost || selectedPostData.selectedPost.length === 0) return;
 
             const getCurrentDate = new Date();
             
@@ -78,7 +78,7 @@ export default function FollowerServices(user_id: string | undefined) {
                 data: {
                     created_at: getCurrentDate.toISOString(),
                     followed_user_id: user_id,
-                    followed_username: user_posts(user_id).currentUserPosts[0].uploader_name,
+                    followed_username: selectedPostData.selectedPost[0].uploader_name,
                     user_id: currentUserId,
                     username: currentUsername
                 }

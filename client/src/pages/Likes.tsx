@@ -6,8 +6,7 @@ import LikeServices from "../services/like.service";
 
 export default function Likes() {
     const { _id } = useParams();
-    const id = _id ? _id : '';
-    const { allLikesData } = LikeServices(id);
+    const { allLikesData } = LikeServices(_id);
 
     return (
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black">

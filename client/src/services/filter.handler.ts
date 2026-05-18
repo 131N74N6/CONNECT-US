@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import useAuth from "./auth-service";
+import AuthServices from "./auth-service";
 import type { PostItemProps } from "../models/post-model";
 
 type SearchedPost = {
@@ -11,7 +11,7 @@ type SearchedPost = {
 }
 
 export default function FilterHandler() {
-    const { token } = useAuth();
+    const { token } = AuthServices();
     
     function searchedPost(props: SearchedPost) {
         const fecthers = async ({ pageParam = 1 }: { pageParam?: number }) => {

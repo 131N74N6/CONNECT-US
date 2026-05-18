@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import DataModifier from "./data.service";
-import useAuth from "./auth-service";
+import AuthServices from "./auth-service";
 import type { PostDetail } from "../models/post-model";
 import type { CommentIntrf } from "../models/comment-model";
 
-export default function CommentServices(id: string) {
+export default function CommentServices(id?: string) {
     const queryClient = useQueryClient();
-    const { currentUserId, currentUsername } = useAuth();
+    const { currentUserId, currentUsername } = AuthServices();
 
     const { error, getData, insertData, infiniteScroll, setError } = DataModifier();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -27,7 +27,7 @@ export default function CommentServices(id: string) {
         query_key: [`comments-${id}`]
     });
 
-    const allLikesData = { commentsData, commentsLoading, commentsError, commentsReachedEnd, loadMoreComments, fetchMoreComments }
+    const allCommentsData = { commentsData, commentsLoading, commentsError, commentsReachedEnd, loadMoreComments, fetchMoreComments }
 
     const { data: commentsTotal } = getData<number>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/comment-total/${id}`, 
@@ -37,10 +37,13 @@ export default function CommentServices(id: string) {
 
     const commentMutation = useMutation({
         onMutate: () => setIsProcessing(true),
-        mutationFn: async (selectedPost: PostDetail[]) => {
+        mutationFn: async (selectedPost: PostDetail[] | undefined) => {
             const getCurrentDate = new Date();
 
             if (!currentUserId || !comment.trim() || !id || !selectedPost) return;
+            console.log(selectedPost);
+            console.log(id);
+            console.log(currentUserId);
 
             await insertData<CommentIntrf>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
@@ -65,5 +68,5 @@ export default function CommentServices(id: string) {
         },
     });
 
-    return { allLikesData, comment, commentMutation, commentsTotal, error, isProcessing, setComment, setError }
+    return { allCommentsData, comment, commentMutation, commentsTotal, currentUserId, currentUsername, error, isProcessing, queryClient, setComment, setError }
 }

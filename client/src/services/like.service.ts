@@ -5,7 +5,7 @@ import DataModifier from "./data.service";
 import { useState } from "react";
 import type { PostDetail } from "../models/post-model";
 
-export default function LikeServices(id: string) {
+export default function LikeServices(id?: string) {
     const queryClient = useQueryClient();
     const { currentUserId, currentUsername } = useAuth();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -43,7 +43,7 @@ export default function LikeServices(id: string) {
     
     const giveLikeMutation = useMutation({
         onMutate: () => setIsProcessing(true),
-        mutationFn: async (selectedPost: PostDetail[]) => {
+        mutationFn: async (selectedPost: PostDetail[] | undefined) => {
             const getCurrentDate = new Date();
             if (!currentUserId || !id || !selectedPost) return;
 
@@ -81,5 +81,5 @@ export default function LikeServices(id: string) {
         onSettled: () => setIsProcessing(false),
     });
 
-    return { allLikesData, error, giveLikeMutation, isProcessing, isLiked, likesTotal, setError, startDislikeMutation }
+    return { allLikesData, error, giveLikeMutation, hasUserLiked, isProcessing, isLiked, likesTotal, setError, startDislikeMutation }
 }

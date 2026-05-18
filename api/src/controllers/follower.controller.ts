@@ -13,7 +13,7 @@ async function getCurrentUserFollowers(req: Request, res: Response): Promise<voi
             { user_id: 1, username: 1, created_at: 1 }
         ).limit(limit).skip(skip);
 
-        res.json(showFollowers);
+        res.status(200).json(showFollowers);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -31,7 +31,7 @@ async function getCurrentUserFollowing(req: Request, res: Response): Promise<voi
             { followed_user_id: 1, followed_username: 1, created_at: 1 }
         ).limit(limit).skip(skip);
 
-        res.json(showFollowed);
+        res.status(200).json(showFollowed);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -47,7 +47,7 @@ async function hasUserFollowed(req: Request, res: Response): Promise<void> {
         }
 
         const isFollowed = await Follower.findOne({ user_id, followed_user_id });
-        res.json(!!isFollowed);
+        res.status(200).json(!!isFollowed);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -58,7 +58,7 @@ async function userConnectionStats(req: Request, res: Response): Promise<void> {
         const currentUserId = req.params.id;
         const followerTotal = await Follower.find({ followed_user_id: currentUserId }).countDocuments();
         const followedTotal = await Follower.find({ user_id: currentUserId }).countDocuments();
-        res.json({
+        res.status(200).json({
             followed_total: followedTotal,
             follower_total: followerTotal,
         });
@@ -71,7 +71,7 @@ async function followOtherUser(req: Request, res: Response): Promise<void> {
     try {
         const newFollower = new Follower(req.body);
         await newFollower.save();
-        res.status(201).json({ message: 'new follower added' });
+        res.status(200).json({ message: 'new follower added' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -81,7 +81,7 @@ async function unfollowOtherUser(req: Request, res: Response): Promise<void> {
     try {
         const getSignedUserId = req.params.id;
         await Follower.deleteOne({ user_id: getSignedUserId });
-        res.status(201).json({ message: 'successfully unfollow' });
+        res.status(200).json({ message: 'successfully unfollow' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

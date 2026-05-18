@@ -9,10 +9,8 @@ import FollowerServices from "../services/follower.service";
 
 export default function About() {
     const { user_id } = useParams();
-    const userId = user_id ? user_id : ''
-    const { currentUserId, error, post_total, setError, user_posts } = PostServices();
-    const { isFollowed, isProcessing, notOwner, startFollowMutation, stopFollowMutation, userConnectionStats } = FollowerServices(userId);
-    const { currentUserPosts, currentUserPostsError, loadPostOwner, loadPosts, postReachEnd, setCurrentUserPosts } = user_posts(userId);
+    const { currentUserId, error, userPostTotal, setError, allCurrentUserPosts } = PostServices({ user_id: user_id });
+    const { isFollowed, isProcessing, notOwner, startFollowMutation, stopFollowMutation, userConnectionStats } = FollowerServices(user_id);
 
     useEffect(() => {
         if (error) {
@@ -74,24 +72,24 @@ export default function About() {
                     <li className="flex flex-col gap-[0.2rem] text-center">
                         <span className="text-purple-400 font-[500] text-[1rem]">Posts</span>
                         <span className="text-purple-400 font-[500] text-[1rem]">
-                            {post_total(userId) ? post_total(userId) : 0}
+                            {userPostTotal ? userPostTotal : 0}
                         </span>
                     </li>
                 </ul>
-                {currentUserPostsError ? (
+                {allCurrentUserPosts.currentUserPostsError ? (
                     <div className="flex justify-center items-center h-full bg-[#1a1a1a]">
-                        <span className="text-[2rem] font-[600] text-purple-700">{currentUserPostsError.message}</span>
+                        <span className="text-[2rem] font-[600] text-purple-700">{allCurrentUserPosts.currentUserPostsError.message}</span>
                     </div>
-                ) : loadPosts ? (
+                ) : allCurrentUserPosts.loadPosts ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div> 
-                ) : currentUserPosts ? (
+                ) : allCurrentUserPosts.currentUserPosts ? (
                     <PostList 
-                        data={currentUserPosts}
-                        loadMore={loadPostOwner}
-                        isReachedEnd={postReachEnd}
-                        setSize={setCurrentUserPosts}
+                        data={allCurrentUserPosts.currentUserPosts}
+                        loadMore={allCurrentUserPosts.loadPostOwner}
+                        isReachedEnd={allCurrentUserPosts.postReachEnd}
+                        setSize={allCurrentUserPosts.setCurrentUserPosts}
                     />
                 ) : (
                     <div className="md:w-3/4 w-full flex justify-center items-center h-full bg-[#1a1a1a]">
