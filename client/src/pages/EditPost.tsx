@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom";
-import useAuth from "../services/auth-service";
 import { useEffect } from "react";
 import Notification from "../components/Notification";
 import PostServices from "../services/post.service";
@@ -7,14 +6,19 @@ import Loading from "../components/Loading";
 
 export default function EditPost() {
     const { _id } = useParams();
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        if (!_id) navigate('/home');
+    }, [_id, navigate]);
+
     const { 
-        description, error, existingFiles, handleFileSelect, isProcessing, fileInputRef, mediaFiles, 
+        currentUserId, description, error, existingFiles, handleFileSelect, isProcessing, fileInputRef, mediaFiles, 
         removeMediaFile, removeExistingFile, selectedPostData, setDescription, setError, setExistingFiles, 
         updatePostMutation 
-    } = PostServices();
+    } = PostServices({ id: _id });
+
     const { selectedPost, errorPost, postLoading } = selectedPostData;
-    const { currentUserId } = useAuth();
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (error) {

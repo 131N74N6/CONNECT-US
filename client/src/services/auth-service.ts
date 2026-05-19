@@ -94,6 +94,21 @@ export default function AuthServices() {
         }
     }
 
+    function updateStoredUser(updates: Partial<CurrentUserInfoIntrf>) {
+        try {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const updatedUser = { ...user, username: updates.username || user.username };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                setUser(updatedUser);
+            }
+        } catch (err) {
+            setUserError('Failed to update stored user');
+            console.error('Failed to update stored user:', err);
+        }
+    }
+
     function signOut(navigate: (path: string) => void) {
         setUserLoading(true);
         setUserError(null);
@@ -118,6 +133,7 @@ export default function AuthServices() {
         setUserError, 
         setUserLoading, 
         token,
+        updateStoredUser,
         userError, 
         userLoading 
     }

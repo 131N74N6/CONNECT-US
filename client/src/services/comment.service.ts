@@ -5,7 +5,7 @@ import AuthServices from "./auth-service";
 import type { PostDetail } from "../models/post-model";
 import type { CommentIntrf } from "../models/comment-model";
 
-export default function CommentServices(id?: string) {
+export default function CommentServices(id: string) {
     const queryClient = useQueryClient();
     const { currentUserId, currentUsername } = AuthServices();
 

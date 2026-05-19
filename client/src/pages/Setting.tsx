@@ -4,8 +4,17 @@ import UserServices from "../services/user.service";
 
 export default function Setting() {
     const { 
-        changeProfileMutation, deleteAllPostMutation, deleteAccountMutation, isProcessing, 
-        isUserDataLoading, userDataError, userData, isEditing, setIsEditing, username, setUsername 
+        changeProfileMutation, 
+        deleteAllPostMutation, 
+        deleteAccountMutation, 
+        isProcessing, 
+        isUserDataLoading, 
+        userDataError, 
+        userData, 
+        isEditing, 
+        setIsEditing, 
+        username, 
+        setUsername 
     } = UserServices();
 
     return (
@@ -37,7 +46,7 @@ export default function Setting() {
                                     className="border border-blue-300 text-blue-300 rounded p-2.5 md:text-lg text-base outline-0 bg-transparent"
                                 />
                                 <p className="text-purple-400 font-[500] text-[1rem]">User ID: {userData?.user_id}</p>
-                                <p className="text-purple-400 font-[500] text-[1rem]">Username: {userData?.username}</p>
+                                <p className="text-purple-400 font-[500] text-[1rem]">Email: {userData?.email}</p>
                                 <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-[0.4rem]">
                                     <button
                                         type="submit"

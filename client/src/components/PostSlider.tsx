@@ -5,7 +5,7 @@ interface PostSliderProps {
     post_files: { file_url: string; }[];
 }
 
-export default function PostSider(props: PostSliderProps) {
+export default function PostSlider(props: PostSliderProps) {
     const [currentIndex, setCurrentIndex] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 

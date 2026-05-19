@@ -6,7 +6,7 @@ import AuthServices from "./auth-service";
 import { useState } from "react";
 import PostServices from "./post.service";
 
-export default function FollowerServices(user_id?: string) {
+export default function FollowerServices(user_id: string) {
     const queryClient = useQueryClient();
     const { currentUserId, currentUsername } = AuthServices();
     const { deleteData, error, getData, insertData, infiniteScroll, setError } = DataModifier();

@@ -9,8 +9,10 @@ import { useRef, useState } from "react";
 export default function PostServices(props?: PostServiceIntrf) {
     const postFolder = 'sns_posts';
     const queryClient = useQueryClient();
-    const { currentUserId, currentUsername } = AuthServices();
     const navigate = useNavigate();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const { currentUserId, currentUsername } = AuthServices();
     const { deleteData, deleteChosenData, error, getData, insertData, infiniteScroll, setError, updateData } = DataModifier();
 
     const [description, setDescription] = useState<string>('');
@@ -18,7 +20,6 @@ export default function PostServices(props?: PostServiceIntrf) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [existingFiles, setExistingFiles] = useState<{ file_url: string; public_id: string }[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -77,7 +78,7 @@ export default function PostServices(props?: PostServiceIntrf) {
         onError: () => {},
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-posts'] });
-            queryClient.invalidateQueries({ queryKey: ['signed-user-posts'] });
+            queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
             setDescription('');
             setMediaFiles([]);
             navigate('/home');
@@ -101,47 +102,31 @@ export default function PostServices(props?: PostServiceIntrf) {
 
     const allPosts = { allPostError, allPostsData, allPostsIsLoading, allPostsReachedEnd, allPostsLoadMore, allPostsNextPage }
 
-    const deleteAllPostMutation = useMutation({
-        onMutate: () => setIsProcessing(true),
-        mutationFn: async () => {
-            if (!currentUserId || !window.confirm('Are you sure you want to delete this post?')) return;
-            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase-all/${currentUserId}`);
-        }, 
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['all-posts'] });
-            queryClient.removeQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
-                        return queryKey[0].startsWith(`like_`) || queryKey[0].startsWith(`comments-`) || 
-                        queryKey[0].startsWith(`user-post-total-`) || queryKey[0].startsWith(`user-connection-stats-`);
-                    }
-                    return false;
-                }
-            });
-            queryClient.invalidateQueries({ queryKey: ['signed-user-posts'] });
-            navigate(`/about/${currentUserId}`);
-        },
-        onError: () => {},
-        onSettled: () => setIsProcessing(false)
-    });
-
     const deletePostMutation = useMutation({
         onMutate: () => setIsProcessing(true),
-        mutationFn: async () => await deleteData(props ? `${import.meta.env.VITE_API_BASE_URL}/posts/erase/${props.id}` : ''),
+        mutationFn: async () => {
+            if (!props || !props.id) return;
+            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase/${props.id}`);
+        },
         onError: () => {},
         onSuccess: () => {
             queryClient.removeQueries({
                 predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
-                        return queryKey[0].startsWith('selected-post-');
+                        return queryKey[0].startsWith('selected-post-') || 
+                        queryKey[0].startsWith('comments-total-') || 
+                        queryKey[0].startsWith('comments-') || 
+                        queryKey[0].startsWith('has-liked-') ||
+                        queryKey[0].startsWith('likes-') ||
+                        queryKey[0].startsWith('likes-total-');
                     }
                     return false; 
                 }
             });
             queryClient.invalidateQueries({ queryKey: ['all-posts'] });
-            queryClient.invalidateQueries({ queryKey: ['signed-user-posts'] });
+            queryClient.invalidateQueries({ queryKey: [`user-post-total-${props?.user_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${props?.user_id}`] });
             navigate('/home');
         },
         onSettled: () => setIsProcessing(false),
@@ -193,7 +178,6 @@ export default function PostServices(props?: PostServiceIntrf) {
         onError: () => {},
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = '';
-            queryClient.invalidateQueries({ queryKey: ['all-posts'] });
             queryClient.removeQueries({
                 predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
                     const queryKey = query.queryKey;
@@ -203,6 +187,7 @@ export default function PostServices(props?: PostServiceIntrf) {
                     return false; 
                 }
             });
+            queryClient.invalidateQueries({ queryKey: ['all-posts'] });
             queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
             navigate(`/about/${currentUserId}`);
         },
@@ -231,7 +216,7 @@ export default function PostServices(props?: PostServiceIntrf) {
     });
 
     return { 
-        allPosts, allCurrentUserPosts, currentUserId, currentUsername, description, deleteAllPostMutation, deletePostMutation, 
+        allPosts, allCurrentUserPosts, currentUserId, currentUsername, description, deletePostMutation, 
         error, existingFiles, fileInputRef, handleFileSelect, insertMutation, isProcessing, mediaFiles, navigate, 
         selectedPostData, userPostTotal, removeExistingFile, removeMediaFile, selectedFiles, setDescription, setError, 
         setExistingFiles, setIsProcessing, updatePostMutation

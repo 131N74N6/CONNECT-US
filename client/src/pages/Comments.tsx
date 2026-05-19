@@ -13,7 +13,7 @@ export default function Comments() {
     }, [_id, navigate]);
 
     const { selectedPostData } = PostServices({ id: _id });
-    const { allCommentsData, comment, commentMutation, isProcessing, setComment } = CommentServices(_id);
+    const { allCommentsData, comment, commentMutation, isProcessing, setComment } = CommentServices(_id!);
 
     function sendComment(event: React.FormEvent): void {
         event.preventDefault();

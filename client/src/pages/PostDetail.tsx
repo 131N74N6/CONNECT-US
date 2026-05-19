@@ -4,10 +4,10 @@ import type { PostDetail } from "../models/post-model"
 import Loading from "../components/Loading";
 import { useEffect } from "react";
 import Notification from "../components/Notification";
-import PostSider from "../components/PostSider";
-import PostServices from "../services/post.service";
+import PostSlider from "../components/PostSlider";
 import CommentServices from "../services/comment.service";
 import LikeServices from "../services/like.service";
+import PostServices from "../services/post.service";
 
 export default function PostDetail() {
     const { _id } = useParams();
@@ -18,8 +18,8 @@ export default function PostDetail() {
     }, [_id, navigate]);
 
     const { currentUserId, deletePostMutation, isProcessing, selectedPostData } = PostServices({ id: _id });
-    const { commentsTotal, error, setError } = CommentServices(_id);
-    const { giveLikeMutation, hasUserLiked, likesTotal, startDislikeMutation } = LikeServices(_id);
+    const { commentsTotal, error, setError } = CommentServices(_id!);
+    const { giveLikeMutation, hasUserLiked, likesTotal, startDislikeMutation } = LikeServices(_id!);
 
     const { selectedPost, errorPost, postLoading } = selectedPostData;
 
@@ -96,7 +96,7 @@ export default function PostDetail() {
                         </div>
                         <div className="flex flex-col gap-[1rem]">
                             {selectedPost && selectedPost[0].posts_file && selectedPost[0].posts_file.length !== 0 ? (
-                                <PostSider post_files={selectedPost[0].posts_file}/>
+                                <PostSlider post_files={selectedPost[0].posts_file}/>
                             ) : null}
                             <div className="flex gap-[1rem]">
                                 <div className="flex gap-[0.5rem] items-center text-[1.2rem]">

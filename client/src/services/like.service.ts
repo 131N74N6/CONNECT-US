@@ -5,7 +5,7 @@ import DataModifier from "./data.service";
 import { useState } from "react";
 import type { PostDetail } from "../models/post-model";
 
-export default function LikeServices(id?: string) {
+export default function LikeServices(id: string) {
     const queryClient = useQueryClient();
     const { currentUserId, currentUsername } = useAuth();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -35,7 +35,7 @@ export default function LikeServices(id?: string) {
     } = infiniteScroll<LikeDataProps>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/get-all/${id}`,
         limit: 12,
-        query_key: [`likes_${id}`],
+        query_key: [`likes-${id}`],
         stale_time: 1800000
     });
 

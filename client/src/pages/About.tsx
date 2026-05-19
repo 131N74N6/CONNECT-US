@@ -1,7 +1,7 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import Notification from "../components/Notification";
 import PostServices from "../services/post.service";
@@ -9,14 +9,8 @@ import FollowerServices from "../services/follower.service";
 
 export default function About() {
     const { user_id } = useParams();
-    const navigate = useNavigate();
-    
-    useEffect(() => {
-        if (!user_id) navigate('/home');
-    }, [user_id, navigate]);
-
     const { currentUserId, error, userPostTotal, setError, allCurrentUserPosts } = PostServices({ user_id: user_id });
-    const { isFollowed, isProcessing, notOwner, startFollowMutation, stopFollowMutation, userConnectionStats } = FollowerServices(user_id);
+    const { isFollowed, isProcessing, notOwner, startFollowMutation, stopFollowMutation, userConnectionStats } = FollowerServices(user_id!);
 
     useEffect(() => {
         if (error) {

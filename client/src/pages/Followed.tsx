@@ -1,11 +1,18 @@
 import Loading from '../components/Loading';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Navbar1, Navbar2 } from '../components/Navbar';
 import FollowerServices from '../services/follower.service';
+import { useEffect } from 'react';
 
 export default function Followed() {
     const { user_id } = useParams();
-    const { followedData, isProcessing } = FollowerServices(user_id);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!user_id) navigate('/home');
+    }, [user_id, navigate]);
+    
+    const { followedData, isProcessing } = FollowerServices(user_id!);
 
     return (
         <section className="flex md:flex-row flex-col h-screen gap-[1rem] p-[1rem] bg-black text-white relative z-10">

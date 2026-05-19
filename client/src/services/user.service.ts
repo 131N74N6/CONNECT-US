@@ -6,7 +6,7 @@ import type { CurrentUserIntrf } from "../models/user-model";
 import { useEffect, useState } from "react";
 
 export default function UserServices() {
-    const { currentUserId, signOut } = AuthServices();
+    const { currentUserId, signOut, updateStoredUser } = AuthServices();
     const { deleteData, getData, updateData } = DataModifier();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -22,8 +22,8 @@ export default function UserServices() {
     });
 
     useEffect(() => {
-        if (userData) setUsername(userData.username);
-    }, [userData, currentUserId]);
+        if (userData && !isEditing) setUsername(userData.username);
+    }, [userData, isEditing]);
 
 
     const changeProfileMutation = useMutation({
@@ -32,14 +32,46 @@ export default function UserServices() {
             if (!currentUserId) return;
             await updateData({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/users/change/${currentUserId}`,
-                data: username.trim()
+                data: { username: username.trim() }
             });
         },
         onError: () => {},
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`signed-in-user-${currentUserId}`] });
+            updateStoredUser({ username: username.trim() });
+            setIsEditing(false);
         },
         onSettled: () => setIsProcessing(false),
+    });
+
+    const deleteAllPostMutation = useMutation({
+        onMutate: () => setIsProcessing(true),
+        mutationFn: async () => {
+            if (!currentUserId || !window.confirm('Are you sure you want to delete this post?')) return;
+            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase-all/${currentUserId}`);
+        }, 
+        onSuccess: () => {
+            queryClient.removeQueries({
+                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
+                        return queryKey[0].startsWith('selected-post-') || 
+                        queryKey[0].startsWith('comments-total-') || 
+                        queryKey[0].startsWith('comments-') || 
+                        queryKey[0].startsWith('has-liked-') ||
+                        queryKey[0].startsWith('likes-') ||
+                        queryKey[0].startsWith('likes-total-');
+                    }
+                    return false;
+                }
+            });
+            queryClient.invalidateQueries({ queryKey: ['all-posts'] });
+            queryClient.invalidateQueries({ queryKey: [`user-post-total-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
+            navigate(`/about/${currentUserId}`);
+        },
+        onError: () => {},
+        onSettled: () => setIsProcessing(false)
     });
 
     const deleteAccountMutation = useMutation({
@@ -53,42 +85,24 @@ export default function UserServices() {
                 predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
-                        return queryKey[0].startsWith(`like_`) || queryKey[0].startsWith(`comments-`) || 
-                        queryKey[0].startsWith(`signed-user-posts-`) || queryKey[0].startsWith(`has-followed-`) ||
-                        queryKey[0].startsWith(`user-connection-stats-`) || queryKey[0].startsWith(`user-post-total-`);
+                        return queryKey[0].startsWith('selected-post-') || 
+                        queryKey[0].startsWith('comments-total-') || 
+                        queryKey[0].startsWith('comments-') || 
+                        queryKey[0].startsWith('has-liked-') ||
+                        queryKey[0].startsWith('likes-') ||
+                        queryKey[0].startsWith('likes-total-');
                     }
                     return false;
                 }
             });
+            queryClient.invalidateQueries({ queryKey: ['all-posts'] });
+            queryClient.invalidateQueries({ queryKey: [`user-post-total-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-connection-stats-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
             signOut(navigate);
         },
         onSettled: () => setIsProcessing(false),
     });
 
-    const deleteAllPostMutation = useMutation({
-        onMutate: () => setIsProcessing(true),
-        mutationFn: async () => {
-            if (!currentUserId || !window.confirm('Are you sure you want to delete this post?')) return;
-            await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase-all/${currentUserId}`);
-        }, 
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['all-posts'] });
-            queryClient.removeQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
-                        return queryKey[0].startsWith(`like_`) || queryKey[0].startsWith(`comments-`) || 
-                        queryKey[0].startsWith(`user-post-total-`) || queryKey[0].startsWith(`user-connection-stats-`);
-                    }
-                    return false;
-                }
-            });
-            queryClient.invalidateQueries({ queryKey: ['signed-user-posts'] });
-            navigate(`/about/${currentUserId}`);
-        },
-        onError: () => {},
-        onSettled: () => setIsProcessing(false)
-    });
-
-    return { changeProfileMutation, deleteAllPostMutation, deleteAccountMutation, isProcessing, isUserDataLoading, userDataError, userData, isEditing, setIsEditing, username, setUsername };
+    return { changeProfileMutation, deleteAccountMutation, deleteAllPostMutation, isProcessing, isUserDataLoading, userDataError, userData, isEditing, setIsEditing, username, setUsername };
 }
