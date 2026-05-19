@@ -109,7 +109,6 @@ export default function FollowerServices(user_id: string) {
         onSettled: () => setIsProcessing(false)
     });
 
-
     return { 
         error, followedData, followersData, isFollowed, isProcessing, notOwner, 
         setError, startFollowMutation, stopFollowMutation, userConnectionStats 

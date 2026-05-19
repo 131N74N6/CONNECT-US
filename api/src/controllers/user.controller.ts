@@ -4,6 +4,7 @@ import { Like } from "../models/like.model";
 import { Comment } from "../models/comment.model";
 import { v2 } from "cloudinary";
 import { User } from "../models/user.model";
+import { Follower } from "../models/follower.model";
 
 export async function deleteCurrentUser(req: Request, res: Response) {
     try {
@@ -55,9 +56,25 @@ export async function getCurrentUserData(req: Request, res: Response) {
 
 export async function updateSelectedUser(req: Request, res: Response) {
     try {
-        await User.updateOne({ _id: req.params.user_id }, {
-            $set: { username: req.body.username }
-        });
+        if (!req.body.username) return res.status(400).json({ message: "username is required" });
+        
+        await Promise.all([
+            User.updateOne({ _id: req.params.user_id }, {
+                $set: { username: req.body.username }
+            }),
+            Comment.updateMany({ user_id: req.params.user_id }, {
+                $set: { username: req.body.username }
+            }),
+            Post.updateMany({ user_id: req.params.user_id }, {
+                $set: { uploader_name: req.body.username }
+            }),
+            Like.updateMany({ user_id: req.params.user_id }, {
+                $set: { username: req.body.username }
+            }),
+            Follower.updateMany({ user_id: req.params.user_id }, {
+                $set: { username: req.body.username }
+            })
+        ]);
         res.status(200).json({ message: "User updated successfully" });
     } catch (error) {
         res.status(500).json({ message: "internal server error" });
