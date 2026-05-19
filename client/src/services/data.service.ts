@@ -82,7 +82,7 @@ export default function DataModifier() {
 
     const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
-            enabled: !!token && !userLoading,
+            enabled: !!token && !userLoading && !!props.query_key.length,
             queryFn: async () => {
                 const request = await fetch(props.api_url, {
                     headers: {
@@ -180,7 +180,7 @@ export default function DataModifier() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
-            enabled: !!token && !userLoading,
+            enabled: !!token && !userLoading && !!props.query_key.length,
             initialPageParam: 1,
             queryKey: props.query_key,
             queryFn: fetchData,

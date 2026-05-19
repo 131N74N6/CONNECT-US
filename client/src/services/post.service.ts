@@ -128,7 +128,7 @@ export default function PostServices(props?: PostServiceIntrf) {
 
     const deletePostMutation = useMutation({
         onMutate: () => setIsProcessing(true),
-        mutationFn: async (id: string) => await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase/${id}`),
+        mutationFn: async () => await deleteData(props ? `${import.meta.env.VITE_API_BASE_URL}/posts/erase/${props.id}` : ''),
         onError: () => {},
         onSuccess: () => {
             queryClient.removeQueries({

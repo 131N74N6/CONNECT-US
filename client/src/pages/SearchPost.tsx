@@ -1,7 +1,7 @@
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import { useCallback, useMemo, useState } from "react";
 import useDebounce from "../services/useDebounce";
-import FilterHandler from "../services/filter.handler";
+import FilterHandler from "../services/filter.service";
 import Loading from "../components/Loading";
 import SearchedPostList from "../components/SearchedPostList";
 

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Loading from "./Loading";
 
 interface PostSliderProps {
     post_files: { file_url: string; }[];
@@ -6,6 +7,24 @@ interface PostSliderProps {
 
 export default function PostSider(props: PostSliderProps) {
     const [currentIndex, setCurrentIndex] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        setIsLoading(true);
+        const currentFile = props.post_files[currentIndex];
+        
+        if (currentFile.file_url.includes('image')) {
+            const img = new Image();
+            img.src = currentFile.file_url;
+            img.onload = () => setIsLoading(false);
+            img.onerror = () => setIsLoading(false);
+        } else if (currentFile.file_url.includes('video')) {
+            const video = document.createElement('video');
+            video.src = currentFile.file_url;
+            video.onloadedmetadata = () => setIsLoading(false);
+            video.onerror = () => setIsLoading(false);
+        }
+    }, [currentIndex, props.post_files]);
 
     const goToPrevious = () => {
         setCurrentIndex(prevIndex => prevIndex === 0 ? props.post_files.length - 1 : prevIndex - 1);
@@ -19,6 +38,11 @@ export default function PostSider(props: PostSliderProps) {
 
     return (
         <div className="relative w-full h-96 bg-gray-900 rounded-lg overflow-hidden">
+            {isLoading ? (
+                <div className="flex justify-center items-center h-full">
+                    <Loading/>
+                </div>
+            ) : null}
             {props.post_files[currentIndex].file_url.includes('image') ? (
                 <img 
                     src={props.post_files[currentIndex].file_url} 

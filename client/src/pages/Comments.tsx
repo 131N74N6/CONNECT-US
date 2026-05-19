@@ -1,17 +1,19 @@
-import { Link, useParams } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Loading from "../components/Loading";
 import CommentServices from "../services/comment.service";
 import PostServices from "../services/post.service";
+import { useEffect } from "react";
 
 export default function Comments() {
     const { _id } = useParams();
-    const id = _id ? _id : '';
-
-    const { selectedPostData } = PostServices();
-    const { allCommentsData, commentMutation, isProcessing } = CommentServices(id);
+    const navigate = useNavigate();
     
-    const [comment, setComment] = useState<string>('');
+    useEffect(() => {
+        if (!_id) navigate('/home');
+    }, [_id, navigate]);
+
+    const { selectedPostData } = PostServices({ id: _id });
+    const { allCommentsData, comment, commentMutation, isProcessing, setComment } = CommentServices(_id);
 
     function sendComment(event: React.FormEvent): void {
         event.preventDefault();
@@ -22,21 +24,23 @@ export default function Comments() {
         <section className="flex gap-[1rem] md:flex-row flex-col h-screen p-[1rem] bg-black text-white relative z-10">
             <div className="w-full h-full flex flex-col gap-[0.8rem] bg-[#1a1a1a] rounded-lg p-[0.8rem]">
                 <div className="flex flex-col gap-[1rem] pb-[1rem] border-b border-purple-400 h-[80%] overflow-y-auto">
-                    {allCommentsData.commentsData.length > 0 ?
-                        allCommentsData.commentsData.map((comment, index) => (
-                            <div className="bg-black flex flex-col gap-[0.6rem] p-[1rem] rounded-[0.6rem]" key={`cmt: ${index}`}>
-                                <div className="flex justify-between">
-                                    <p>{comment.username}</p>
-                                    <p className="text-[0.9rem]">{new Date(comment.created_at).toLocaleString()}</p>
+                    <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+                        {allCommentsData.commentsData.length > 0 ?
+                            allCommentsData.commentsData.map((comment, index) => (
+                                <div className="bg-black flex flex-col gap-[0.6rem] p-[1rem] rounded-[0.6rem]" key={`cmt: ${index}`}>
+                                    <div className="flex justify-between">
+                                        <p>{comment.username}</p>
+                                        <p className="text-[0.9rem]">{new Date(comment.created_at).toLocaleString()}</p>
+                                    </div>
+                                    <h3 className="font-[500]">{comment.opinions}</h3>
                                 </div>
-                                <h3 className="font-[500]">{comment.opinions}</h3>
-                            </div>
-                        )) : (
-                            <div className="flex justify-center items-center h-full">
-                                <span className="text-center font-[550] text-[1.6rem]">No Comments</span>
-                            </div>
-                        )
-                    }
+                            )) : (
+                                <div className="flex justify-center items-center h-full">
+                                    <span className="text-center font-[550] text-[1.6rem]">No Comments</span>
+                                </div>
+                            )
+                        }
+                    </div>
                     {allCommentsData.loadMoreComments ? <div className="flex justify-center"><Loading/></div> : null}
                     {allCommentsData.commentsData.length < 12 ? (
                         <></>

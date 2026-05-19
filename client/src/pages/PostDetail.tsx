@@ -11,12 +11,17 @@ import LikeServices from "../services/like.service";
 
 export default function PostDetail() {
     const { _id } = useParams();
-    const { currentUserId, deletePostMutation, isProcessing, selectedPostData } = PostServices();
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        if (!_id) navigate('/home');
+    }, [_id, navigate]);
+
+    const { currentUserId, deletePostMutation, isProcessing, selectedPostData } = PostServices({ id: _id });
     const { commentsTotal, error, setError } = CommentServices(_id);
     const { giveLikeMutation, hasUserLiked, likesTotal, startDislikeMutation } = LikeServices(_id);
 
     const { selectedPost, errorPost, postLoading } = selectedPostData;
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (error) {
@@ -37,7 +42,7 @@ export default function PostDetail() {
     function handleDeletePost(): void {
         if (!_id) return;
         if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
-        deletePostMutation.mutate(_id);
+        deletePostMutation.mutate();
     }
 
     return (
