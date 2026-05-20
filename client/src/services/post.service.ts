@@ -126,8 +126,8 @@ export default function PostServices(props?: PostServiceIntrf) {
                 }
             });
             queryClient.invalidateQueries({ queryKey: ['all-posts'] });
-            queryClient.invalidateQueries({ queryKey: [`user-post-total-${props?.user_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${props?.user_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-post-total-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
             navigate('/home');
         },
         onSettled: () => setIsProcessing(false),
