@@ -18,6 +18,7 @@ export default function UserServices() {
     const { data: userData, isLoading: isUserDataLoading, error: userDataError } =  getData<CurrentUserIntrf>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
         query_key: [`signed-in-user-${currentUserId}`], 
+        query_params: !!currentUserId,
         stale_time: 1800000
     });
 
