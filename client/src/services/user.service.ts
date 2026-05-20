@@ -93,6 +93,9 @@ export default function UserServices() {
                         queryKey[0].startsWith('comments-') || 
                         queryKey[0].startsWith('has-liked-') ||
                         queryKey[0].startsWith('likes-') ||
+                        queryKey[0].startsWith('who-followed-') ||
+                        queryKey[0].startsWith('followers-') ||
+                        queryKey[0].startsWith('has-followed-') ||
                         queryKey[0].startsWith('likes-total-');
                     }
                     return false;
