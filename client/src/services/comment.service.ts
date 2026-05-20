@@ -24,6 +24,7 @@ export default function CommentServices(id: string) {
         api_url: id ? `${import.meta.env.VITE_API_BASE_URL}/comments/get-all/${id}` : ``, 
         limit: 12,
         stale_time: 1800000,
+        query_params: !!id,
         query_key: [`comments-${id}`]
     });
 
@@ -32,23 +33,19 @@ export default function CommentServices(id: string) {
     const { data: commentsTotal } = getData<number>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/comment-total/${id}`, 
         query_key: [`comments-total-${id}`],
+        query_params: !!id,
         stale_time: 1800000
     });
 
     const commentMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async (selectedPost: PostDetail[] | undefined) => {
-            const getCurrentDate = new Date();
-
             if (!currentUserId || !comment.trim() || !id || !selectedPost) return;
-            console.log(selectedPost);
-            console.log(id);
-            console.log(currentUserId);
 
             await insertData<CommentIntrf>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
                 data: {
-                    created_at: getCurrentDate.toISOString(),
+                    created_at: new Date().toISOString(),
                     opinions: comment.trim(),
                     post_id: id,
                     user_id: currentUserId,

@@ -97,6 +97,7 @@ export default function PostServices(props?: PostServiceIntrf) {
         api_url: `${import.meta.env.VITE_API_BASE_URL}/posts/get-all`, 
         limit: 12,
         query_key: ['all-posts'],
+        query_params: !!currentUserId,
         stale_time: 1800000
     });
 
@@ -148,6 +149,7 @@ export default function PostServices(props?: PostServiceIntrf) {
         api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/signed-user/${props.user_id}` : '',
         limit: 12,
         query_key: [`signed-user-posts-${props?.user_id}`],
+        query_params: !!props?.user_id,
         stale_time: 1800000
     });
 
@@ -182,7 +184,8 @@ export default function PostServices(props?: PostServiceIntrf) {
                 predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
-                        return queryKey[0].startsWith('edit-selected-post-');
+                        return queryKey[0].startsWith('edit-selected-post-') ||
+                        queryKey[0].startsWith('selected-post-');
                     }
                     return false; 
                 }
@@ -204,6 +207,7 @@ export default function PostServices(props?: PostServiceIntrf) {
     const { data: selectedPost, error: errorPost, isLoading: postLoading } = getData<PostDetail[]>({
         api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${props.id}` : '',
         query_key: [`selected-post-${props?.id}`],
+        query_params: !!props?.id,
         stale_time: 1800000
     });
 
@@ -212,6 +216,7 @@ export default function PostServices(props?: PostServiceIntrf) {
     const { data: userPostTotal } = getData<number>({
         api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/post-total/${props.user_id}` : '',
         query_key: [`user-post-total-${props?.user_id}`],
+        query_params: !!props?.user_id,
         stale_time: 1800000
     });
 

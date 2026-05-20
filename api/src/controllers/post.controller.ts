@@ -20,11 +20,10 @@ export async function deleteAllPosts(req: Request, res: Response) {
 
         const deletePromises = gatherPublicIds.map(public_id => {
             return v2.uploader.destroy(public_id);
-        });
-
-        await Promise.all(deletePromises);
+        });;
 
         await Promise.all([
+            deletePromises,
             Post.deleteMany({ user_id: signedUserId }),
             Like.deleteMany({ post_owner_id: signedUserId }),
             Comment.deleteMany({ post_owner_id: signedUserId })

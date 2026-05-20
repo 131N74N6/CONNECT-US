@@ -27,6 +27,8 @@ export async function deleteCurrentUser(req: Request, res: Response) {
             deleteFromCloudinary,
             Post.deleteMany({ user_id: req.params.user_id }),
             Like.deleteMany({ post_owner_id: req.params.user_id }),
+            Follower.deleteMany({ user_id: req.params.user_id }),
+            Follower.deleteMany({ followed_user_id: req.params.user_id }),
             Comment.deleteMany({ post_owner_id: req.params.user_id }),
             User.deleteOne({ _id: req.params.user_id }),
         ]);
@@ -65,15 +67,18 @@ export async function updateSelectedUser(req: Request, res: Response) {
             Comment.updateMany({ user_id: req.params.user_id }, {
                 $set: { username: req.body.username }
             }),
+            Follower.updateOne({ followed_user_id: req.params.user_id }, {
+                $set: { followed_username: req.body.username }
+            }),
+            Follower.updateMany({ user_id: req.params.user_id }, {
+                $set: { username: req.body.username }
+            }),
             Post.updateMany({ user_id: req.params.user_id }, {
                 $set: { uploader_name: req.body.username }
             }),
             Like.updateMany({ user_id: req.params.user_id }, {
                 $set: { username: req.body.username }
             }),
-            Follower.updateMany({ user_id: req.params.user_id }, {
-                $set: { username: req.body.username }
-            })
         ]);
         res.status(200).json({ message: "User updated successfully" });
     } catch (error) {

@@ -21,7 +21,7 @@ export default function About() {
 
     function handleFollowBtn() {
         if (isProcessing) return;
-        if (!isFollowed) startFollowMutation.mutate();
+        if (!isFollowed) startFollowMutation.mutate(allCurrentUserPosts.currentUserPosts[0].uploader_name);
         else stopFollowMutation.mutate();
     }
 

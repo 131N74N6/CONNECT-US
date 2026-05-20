@@ -56,6 +56,7 @@ export default function UserServices() {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
                         return queryKey[0].startsWith('selected-post-') || 
+                        queryKey[0].startsWith('edit-selected-post-') ||
                         queryKey[0].startsWith('comments-total-') || 
                         queryKey[0].startsWith('comments-') || 
                         queryKey[0].startsWith('has-liked-') ||
@@ -86,6 +87,7 @@ export default function UserServices() {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
                         return queryKey[0].startsWith('selected-post-') || 
+                        queryKey[0].startsWith('edit-selected-post-') ||
                         queryKey[0].startsWith('comments-total-') || 
                         queryKey[0].startsWith('comments-') || 
                         queryKey[0].startsWith('has-liked-') ||

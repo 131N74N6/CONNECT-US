@@ -13,7 +13,14 @@ export default function Comments() {
     }, [_id, navigate]);
 
     const { selectedPostData } = PostServices({ id: _id });
-    const { allCommentsData, comment, commentMutation, isProcessing, setComment } = CommentServices(_id!);
+    const { allCommentsData, comment, commentMutation, error, isProcessing, setComment, setError } = CommentServices(_id!);
+
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error, setError]);
 
     function sendComment(event: React.FormEvent): void {
         event.preventDefault();

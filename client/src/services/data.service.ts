@@ -12,12 +12,14 @@ type InfiniteScrollProps = {
     limit: number; 
     query_key: string[];
     stale_time: number;
+    query_params?: boolean;
 }
 
 type IGetData = {
     api_url: string; 
     query_key: string[];
     stale_time: number;
+    query_params?: boolean;
 }
 
 type IPutData<T> = {
@@ -82,7 +84,7 @@ export default function DataModifier() {
 
     const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
-            enabled: !!token && !userLoading,
+            enabled: !!token && !userLoading && (props.query_params ?? true),
             queryFn: async () => {
                 const request = await fetch(props.api_url, {
                     headers: {
@@ -180,7 +182,7 @@ export default function DataModifier() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
-            enabled: !!token && !userLoading,
+            enabled: !!token && !userLoading && (props.query_params ?? true),
             initialPageParam: 1,
             queryKey: props.query_key,
             queryFn: fetchData,

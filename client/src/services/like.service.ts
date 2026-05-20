@@ -9,7 +9,7 @@ export default function LikeServices(id: string) {
     const queryClient = useQueryClient();
     const { currentUserId, currentUsername } = useAuth();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
-    const { deleteData, error, getData, insertData, infiniteScroll, setError } = DataModifier();
+    const { deleteData, getData, insertData, infiniteScroll } = DataModifier();
 
     const { data: likesTotal } = getData<number>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/likes-total/${id}`, 
@@ -81,5 +81,5 @@ export default function LikeServices(id: string) {
         onSettled: () => setIsProcessing(false),
     });
 
-    return { allLikesData, error, giveLikeMutation, hasUserLiked, isProcessing, isLiked, likesTotal, setError, startDislikeMutation }
+    return { allLikesData, giveLikeMutation, hasUserLiked, isProcessing, isLiked, likesTotal, startDislikeMutation }
 }
