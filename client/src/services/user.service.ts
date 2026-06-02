@@ -30,7 +30,7 @@ export default function UserServices() {
         },
         onError: () => {},
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`signed-in-user-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
             setIsEditing(false);
         },
         onSettled: () => setIsProcessing(false),
@@ -61,6 +61,7 @@ export default function UserServices() {
             queryClient.invalidateQueries({ queryKey: ['all-posts'] });
             queryClient.invalidateQueries({ queryKey: [`user-post-total-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
             navigate(`/about/${currentUserId}`);
         },
         onError: () => {},
@@ -92,6 +93,7 @@ export default function UserServices() {
                     return false;
                 }
             });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
             queryClient.invalidateQueries({ queryKey: ['all-posts'] });
             queryClient.invalidateQueries({ queryKey: [`user-post-total-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`user-connection-stats-${currentUserId}`] });

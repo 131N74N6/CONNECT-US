@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import useAuth from "../services/auth.service";
 import { Navigate } from "react-router-dom";
+import Loading from "./Loading";
 
 type ProtectedRouteProps = {
     children: ReactNode;
@@ -11,8 +12,8 @@ export default function ProtectedRoute(props: ProtectedRouteProps) {
 
     if (isUserDataLoading) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+            <div className="flex justify-center items-center h-screen bg-[#1a1a1a]">
+                <Loading/>
             </div>
         );
     }

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useAuth from "./auth.service";
+import AuthServices from "./auth.service";
 import type { LikeDataProps } from "../models/like_model";
 import DataModifier from "./data.service";
 import { useState } from "react";
@@ -7,9 +7,9 @@ import type { PostDetail } from "../models/post_model";
 
 export default function LikeServices(id: string) {
     const queryClient = useQueryClient();
-    const { currentUserId, currentUsername } = useAuth();
+    const { currentUserId, currentUsername } = AuthServices();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
-    const { deleteData, getData, insertData, infiniteScroll } = DataModifier();
+    const { deleteData, getData, insertData, infiniteScroll, setError } = DataModifier();
 
     const { data: likesTotal } = getData<number>({
         api_url: `${import.meta.env.VITE_API_BASE_URL}/likes/likes-total/${id}`, 
@@ -58,7 +58,9 @@ export default function LikeServices(id: string) {
                 }
             });
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to give like. Try again later');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`likes-${id}`] });
             queryClient.invalidateQueries({ queryKey: [`has-liked-${id}-${currentUserId}`] });
@@ -72,7 +74,9 @@ export default function LikeServices(id: string) {
         mutationFn: async () => {
             await deleteData(`${import.meta.env.VITE_API_BASE_URL}/likes/erase/${currentUserId}`);
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to remove like. Try again later');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`likes-${id}`] });
             queryClient.invalidateQueries({ queryKey: [`has-liked-${id}-${currentUserId}`] });

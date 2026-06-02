@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function FollowerServices(user_id: string) {
     const queryClient = useQueryClient();
     const { currentUserId, currentUsername } = AuthServices();
-    const { deleteData, getData, insertData, infiniteScroll } = DataModifier();
+    const { deleteData, getData, insertData, infiniteScroll, setError } = DataModifier();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const { data: userConnectionStats } = getData<UserConnectionStatsProps>({
@@ -84,7 +84,9 @@ export default function FollowerServices(user_id: string) {
                 }
             });
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to follow user. Try again later');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryClient.invalidateQueries({ queryKey: [`followers-${user_id}`] });
@@ -99,7 +101,9 @@ export default function FollowerServices(user_id: string) {
         mutationFn: async () => {
             await deleteData(`${import.meta.env.VITE_API_BASE_URL}/followers/erase/${currentUserId}`);
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to unfollow user. Try again later');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-connection-stats-${user_id}`] });
             queryClient.invalidateQueries({ queryKey: [`followers-${user_id}`] });

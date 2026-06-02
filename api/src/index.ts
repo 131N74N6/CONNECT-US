@@ -46,8 +46,8 @@ app.use(cors({
     origin: [
         "http://localhost:5173", 
         "http://localhost:1234", 
-        "https://connect-us-ten-xi.vercel.app/", 
-        "https://connect-us-be-five.vercel.app/"
+        "https://connect-us-ten-xi.vercel.app", 
+        "https://connect-us-be-five.vercel.app"
     ]
 }));
 app.use('/api/comments', commentRoutes);

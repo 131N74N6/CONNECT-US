@@ -12,16 +12,16 @@ export default function AuthServices() {
         queryKey: ['current-user'],
         queryFn: async () => {
             try {
-                const request = await fetch('${import.meta.env.VITE_API_BASE_URL}/users/profile', {
+                const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/profile`, {
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     method: 'GET'
                 });
                 const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return await request.json();
+                if (!request.ok) return null;
+                return await response;
             } catch (error) {
-                throw error;
+                return null;
             }
         },
         retry: false,
@@ -35,6 +35,7 @@ export default function AuthServices() {
         mutationFn: async (props: SignInProps) => {
             try {
                 const request = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-in`, {
+                    credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: props.email.trim(), password: props.password.trim() }),
                     method: 'POST'
@@ -71,6 +72,7 @@ export default function AuthServices() {
                     username: props.username.trim() 
                 }),
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 method: 'POST'
             });
 

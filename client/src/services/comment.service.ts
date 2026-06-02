@@ -54,7 +54,9 @@ export default function CommentServices(id: string) {
                 }
             });
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to add comment. Try again later');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`comments-${id}`] });
             queryClient.invalidateQueries({ queryKey: [`comments-total-${id}`] });

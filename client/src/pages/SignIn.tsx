@@ -4,7 +4,7 @@ import AuthServices from "../services/auth.service";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
-    const { authError, isSigningIn, setAuthError, currentUserId, signIn } = AuthServices();
+    const { authError, isUserDataLoading, isSigningIn, setAuthError, currentUserId, signIn } = AuthServices();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
@@ -12,8 +12,8 @@ export default function SignIn() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     useEffect(() => {
-        if (currentUserId) navigate('/home', { replace: true });
-    }, [currentUserId, isSigningIn, navigate]);
+        if (currentUserId && !isUserDataLoading) navigate('/home', { replace: true });
+    }, [currentUserId, isUserDataLoading, navigate]);
 
     useEffect(() => {
         if (authError) {

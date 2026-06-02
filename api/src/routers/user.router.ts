@@ -4,7 +4,7 @@ import { checkOwnership, verifyToken } from "../middleware/auth.middleware";
 
 const userRoutes = Router();
 
-userRoutes.delete('/delete_user/:user_id', verifyToken, checkOwnership, deleteCurrentUser)
+userRoutes.delete('/delete_user/:user_id', verifyToken, checkOwnership, deleteCurrentUser);
 userRoutes.get('/profile', verifyToken, getCurrentUserData);
 userRoutes.put('/change/:user_id', verifyToken, checkOwnership, updateSelectedUser);
 

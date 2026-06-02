@@ -75,13 +75,16 @@ export default function PostServices(props?: PostServiceIntrf) {
                 }
             });
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to create post. Try again later');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-posts'] });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
             queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
             setDescription('');
             setMediaFiles([]);
-            navigate('/home');
+            navigate(`/about/${currentUserId}`);
         },
         onSettled: () => setIsProcessing(false),
     });
@@ -109,7 +112,9 @@ export default function PostServices(props?: PostServiceIntrf) {
             if (!props || !props.id) return;
             await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase/${props.id}`);
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to delete post. Try again later');
+        },
         onSuccess: () => {
             queryClient.removeQueries({
                 predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
@@ -177,7 +182,9 @@ export default function PostServices(props?: PostServiceIntrf) {
                 }
             });
         },
-        onError: () => {},
+        onError: (error) => {
+            setError(error.message || 'Failed to update post. Try again later');
+        },
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = '';
             queryClient.removeQueries({
