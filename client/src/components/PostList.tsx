@@ -16,14 +16,7 @@ export default function PostList(props: PostListProps) {
             {!props.data ? <Loading/> : null}
             <div className="gap-[0.5rem] grid md:grid-cols-3 grid-cols-2">
                 {props.data.map((post) => (
-                    <PostItem 
-                        key={`posts_${post._id}`}
-                        _id={post._id} 
-                        description={post.description}
-                        posts_file={post.posts_file}
-                        uploader_name={post.uploader_name}
-                        user_id={post.user_id}
-                    />
+                    <PostItem {...post} key={`posts_${post._id}`}/>
                 ))}
             </div>
             <div className="flex justify-center">

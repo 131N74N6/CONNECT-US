@@ -15,12 +15,7 @@ export default function LikeList(props: LikeListProps) {
         <div className="bg-[#1a1a1a] gap-[1rem] flex flex-col overflow-y-auto">
             <div className="gap-[0.5rem] flex flex-col">
                 {props.likes.map((like) => (
-                    <LikeItem 
-                        key={`like-data-${like.user_id}`} 
-                        created_at={like.created_at}
-                        user_id={like.user_id}
-                        username={like.username}
-                    />
+                    <LikeItem {...like} key={`like-data-${like.user_id}`}/>
                 ))}
             </div>
             <div className="flex justify-center">
