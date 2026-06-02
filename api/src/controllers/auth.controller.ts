@@ -63,7 +63,7 @@ export async function signUp(req: Request, res: Response) {
     }
 }
 
-export async function signOut(req: Request, res: Response) {
+export async function signOut(_: Request, res: Response) {
     try {
         res.clearCookie('token', {
             httpOnly: true,
