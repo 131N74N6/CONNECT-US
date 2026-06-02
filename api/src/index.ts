@@ -23,14 +23,11 @@ import cookieParser from 'cookie-parser';
 
 const app = express();
 
-app.use(async (_: Request, __: Response, next: NextFunction) => {
-    mongoose.connect((`${process.env.MONGODB_URL}`))
-    .then(res => {
-        if (res) console.log('Database connection succeffully');
-    }).catch(err => {
-        console.log("Database connection check failed:", err);
-    });
-    next();
+mongoose.connect((`${process.env.MONGODB_URL}`))
+.then(res => {
+    if (res) console.log('Database connection succeffully');
+}).catch(err => {
+    console.log("Database connection check failed:", err);
 });
 
 v2.config({

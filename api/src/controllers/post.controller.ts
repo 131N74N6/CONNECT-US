@@ -29,7 +29,7 @@ export async function deleteAllPosts(req: Request, res: Response) {
             Comment.deleteMany({ post_owner_id: signedUserId })
         ]);
         
-        res.status(201).json({ message: 'all post deleted' });
+        res.status(200).json({ message: 'all post deleted' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -86,7 +86,7 @@ export async function getAllPosts(req: Request, res: Response) {
             { _id: 1, description: 1, posts_file: 1, user_id: 1 }
         ).limit(limit).skip(skip);
         
-        res.json(allPost);
+        res.status(200).json(allPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -110,7 +110,7 @@ export async function getSearchedPost(req: Request, res: Response) {
             { _id: 1, description: 1, posts_file: 1, user_id: 1 }
         ).limit(limit).skip(skip);
         
-        res.json(searchedPost);
+        res.status(200).json(searchedPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -128,7 +128,7 @@ export async function getSignedUserPosts(req: Request, res: Response) {
             { _id: 1, description: 1, posts_file: 1, user_id: 1, uploader_name: 1 }
         ).limit(limit).skip(skip);
 
-        res.json(signedInUserPosts);
+        res.status(200).json(signedInUserPosts);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -141,7 +141,7 @@ export async function getSelectedPost(req: Request, res: Response) {
 
         if (!getSelectedPost) return res.status(404).json({ message: 'Post not found.' });
 
-        res.json(getSelectedPost)
+        res.status(200).json(getSelectedPost)
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -151,7 +151,7 @@ export async function getUserTotalPost(req: Request, res: Response) {
     try {
         const getUserId = req.params.user_id;
         const totalPost = await Post.find({ user_id: getUserId }).countDocuments();
-        res.json(totalPost);
+        res.status(200).json(totalPost);
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }
@@ -165,7 +165,7 @@ export async function insertNewPost(req: Request, res: Response) {
 
         const newPost = new Post(req.body);
         await newPost.save();
-        res.status(201).json({ message: 'new post added' });
+        res.status(200).json({ message: 'new post added' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

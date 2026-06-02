@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { PostItemProps } from "../models/post_model";
+import AuthServices from "./auth.service";
 
 type SearchedPost = {
     api_url: string;
@@ -10,6 +11,8 @@ type SearchedPost = {
 }
 
 export default function FilterHandler() {
+    const { currentUserId, isSigningIn } = AuthServices();
+    
     function searchedPost(props: SearchedPost) {
         const fecthers = async ({ pageParam = 1 }: { pageParam?: number }) => {
             const request = await fetch(`${props.api_url}?searched=${props.searched}&page=${pageParam}&limit=${props.limit}`, {
@@ -33,7 +36,7 @@ export default function FilterHandler() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
-            enabled: !!props.searched,
+            enabled: !!props.searched.trim() && !!currentUserId && !isSigningIn,
             queryKey: props.query_key,
             queryFn: fecthers,
             getNextPageParam: (lastPage, allPages) => {
