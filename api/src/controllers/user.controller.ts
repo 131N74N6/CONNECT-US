@@ -24,7 +24,7 @@ export async function deleteCurrentUser(req: Request, res: Response) {
         })
 
         await Promise.all([
-            deleteFromCloudinary,
+            ...deleteFromCloudinary,
             Post.deleteMany({ user_id: req.params.user_id }),
             Like.deleteMany({ post_owner_id: req.params.user_id }),
             Follower.deleteMany({ user_id: req.params.user_id }),

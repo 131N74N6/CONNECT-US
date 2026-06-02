@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import AuthServices from "./auth-service";
+import AuthServices from "./auth.service";
 import { useState } from "react";
 
 type IPostData<T> = {
@@ -28,14 +28,14 @@ type IPutData<T> = {
 }
 
 export default function DataModifier() {
-    const { userLoading, token } = AuthServices();
+    const { isUserDataLoading, currentUserId } = AuthServices();
     const [error, setError] = useState<string | null>(null);
 
     async function deleteData(api_url: string) {
         try {
             const request = await fetch(api_url, {
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 method: 'DELETE'
@@ -44,14 +44,11 @@ export default function DataModifier() {
             const response = await request.json();
 
             if (!request.ok) {
-                setError(response.message);
                 throw new Error(response.message);
             } else {
-                setError(null);
                 return response;
             }
         } catch (error: any) {
-            setError(error.message || 'Network Error');
             throw error;
         }
     }
@@ -60,8 +57,8 @@ export default function DataModifier() {
         try {
             const request = await fetch(api_url, {
                 body: JSON.stringify({ publicIds: data }),
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 method: 'DELETE'
@@ -70,26 +67,23 @@ export default function DataModifier() {
             const response = await request.json();
 
             if (!request.ok) {
-                setError(response.message);
                 throw new Error(response.message);
             } else {
-                setError(null);
                 return response;
             }
         } catch (error: any) {
-            setError(error.message || 'Network Error');
             throw error;
         }
     }
 
     const getData = <TSX>(props: IGetData) => {
         const { data, error, isLoading } = useQuery<TSX, Error>({
-            enabled: !!token && !userLoading && (props.query_params ?? true),
+            enabled: !!currentUserId && !isUserDataLoading && (props.query_params ?? true),
             queryFn: async () => {
                 const request = await fetch(props.api_url, {
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
                     },
                     method: 'GET'
                 });
@@ -111,8 +105,8 @@ export default function DataModifier() {
         try {
             const request = await fetch(props.api_url, {
                 body: JSON.stringify(props.data),
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 method: 'POST',
@@ -121,14 +115,12 @@ export default function DataModifier() {
             const response = await request.json();
             
             if (!request.ok) {
-                setError(response.message);
                 throw new Error(response.message);
             } else {
                 setError(null);
                 return response;
             }
         } catch (error: any) {
-            setError(error.message || 'Check Your Network');
             throw error;
         }
     }
@@ -137,8 +129,8 @@ export default function DataModifier() {
         try {
             const request = await fetch(props.api_url, {
                 body: JSON.stringify(props.data),
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 method: 'PUT',
@@ -147,14 +139,12 @@ export default function DataModifier() {
             const response = await request.json();
 
             if (!request.ok) {
-                setError(response.message);
                 throw new Error(response.message);
             } else {
                 setError(null);
                 return response;
             }
         } catch (error: any) {
-            setError(error.message || 'Network Error');
             throw error;
         }
     }
@@ -162,9 +152,9 @@ export default function DataModifier() {
     const infiniteScroll = <T>(props: InfiniteScrollProps) => {
         const fetchData = async ({ pageParam = 1 }: { pageParam?: number }) => {
             const request = await fetch(`${props.api_url}?page=${pageParam}&limit=${props.limit}`, {
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
                 },
                 method: 'GET'
             });
@@ -182,7 +172,7 @@ export default function DataModifier() {
             isLoading,
             refetch,
         } = useInfiniteQuery({
-            enabled: !!token && !userLoading && (props.query_params ?? true),
+            enabled: !!currentUserId && !isUserDataLoading && (props.query_params ?? true),
             initialPageParam: 1,
             queryKey: props.query_key,
             queryFn: fetchData,

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth-service";
+import AuthServices from "../services/auth.service";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
-    const { userError, userLoading, setUserError, currentUserId, signIn } = useAuth();
+    const { authError, isSigningIn, setAuthError, currentUserId, signIn } = AuthServices();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
@@ -13,18 +13,18 @@ export default function SignIn() {
 
     useEffect(() => {
         if (currentUserId) navigate('/home', { replace: true });
-    }, [currentUserId, userLoading, navigate]);
+    }, [currentUserId, isSigningIn, navigate]);
 
     useEffect(() => {
-        if (userError) {
-            const timer = setTimeout(() => setUserError(null), 3000);
+        if (authError) {
+            const timer = setTimeout(() => setAuthError(null), 3000);
             return () => clearTimeout(timer);
         }
-    }, [userError]);
+    }, [authError]);
 
     async function handleSignIn(event: React.FormEvent): Promise<void> {
         event.preventDefault();
-        await signIn({ email, password });
+        await signIn.mutateAsync({ email, password });
     }
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -70,14 +70,14 @@ export default function SignIn() {
                     <span className="text-white">Don't have an account?</span> <Link className="text-blue-400 hover:underline" to={'/signup'}>Sign Up</Link>
                 </div>
                 
-                {userError ? <div className="text-blue-300 font-medium text-center text-base md:text-md">{userError}</div> : null}
+                {authError ? <div className="text-blue-300 font-medium text-center text-base md:text-md">{authError}</div> : null}
                 
                 <button 
                     type="submit" 
-                    disabled={userLoading}
+                    disabled={isSigningIn}
                     className="p-[0.45rem] text-base md:text-md outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed rounded hover:bg-purple-800 transition-colors"
                 >
-                    {userLoading ? 'Signing In...' : 'Sign In'}
+                    {isSigningIn ? 'Signing In...' : 'Sign In'}
                 </button>
             </form>
         </div>

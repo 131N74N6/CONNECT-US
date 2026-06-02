@@ -23,7 +23,7 @@ export async function deleteAllPosts(req: Request, res: Response) {
         });;
 
         await Promise.all([
-            deletePromises,
+            ...deletePromises,
             Post.deleteMany({ user_id: signedUserId }),
             Like.deleteMany({ post_owner_id: signedUserId }),
             Comment.deleteMany({ post_owner_id: signedUserId })

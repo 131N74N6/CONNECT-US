@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import DataModifier from "./data.service";
-import type { UserConnectionStatsProps } from "../models/user-model";
-import type { AddFollowerProps } from "../models/follower-model";
-import AuthServices from "./auth-service";
+import type { UserConnectionStatsProps } from "../models/user_model";
+import type { AddFollowerProps } from "../models/follower_model";
+import AuthServices from "./auth.service";
 import { useState } from "react";
 
 export default function FollowerServices(user_id: string) {

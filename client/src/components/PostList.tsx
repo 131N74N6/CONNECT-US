@@ -1,4 +1,4 @@
-import type { PostListProps } from "../models/post-model";
+import type { PostListProps } from "../models/post_model";
 import Loading from "./Loading";
 import PostItem from "./PostItem";
 

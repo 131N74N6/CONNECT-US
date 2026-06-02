@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useAuth from "./auth-service";
-import type { LikeDataProps } from "../models/like-model";
+import useAuth from "./auth.service";
+import type { LikeDataProps } from "../models/like_model";
 import DataModifier from "./data.service";
 import { useState } from "react";
-import type { PostDetail } from "../models/post-model";
+import type { PostDetail } from "../models/post_model";
 
 export default function LikeServices(id: string) {
     const queryClient = useQueryClient();

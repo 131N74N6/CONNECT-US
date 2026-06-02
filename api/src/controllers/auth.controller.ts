@@ -18,13 +18,19 @@ export async function signIn(req: Request, res: Response) {
         if (!isPasswordMatch) return res.status(400).json({ message: 'incorrect password' });
 
         const generatedToken = jwt.sign(
-            { user_id: findEmail._id.toString() },
+            { user_id: findEmail._id.toString(), username: findEmail.username },
             process.env.JWT_TOKEN || 'your_secret_key',
+            { expiresIn: '1d' }
         );
 
+        res.cookie('token', generatedToken, {
+            httpOnly: true,
+            maxAge: 86400000,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: process.env.NODE_ENV === 'production'
+        });
+
         res.status(200).json({
-            status: 'ok',
-            token: generatedToken,
             user_id: findEmail._id.toString(),
             username: findEmail.username
         });
@@ -52,6 +58,19 @@ export async function signUp(req: Request, res: Response) {
         const newUser = new User({ created_at, email, password: hashedPassword, username });
         await newUser.save();
         res.status(200).json({ message: 'user added' });
+    } catch (error) {
+        res.status(500).json({ message: 'internal server error' });
+    }
+}
+
+export async function signOut(req: Request, res: Response) {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: process.env.NODE_ENV === 'production'
+        });
+        res.status(200).json({ message: 'signed out successfully' });
     } catch (error) {
         res.status(500).json({ message: 'internal server error' });
     }

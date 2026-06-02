@@ -9,7 +9,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 import express from 'express';
-import { db } from './database/mongodb';
+import mongoose from 'mongoose';
+import { NextFunction, Request, Response } from 'express';
 import { v2 } from "cloudinary";
 import cors from 'cors';
 import postRoutes from './routers/post.router';
@@ -18,8 +19,19 @@ import commentRoutes from './routers/comment.router';
 import userRoutes from './routers/user.router';
 import followerRoutes from './routers/follower.router';
 import authRoutes from './routers/auth.router';
+import cookieParser from 'cookie-parser';
 
 const app = express();
+
+app.use(async (_: Request, __: Response, next: NextFunction) => {
+    mongoose.connect((`${process.env.MONGODB_URL}`))
+    .then(res => {
+        if (res) console.log('Database connection succeffully');
+    }).catch(err => {
+        console.log("Database connection check failed:", err);
+    });
+    next();
+});
 
 v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -28,6 +40,7 @@ v2.config({
 });
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
     credentials: true,
     origin: [
@@ -45,9 +58,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
-    db.then(() => {
-        app.listen(1234, () => console.log(`server running at http://localhost:1234`));
-    });
+    app.listen(1234, () => console.log(`server running at http://localhost:1234`));
 }
 
 export default app;

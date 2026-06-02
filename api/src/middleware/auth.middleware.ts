@@ -4,24 +4,21 @@ import jwt, { JwtPayload as JwtPayloadType } from "jsonwebtoken";
 export interface AuthRequest extends Request {
     user?: {
         user_id: string;
-        token: string;
+        username: string;
     };
 }
 
 export interface JwtPayload {
     user_id: string;
-    token: string;
+    username: string;
 }
 
 export async function verifyToken(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ message: 'Access token required' });
-
-        const token = authHeader.split(' ')[1];
+        const token = req.cookies?.token;
         const decoded = jwt.verify(token, process.env.JWT_TOKEN || 'your_secret_key') as JwtPayload;
 
-        req.user = { user_id: decoded.user_id, token: token }
+        req.user = { user_id: decoded.user_id, username: decoded.username };
         next();
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) res.status(401).json({ message: 'Invalid or expired token' });

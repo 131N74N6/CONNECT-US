@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import DataModifier from "./data.service";
-import AuthServices from "./auth-service";
-import type { PostDetail } from "../models/post-model";
-import type { CommentIntrf } from "../models/comment-model";
+import AuthServices from "./auth.service";
+import type { PostDetail } from "../models/post_model";
+import type { CommentIntrf } from "../models/comment_model";
 
 export default function CommentServices(id: string) {
     const queryClient = useQueryClient();

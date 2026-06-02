@@ -1,7 +1,7 @@
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { MediaFile, PostDetail, PostItemProps, PostServiceIntrf } from "../models/post-model";
+import type { MediaFile, PostDetail, PostItemProps, PostServiceIntrf } from "../models/post_model";
 import { uploadToCloudinary } from "./cloudiary.service";
-import AuthServices from "./auth-service";
+import AuthServices from "./auth.service";
 import { useNavigate } from "react-router-dom";
 import DataModifier from "./data.service";
 import { useRef, useState } from "react";

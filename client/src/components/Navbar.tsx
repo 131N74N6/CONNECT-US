@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth-service";
+import useAuth from "../services/auth.service";
 import { DoorOpen, House, Info, Search, SquarePlus } from "lucide-react";
 
 export function Navbar1() {

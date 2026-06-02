@@ -1,26 +1,18 @@
 import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
-import AuthServices from "./auth-service";
+import AuthServices from "./auth.service";
 import DataModifier from "./data.service";
 import { useNavigate } from "react-router-dom";
-import type { CurrentUserIntrf } from "../models/user-model";
 import { useEffect, useState } from "react";
 
 export default function UserServices() {
-    const { currentUserId, signOut, updateStoredUser } = AuthServices();
-    const { deleteData, getData, updateData } = DataModifier();
+    const { currentUserId, signOut, userData, userDataError, isUserDataLoading } = AuthServices();
+    const { deleteData, updateData } = DataModifier();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [username, setUsername] = useState<string>('');
-
-    const { data: userData, isLoading: isUserDataLoading, error: userDataError } =  getData<CurrentUserIntrf>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/users/profile/${currentUserId}`, 
-        query_key: [`signed-in-user-${currentUserId}`], 
-        query_params: !!currentUserId,
-        stale_time: 1800000
-    });
 
     useEffect(() => {
         if (userData && !isEditing) setUsername(userData.username);
@@ -39,7 +31,6 @@ export default function UserServices() {
         onError: () => {},
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`signed-in-user-${currentUserId}`] });
-            updateStoredUser({ username: username.trim() });
             setIsEditing(false);
         },
         onSettled: () => setIsProcessing(false),
@@ -82,7 +73,7 @@ export default function UserServices() {
             await deleteData(`${import.meta.env.VITE_API_BASE_URL}/users/delete_user/${currentUserId}`);
         },
         onError: () => {},
-        onSuccess: () => {
+        onSuccess: async () => {
             queryClient.removeQueries({
                 predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
                     const queryKey = query.queryKey;
@@ -105,7 +96,7 @@ export default function UserServices() {
             queryClient.invalidateQueries({ queryKey: [`user-post-total-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`user-connection-stats-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`signed-user-posts-${currentUserId}`] });
-            signOut(navigate);
+            await signOut();
         },
         onSettled: () => setIsProcessing(false),
     });

@@ -1,4 +1,4 @@
-import type { LikeListProps } from "../models/like-model";
+import type { LikeListProps } from "../models/like_model";
 import LikeItem from "./LikeItem";
 import Loading from "./Loading";
 

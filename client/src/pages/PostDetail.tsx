@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
-import type { PostDetail } from "../models/post-model"
+import type { PostDetail } from "../models/post_model"
 import Loading from "../components/Loading";
 import { useEffect } from "react";
 import Notification from "../components/Notification";

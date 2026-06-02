@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../services/auth-service";
+import AuthServices from "../services/auth.service";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function SignUp() {
-    const { userError, userLoading, setUserError, signUp, currentUserId } = useAuth();
+    const { authError, isSigningIn, setAuthError, signUp, currentUserId } = AuthServices();
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
@@ -14,19 +14,18 @@ export default function SignUp() {
 
     useEffect(() => {
         if (currentUserId) navigate('/home', { replace: true });
-    }, [currentUserId, userLoading, navigate]);
+    }, [currentUserId, isSigningIn, navigate]);
 
     useEffect(() => {
-        if (userError) {
-            const timer = setTimeout(() => setUserError(null), 3000);
+        if (authError) {
+            const timer = setTimeout(() => setAuthError(null), 3000);
             return () => clearTimeout(timer);
         }
-    }, [userError]);
+    }, [authError]);
 
     async function handleSignUp(event: React.FormEvent): Promise<void> {
         event.preventDefault();
         await signUp({ created_at: new Date().toISOString(), email, password, username });
-        navigate('/signin');
     }
     
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -76,10 +75,10 @@ export default function SignUp() {
                     </button>
                 </div>
                 <div className="text-center text-white">Already have account? <Link className="text-blue-400" to={'/signin'}>SignIn</Link></div>                    
-                {userError ? <div className="text-blue-300 font-medium text-base md:text-md text-center">{userError}</div> : null}
+                {authError ? <div className="text-blue-300 font-medium text-base md:text-md text-center">{authError}</div> : null}
                 <button 
                     type="submit" 
-                    disabled={userLoading}
+                    disabled={isSigningIn}
                     className="p-[0.45rem] text-base md:text-md outline-0 border-0 bg-purple-700 text-white font-[550] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Sign Up
