@@ -10,7 +10,6 @@ if (process.env.NODE_ENV !== 'production') {
 
 import express from 'express';
 import mongoose from 'mongoose';
-import { NextFunction, Request, Response } from 'express';
 import { v2 } from "cloudinary";
 import cors from 'cors';
 import postRoutes from './routers/post.router';
