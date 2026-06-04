@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 import express from 'express';
-import mongoose from 'mongoose';
+import { connection } from './mongodb/connection';
 import { v2 } from "cloudinary";
 import cors from 'cors';
 import postRoutes from './routers/post.router';
@@ -21,13 +21,6 @@ import authRoutes from './routers/auth.router';
 import cookieParser from 'cookie-parser';
 
 const app = express();
-
-mongoose.connect((`${process.env.MONGODB_URL}`))
-.then(res => {
-    if (res) console.log('Database connection succeffully');
-}).catch(err => {
-    console.log("Database connection check failed:", err);
-});
 
 v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -54,7 +47,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(1234, () => console.log(`server running at http://localhost:1234`));
+    connection.then(() => {
+        app.listen(1234, () => console.log(`server running at http://localhost:1234`));
+    });
 }
 
 export default app;
