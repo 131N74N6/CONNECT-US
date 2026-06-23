@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import PostServices from "../services/post.service";
 import Loading from "../components/Loading";
@@ -7,26 +7,36 @@ import Loading from "../components/Loading";
 export default function EditPost() {
     const { _id } = useParams();
     const navigate = useNavigate();
+    const [error, setError] = useState<string | null>(null);
+    
+    useEffect(() => {
+        if (error) {
+            const timeout = setTimeout(() => setError(null), 3000);
+            return () => clearTimeout(timeout);
+        }
+    }, [error, setError]);
     
     useEffect(() => {
         if (!_id) navigate('/home');
     }, [_id, navigate]);
 
     const { 
-        currentUserId, description, error, existingFiles, handleFileSelect, isProcessing, fileInputRef, mediaFiles, 
-        removeMediaFile, removeExistingFile, selectedPostData, setDescription, setError, setExistingFiles, 
+        currentUserId, 
+        description, 
+        existingFiles, 
+        handleFileSelect, 
+        isProcessing, 
+        fileInputRef, 
+        mediaFiles, 
+        removeMediaFile, 
+        removeExistingFile, 
+        selectedPostData, 
+        setDescription, 
+        setExistingFiles, 
         updatePostMutation 
-    } = PostServices({ id: _id });
+    } = PostServices({ id: _id, set_message: setError });
 
     const { selectedPost, errorPost, postLoading } = selectedPostData;
-
-    useEffect(() => {
-        if (error) {
-            const timeout = setTimeout(() => setError(null), 3000);
-            return () => clearTimeout(timeout);
-        }
-    }, [error]);
-
 
     useEffect(() => {
         if (selectedPost && selectedPost.length > 0) {

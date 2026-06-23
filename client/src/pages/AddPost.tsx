@@ -1,19 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import PostServices from "../services/post.service";
 
 export default function AddPost() {
-    const { 
-        currentUserId, description, error, fileInputRef, handleFileSelect, insertMutation, 
-        isProcessing, mediaFiles, navigate, removeMediaFile, setDescription, setError 
-    } = PostServices();
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (error) {
             const timeout = setTimeout(() => setError(null), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error]);
+    }, [error, setError]);
+
+    const { 
+        currentUserId, 
+        description, 
+        fileInputRef, 
+        handleFileSelect, 
+        insertMutation, 
+        isProcessing, 
+        mediaFiles, 
+        navigate, 
+        removeMediaFile, 
+        setDescription 
+    } = PostServices({ set_message: setError });
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();

@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Navbar1, Navbar2 } from "../components/Navbar";
 import type { PostDetail } from "../models/post_model"
 import Loading from "../components/Loading";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import PostSlider from "../components/PostSlider";
 import CommentServices from "../services/comment.service";
@@ -12,23 +12,36 @@ import PostServices from "../services/post.service";
 export default function PostDetail() {
     const { _id } = useParams();
     const navigate = useNavigate();
+    const [error, setError] = useState<string | null>(null);
     
     useEffect(() => {
         if (!_id) navigate('/home');
     }, [_id, navigate]);
-
-    const { currentUserId, deletePostMutation, isProcessing, selectedPostData } = PostServices({ id: _id });
-    const { commentsTotal, error, setError } = CommentServices(_id!);
-    const { giveLikeMutation, hasUserLiked, likesTotal, startDislikeMutation } = LikeServices(_id!);
-
-    const { selectedPost, errorPost, postLoading } = selectedPostData;
-
+    
     useEffect(() => {
         if (error) {
             const timeout = setTimeout(() => setError(null), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error]);
+    }, [error, setError]);
+
+    const { 
+        currentUserId, 
+        deletePostMutation, 
+        isProcessing, 
+        selectedPostData 
+    } = PostServices({ id: _id!, set_message: setError });
+
+    const { commentsTotal } = CommentServices({ _id: _id!, set_message: setError });
+
+    const { 
+        giveLikeMutation, 
+        hasUserLiked, 
+        likesTotal, 
+        startDislikeMutation 
+    } = LikeServices({ id:_id!, set_message: setError });
+
+    const { selectedPost, errorPost, postLoading } = selectedPostData;
     
     const isPostOwner = currentUserId ? currentUserId === selectedPost?.[0]?.user_id : false;
     const isLiked = hasUserLiked ? hasUserLiked : false;
@@ -41,7 +54,6 @@ export default function PostDetail() {
 
     function handleDeletePost(): void {
         if (!_id) return;
-        if (!selectedPost || !window.confirm('Are you sure you want to delete this post?')) return;
         deletePostMutation.mutate();
     }
 

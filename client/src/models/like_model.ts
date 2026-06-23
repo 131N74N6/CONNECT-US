@@ -1,5 +1,10 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult } from "@tanstack/react-query";
 
+export type ILikeService = {
+    id?: string
+    set_message?: (value: React.SetStateAction<string | null>) => void;
+}
+
 export type LikeDataProps = {
     _id: string;
     created_at: string;

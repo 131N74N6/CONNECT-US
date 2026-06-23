@@ -12,7 +12,7 @@ export default function Followed() {
         if (!user_id) navigate('/home');
     }, [user_id, navigate]);
     
-    const { followedData, isProcessing } = FollowerServices(user_id!);
+    const { followedData, isProcessing } = FollowerServices({ user_id: user_id! });
 
     return (
         <section className="flex md:flex-row flex-col h-screen gap-[1rem] p-[1rem] bg-black text-white relative z-10">

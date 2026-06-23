@@ -2,22 +2,36 @@ import { Navbar1, Navbar2 } from "../components/Navbar";
 import Loading from "../components/Loading";
 import PostList from "../components/PostList";
 import { Link, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Notification from "../components/Notification";
 import PostServices from "../services/post.service";
 import FollowerServices from "../services/follower.service";
 
 export default function About() {
     const { user_id } = useParams();
-    const { currentUserId, error, userPostTotal, setError, allCurrentUserPosts } = PostServices({ user_id: user_id });
-    const { isFollowed, isProcessing, notOwner, startFollowMutation, stopFollowMutation, userConnectionStats } = FollowerServices(user_id!);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (error) {
             const timeout = setTimeout(() => setError(null), 3000);
             return () => clearTimeout(timeout);
         }
-    }, [error]);
+    }, [error, setError]);
+
+    const { 
+        currentUserId, 
+        userPostTotal, 
+        allCurrentUserPosts 
+    } = PostServices({ set_message: setError, user_id: user_id! });
+
+    const { 
+        isFollowed, 
+        isProcessing, 
+        notOwner, 
+        startFollowMutation, 
+        stopFollowMutation, 
+        userConnectionStats 
+    } = FollowerServices({ set_message: setError, user_id: user_id! });
 
     function handleFollowBtn() {
         if (isProcessing) return;

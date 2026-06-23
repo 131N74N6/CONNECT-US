@@ -7,3 +7,9 @@ export type CommentIntrf = {
     user_id: string;
     username: string;
 }
+
+
+export type ICommentService = {
+    _id?: string;
+    set_message: (value: React.SetStateAction<string | null>) => void;
+}

@@ -2,18 +2,16 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Loading from "../components/Loading";
 import CommentServices from "../services/comment.service";
 import PostServices from "../services/post.service";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Comments() {
     const { _id } = useParams();
     const navigate = useNavigate();
+    const [error, setError] = useState<string | null>(null);
     
     useEffect(() => {
         if (!_id) navigate('/home');
     }, [_id, navigate]);
-
-    const { selectedPostData } = PostServices({ id: _id });
-    const { allCommentsData, comment, commentMutation, error, isProcessing, setComment, setError } = CommentServices(_id!);
 
     useEffect(() => {
         if (error) {
@@ -21,6 +19,15 @@ export default function Comments() {
             return () => clearTimeout(timer);
         }
     }, [error, setError]);
+
+    const { selectedPostData } = PostServices({ id: _id!, set_message: setError });
+    const { 
+        allCommentsData, 
+        comment, 
+        commentMutation, 
+        isProcessing, 
+        setComment 
+    } = CommentServices({ _id: _id!, set_message: setError });
 
     function sendComment(event: React.FormEvent): void {
         event.preventDefault();

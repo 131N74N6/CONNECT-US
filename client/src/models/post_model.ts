@@ -34,4 +34,5 @@ export type PostDetail = {
 export type PostServiceIntrf = {
     id?: string;
     user_id?: string;
+    set_message: (value: React.SetStateAction<string | null>) => void;
 }

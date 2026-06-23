@@ -13,7 +13,7 @@ export default function PostServices(props?: PostServiceIntrf) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { currentUserId, currentUsername } = AuthServices();
-    const { deleteData, deleteChosenData, error, getData, insertData, infiniteScroll, setError, updateData } = DataModifier();
+    const { deleteData, deleteChosenData, getData, insertData, infiniteScroll, updateData } = DataModifier();
 
     const [description, setDescription] = useState<string>('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -76,7 +76,7 @@ export default function PostServices(props?: PostServiceIntrf) {
             });
         },
         onError: (error) => {
-            setError(error.message || 'Failed to create post. Try again later');
+            props?.set_message(error.message || 'Failed to create post. Try again later');
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-posts'] });
@@ -101,7 +101,7 @@ export default function PostServices(props?: PostServiceIntrf) {
         limit: 12,
         query_key: ['all-posts'],
         query_params: !!currentUserId,
-        stale_time: 1800000
+        stale_time: Infinity
     });
 
     const allPosts = { allPostError, allPostsData, allPostsIsLoading, allPostsReachedEnd, allPostsLoadMore, allPostsNextPage }
@@ -113,7 +113,7 @@ export default function PostServices(props?: PostServiceIntrf) {
             await deleteData(`${import.meta.env.VITE_API_BASE_URL}/posts/erase/${props.id}`);
         },
         onError: (error) => {
-            setError(error.message || 'Failed to delete post. Try again later');
+            props?.set_message(error.message || 'Failed to delete post. Try again later');
         },
         onSuccess: () => {
             queryClient.removeQueries({
@@ -155,7 +155,7 @@ export default function PostServices(props?: PostServiceIntrf) {
         limit: 12,
         query_key: [`signed-user-posts-${props?.user_id}`],
         query_params: !!props?.user_id,
-        stale_time: 1800000
+        stale_time: Infinity
     });
 
     const allCurrentUserPosts = { currentUserPostsError, currentUserPosts, loadPosts, postReachEnd, loadPostOwner, setCurrentUserPosts }
@@ -183,7 +183,7 @@ export default function PostServices(props?: PostServiceIntrf) {
             });
         },
         onError: (error) => {
-            setError(error.message || 'Failed to update post. Try again later');
+            props?.set_message(error.message || 'Failed to update post. Try again later');
         },
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -215,7 +215,7 @@ export default function PostServices(props?: PostServiceIntrf) {
         api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/selected/${props.id}` : '',
         query_key: [`selected-post-${props?.id}`],
         query_params: !!props?.id,
-        stale_time: 1800000
+        stale_time: Infinity
     });
 
     const selectedPostData = { errorPost, postLoading, selectedPost }
@@ -224,13 +224,13 @@ export default function PostServices(props?: PostServiceIntrf) {
         api_url: props ? `${import.meta.env.VITE_API_BASE_URL}/posts/post-total/${props.user_id}` : '',
         query_key: [`user-post-total-${props?.user_id}`],
         query_params: !!props?.user_id,
-        stale_time: 1800000
+        stale_time: Infinity
     });
 
     return { 
-        allPosts, allCurrentUserPosts, currentUserId, currentUsername, description, deletePostMutation, 
-        error, existingFiles, fileInputRef, handleFileSelect, insertMutation, isProcessing, mediaFiles, navigate, 
-        selectedPostData, userPostTotal, removeExistingFile, removeMediaFile, selectedFiles, setDescription, setError, 
+        allPosts, allCurrentUserPosts, currentUserId, currentUsername, description, deletePostMutation, existingFiles, 
+        fileInputRef, handleFileSelect, insertMutation, isProcessing, mediaFiles, navigate, 
+        selectedPostData, userPostTotal, removeExistingFile, removeMediaFile, selectedFiles, setDescription, 
         setExistingFiles, setIsProcessing, updatePostMutation
     }
 }

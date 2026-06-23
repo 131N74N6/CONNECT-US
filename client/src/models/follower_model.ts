@@ -6,3 +6,8 @@ export type AddFollowerProps = {
     user_id: string;
     username: string;
 }
+
+export type IFollowerService = {
+    set_message?: (value: React.SetStateAction<string | null>) => void;
+    user_id: string;
+}

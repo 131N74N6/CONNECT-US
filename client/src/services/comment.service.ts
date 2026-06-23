@@ -3,13 +3,13 @@ import { useState } from "react";
 import DataModifier from "./data.service";
 import AuthServices from "./auth.service";
 import type { PostDetail } from "../models/post_model";
-import type { CommentIntrf } from "../models/comment_model";
+import type { CommentIntrf, ICommentService } from "../models/comment_model";
 
-export default function CommentServices(id: string) {
+export default function CommentServices(props?: ICommentService) {
     const queryClient = useQueryClient();
     const { currentUserId, currentUsername } = AuthServices();
 
-    const { error, getData, insertData, infiniteScroll, setError } = DataModifier();
+    const { getData, insertData, infiniteScroll } = DataModifier();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [comment, setComment] = useState<string>('');
 
@@ -21,33 +21,33 @@ export default function CommentServices(id: string) {
         isLoadingMore: loadMoreComments,
         fetchNextPage: fetchMoreComments,
     } =  infiniteScroll<Pick<CommentIntrf, 'created_at' | 'username' | 'opinions'>>({
-        api_url: id ? `${import.meta.env.VITE_API_BASE_URL}/comments/get-all/${id}` : ``, 
+        api_url: props?._id ? `${import.meta.env.VITE_API_BASE_URL}/comments/get-all/${props?._id}` : ``, 
         limit: 12,
         stale_time: 1800000,
-        query_params: !!id,
-        query_key: [`comments-${id}`]
+        query_params: !!props?._id,
+        query_key: [`comments-${props?._id}`]
     });
 
     const allCommentsData = { commentsData, commentsLoading, commentsError, commentsReachedEnd, loadMoreComments, fetchMoreComments }
 
     const { data: commentsTotal } = getData<number>({
-        api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/comment-total/${id}`, 
-        query_key: [`comments-total-${id}`],
-        query_params: !!id,
+        api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/comment-total/${props?._id}`, 
+        query_key: [`comments-total-${props?._id}`],
+        query_params: !!props?._id,
         stale_time: 1800000
     });
 
     const commentMutation = useMutation({
         onMutate: () => setIsProcessing(true),
         mutationFn: async (selectedPost: PostDetail[] | undefined) => {
-            if (!currentUserId || !comment.trim() || !id || !selectedPost) return;
+            if (!currentUserId || !comment.trim() || !props?._id || !selectedPost) return;
 
             await insertData<CommentIntrf>({
                 api_url: `${import.meta.env.VITE_API_BASE_URL}/comments/add`,
                 data: {
                     created_at: new Date().toISOString(),
                     opinions: comment.trim(),
-                    post_id: id,
+                    post_id: props?._id,
                     user_id: currentUserId,
                     username: currentUsername,
                     post_owner_id: selectedPost?.[0]?.user_id
@@ -55,11 +55,11 @@ export default function CommentServices(id: string) {
             });
         },
         onError: (error) => {
-            setError(error.message || 'Failed to add comment. Try again later');
+            props?.set_message(error.message || 'Failed to add comment. Try again later');
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`comments-${id}`] });
-            queryClient.invalidateQueries({ queryKey: [`comments-total-${id}`] });
+            queryClient.invalidateQueries({ queryKey: [`comments-${props?._id}`] });
+            queryClient.invalidateQueries({ queryKey: [`comments-total-${props?._id}`] });
         },
         onSettled: () => {
             setComment('');
@@ -67,5 +67,5 @@ export default function CommentServices(id: string) {
         },
     });
 
-    return { allCommentsData, comment, commentMutation, commentsTotal, currentUserId, currentUsername, error, isProcessing, queryClient, setComment, setError }
+    return { allCommentsData, comment, commentMutation, commentsTotal, currentUserId, currentUsername, isProcessing, queryClient, setComment }
 }
